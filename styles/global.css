@@ -4,7 +4,7 @@ body {
     padding: 0;
     margin: 0;
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif !important;
-    background-color: #FAFAFA;
+    background-color: #FFFFFF;
 }
 
 :root {
@@ -12,7 +12,7 @@ body {
     --primary-dark: #333333;
     --complementary: #F48221;
     --background-light: #FFFFFF;
-    --background: #F7FDF4;
+    --background-color: #F7FDF4;
 }
 
 a {
@@ -22,4 +22,115 @@ a {
 
 * {
     box-sizing: border-box;
+}
+
+.text-primary-dark {
+    color: var(--primary-dark);
+}
+
+.text-primary {
+    color: var(--primary)!important;
+}
+
+.cta-font-size{
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
+}
+
+.title-sm-font-size{
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.title-font-size{
+    font-size: clamp(2rem, 5vw, 3.3rem);
+}
+
+.btn-primary {
+    background-color: var(--primary)!important;
+    border-color: var(--primary)!important;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark)!important;
+    border-color:  var(--primary-dark)!important;
+}
+
+.btn-round{
+    border-radius: 30px;
+}
+
+.nav-link {
+    font-size: 1.2rem;
+    color: var(--primary-dark);
+}
+
+.nav-link:hover {
+    color: var(--primary);
+}
+
+.nav-link.active{
+    color: var(--primary);
+}
+
+
+.menu {
+    display: block;
+    width: 40px;
+    height: 36px;
+    position: relative;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    border-radius: unset !important;
+}
+
+.menu div {
+    position: absolute;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--primary-dark);
+    transition: transform 0.45s cubic-bezier(0.9, -0.6, 0.3, 1.6), width 0.2s ease 0.2s;
+}
+
+.menu input {
+    display: none;
+}
+
+.menu input+div {
+    top: 50%;
+    left: 0;
+    margin: -2px 0 0 0;
+    width: 40px;
+    transform-origin: 50% 50%;
+}
+
+.menu input+div+div {
+    top: 2px;
+    left: 0;
+    width: 20px;
+    transform-origin: 0 50%;
+}
+
+.menu input+div+div+div {
+    bottom: 2px;
+    right: 0;
+    width: 28px;
+    transform-origin: 100% 50%;
+    transform: translate(-12px, 0);
+}
+
+.menu:not(.collapsed) div {
+    transform: rotate(-45deg);
+    transition: transform 0.45s cubic-bezier(0.9, -0.6, 0.3, 1.6) 0.1s;
+}
+
+.menu:not(.collapsed) div+div {
+    width: 19px;
+    transform: translate(6px, 0) rotate(45deg);
+    transition: transform 0.45s cubic-bezier(0.9, -0.6, 0.3, 1.6) 0.1s, width 0.2s ease;
+}
+
+.menu:not(.collapsed) div+div+div {
+    width: 19px;
+    transform: translate(-6px, 0) rotate(45deg);
+    transition: transform 0.45s cubic-bezier(0.9, -0.6, 0.3, 1.6) 0.1s, width 0.2s ease;
 }

@@ -1,0 +1,10 @@
+.sectionInicio {
+    max-height: max(560px, 70vh);
+    padding:2rem;
+    background-color: var(--background-color);
+}
+
+.headerBackground {
+    background-color: var(--background-color);
+}
+
