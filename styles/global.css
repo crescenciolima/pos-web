@@ -141,5 +141,9 @@ a {
 
 .sidebar {
     background-color: white;
-    min-height: 568px;
+    min-height: 600px;
+}
+
+.text-right{
+    text-align: right;;
 }

@@ -6,7 +6,7 @@ import { faChartLine, faBookReader, faChalkboardTeacher, faFile, faFileAlt, faFi
 export default function AdminSidebar() {
 
     return (
-        <nav className="col-md-3 col-lg-2 d-md-block sidebar">
+        <nav className="col-md-3 col-lg-3 d-md-block sidebar">
             <div className="d-flex flex-column p-3 text-primary">
                 <a className="navbar-brand text-center" href="/">
                     <Image src="/images/ifbavca.png" className="d-inline-block align-text-top" alt="Logo" width={140} height={40} priority={true} />
