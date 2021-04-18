@@ -1,0 +1,27 @@
+.main {
+    background-color: #FCFCFC;
+    min-height: 568px;
+}
+
+.icon{
+    padding: 10px;
+}
+
+.sidebar {
+    min-height: 568px;
+    width: 260px;
+    background-color: white;
+}
+
+.sidebarLabel{
+    font-size: 14px;
+}
+
+.content {
+    position: relative;
+    height: 85%;
+    top: 100px;
+    background: #FFFFFF;
+    border-radius: 40px;
+}
+

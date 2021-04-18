@@ -8,7 +8,11 @@
     "start": "next start"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
     "bootstrap": "^5.0.0-beta3",
+    "bootstrap-icons": "^1.4.1",
     "date-fns": "^2.11.1",
     "firebase": "^8.4.1",
     "gray-matter": "^4.0.2",
