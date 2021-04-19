@@ -9,7 +9,6 @@ const firebaseConfig = {
   appId: process.env.FB_APP_ID
 };
 try {
-  console.log(firebaseConfig)
   firebase.initializeApp(firebaseConfig);
 } catch (err) {
   if (!/already exists/.test(err.message)) {
