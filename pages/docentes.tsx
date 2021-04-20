@@ -77,7 +77,8 @@ export default function Docentes({ docentes }) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
-
+  console.log(APIRoutes.API_URL)
+  console.log(APIRoutes.DOCENTES)
   const res = await fetch(APIRoutes.DOCENTES);
   const docentes = await res.json();
   return {
