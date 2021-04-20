@@ -1,13 +1,13 @@
 import Head from 'next/head'
 import { GetStaticProps } from 'next'
 import React from 'react'
-import AdminSidebar from '../components/admin-sidebar'
+import AdminSidebar from './admin-sidebar'
 import adminStyle from '../styles/admin.module.css'
 import AdminContent from '../components/admin-content'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 
-export default function Admin() {
+export default function AdminBase(props: any) {
   return (
     <>
       <Head>
@@ -32,20 +32,13 @@ export default function Admin() {
                         </i>                     
                         <label className={adminStyle.sidebarLabel}>Sair</label>
                     </div>
-                    <AdminContent />
+                    <AdminContent>
+                        {props.children}
+                    </AdminContent>
                 </div>
             </div>
         </div>
       </main>
     </>
   )
-}
-
-export const getStaticProps: GetStaticProps = async () => {
-  const allPostsData = []
-  return {
-    props: {
-      allPostsData
-    }
-  }
 }
