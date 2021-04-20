@@ -1,22 +1,28 @@
 import { GetStaticProps } from 'next'
 import React from 'react'
-import AdminBase from '../../../components/admin-base'
 import * as Yup from 'yup'
 import {ErrorMessage, Field, Formik} from 'formik'
 
+import AdminBase from '../../../components/admin-base'
+import CourseService from '../../../lib/course.service'
+import { Course } from "../../../models/course";
 
 export default function Admin() {
 
-  const saveCourse = async (values) => {
+  const courseService = CourseService();
+
+  const saveCourse = async (values: Course) => {
     try {
       console.log(values)
+      //await courseService.save(values);
+      const courseList = courseService.getAll();
+      console.log(courseList)
     } catch (error) {
       console.error(error);
     }
   };
   
   const onSubmit = async (values, actions) => {
-    console.log('teste')
     try {
       actions.setSubmitting(true);
       await saveCourse(values);
