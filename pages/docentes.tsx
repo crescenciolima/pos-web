@@ -8,6 +8,7 @@ import Image from 'next/image'
 import { Docente } from '../models/docente'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPhoneAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import DocenteService from '../lib/docente.service'
 
 export default function Docentes({ docentes }) {
 
@@ -78,11 +79,13 @@ export default function Docentes({ docentes }) {
 
 export const getStaticProps: GetStaticProps = async () => {
 
-  const res = await fetch(APIRoutes.DOCENTES);
-  const docentes = await res.json();
+  const docenteService = DocenteService();
+
+  const docenteList = await docenteService.getAll();
+
   return {
     props: {
-      docentes: docentes
+      docentes: docenteList
     },
     revalidate: 33200
   }
