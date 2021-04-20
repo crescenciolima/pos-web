@@ -1,0 +1,28 @@
+
+
+.main {
+    background-color: var(--background-color);
+    min-height: 80vh;
+}
+
+.card{
+    border-radius: 30px;
+    border:none;
+}
+
+.avatar{
+    border-radius: 100px;
+}
+
+.card a{
+    cursor: pointer;
+    color: var(--primary);
+}
+
+.card a:hover{
+    color: var(--complementary);
+}
+
+.card a svg{
+    margin-right: 0.5rem;
+}

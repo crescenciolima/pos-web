@@ -15,7 +15,7 @@ export default function DocenteService() {
                 snapshot.forEach(
                     (result) => {
                         const id = result.id;
-                        const doc = result.data;
+                        const doc = result.data();
                         const docente: Docente = {
                             id: id,
                             nome: doc['nome'],
