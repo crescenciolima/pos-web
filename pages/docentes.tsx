@@ -12,7 +12,7 @@ import DocenteService from '../lib/docente.service'
 
 export default function Docentes({ docentes }) {
 
-  const listaDocentes: Docente[] = docentes.list;
+  const listaDocentes: Docente[] = docentes;
 
   return (
     <>
