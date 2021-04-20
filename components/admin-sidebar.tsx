@@ -13,7 +13,7 @@ export default function AdminSidebar() {
                 </a>
                 <ul className="nav nav-pills flex-column mb-auto text-primary ">
                     <li>
-                        <a href="#" className="nav-link text-primary sidebar-item">
+                        <a href="/admin" className="nav-link text-primary sidebar-item">
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faChartLine} className="sm-icon"/>
                             </i>                     
@@ -21,11 +21,11 @@ export default function AdminSidebar() {
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="nav-link text-primary">
+                        <a href="/admin/course" className="nav-link text-primary">
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faBookReader} className="sm-icon"/>
                             </i>                     
-                            <label className={adminStyle.sidebarLabel}>Cursos</label>
+                            <label className={adminStyle.sidebarLabel}>Curso</label>
                         </a>
                     </li>
                     <li>
