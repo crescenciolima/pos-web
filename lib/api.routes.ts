@@ -4,4 +4,6 @@ export class APIRoutes {
 
     static DOCENTES:string = APIRoutes.API_URL + "/api/docente"
 
+    static COURSE:string = APIRoutes.API_URL + "/api/course"
+
 }

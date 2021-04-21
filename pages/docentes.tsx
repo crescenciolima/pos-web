@@ -3,7 +3,6 @@ import style from '../styles/docentes.module.css'
 import { GetStaticProps } from 'next'
 import React from 'react'
 import SiteHeader from '../components/site-header'
-import { APIRoutes } from '../lib/api.routes'
 import Image from 'next/image'
 import { Docente } from '../models/docente'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -23,13 +22,13 @@ export default function Docentes({ docentes }) {
       <main className={style.main}>
         <section>
           <div className="row h-100 justify-content-center">
-            <div className="col-md-5 col-xl-4 d-flex justify-content-center align-items-center">
+            <div className="col-md-5 col-xl-4 col-xxl-3 d-flex justify-content-center align-items-center">
               <div className="p-4">
                 <h1 className="text-primary-dark mt-4 title-sm-font-size">Nossa</h1>
                 <h1 className="text-primary-dark title-sm-font-size">Equipe</h1>
               </div>
             </div>
-            <div className="col-md-5  col-xl-4  d-flex justify-content-center align-items-center">
+            <div className="col-md-5 col-xl-4 col-xxl-3 d-flex justify-content-center align-items-center">
               <div className="p-4">
                 <h5 className="text-primary-dark mt-4">Conheça a equipe de docentes por trás da nossa pós graduação Lato Sensu em Desenvolvimento Web do IFBA - Vitória da Conquista.</h5>
               </div>
@@ -38,13 +37,13 @@ export default function Docentes({ docentes }) {
         </section>
 
         <section>
-          <div className="row h-100 justify-content-center mt-5">
-            <div className="col-md-10 col-xl-8">
+          <div className="row h-100 justify-content-center mt-5 pb-5">
+            <div className="col-11 col-md-10 col-xl-8 col-xxl-7">
               <div className="row justify-content-center">
                 {listaDocentes.map((docente, i) => {
                   return (
-                    <div className="col-sm-2 col-md-3 col-xl-4" key={i}>
-                      <div className={style.card + ' card'}>
+                    <div className="col-sm-6 col-md-4 col-xl-4" key={i}>
+                      <div className={style.card + ' card mt-3 mt-md-2'}>
                         <div className="card-body text-center mb-3">
                           <Image src={docente.fotoUrl} className={style.avatar + ''} alt="Foto do docente" width={150} height={150} />
 
@@ -87,6 +86,6 @@ export const getStaticProps: GetStaticProps = async () => {
     props: {
       docentes: docenteList
     },
-    revalidate: 33200
+    revalidate: 86400
   }
 }

@@ -6,6 +6,7 @@ import {ErrorMessage, Field, Formik} from 'formik'
 import AdminBase from '../../../components/admin-base'
 import CourseService from '../../../lib/course.service'
 import { Course } from "../../../models/course";
+import { APIRoutes } from '../../../lib/api.routes'
 
 export default function Admin() {
 
@@ -13,10 +14,23 @@ export default function Admin() {
 
   const saveCourse = async (values: Course) => {
     try {
-      console.log(values)
       //await courseService.save(values);
-      const courseList = courseService.getAll();
-      console.log(courseList)
+      // const courseList = courseService.getAll();
+
+      const res = await fetch(
+        APIRoutes.COURSE,
+        {
+          body: JSON.stringify(values),
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          method: 'POST'
+        }
+      )
+  
+      const result = await res.json();
+
+      console.log(result)
     } catch (error) {
       console.error(error);
     }
@@ -85,11 +99,3 @@ export default function Admin() {
   )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-  const allPostsData = []
-  return {
-    props: {
-      allPostsData
-    }
-  }
-}

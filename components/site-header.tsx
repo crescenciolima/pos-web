@@ -8,17 +8,19 @@ export default function SiteHeader() {
   const [navBarCollapsed, setNavBarCollapsed] = useState(false);
 
   function toogleNavBarMenu() {
-    console.log(navBarCollapsed)
     setNavBarCollapsed(!navBarCollapsed);
   }
 
   return (
     <header className={homeStyle.headerBackground}>
       <nav className="navbar  bg-transparent navbar-expand-md">
-        <div className="container-fluid">
-          <a className="navbar-brand" href="/">
-            <Image src="/images/ifbavca.png" className="d-inline-block align-text-top" alt="Logo do IFBA" width={209} height={60} priority={true} />
-          </a>
+        <div className="container-fluid mx-1 mx-md-2">
+          <Link href="/">
+            <a className="navbar-brand">
+              <Image src="/images/ifbavca.png" className="d-inline-block align-text-top" alt="Logo do IFBA" width={209} height={60} priority={true} />
+            </a>
+          </Link>
+
           <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
@@ -31,19 +33,19 @@ export default function SiteHeader() {
           <div className={"collapse navbar-collapse justify-content-end " + (navBarCollapsed ? 'show' : '')} id="navbarNav">
             <ul className="navbar-nav">
               <li className="nav-item">
-                <a className="nav-link" aria-current="page" href="#">Notícias</a>
+                <a className="nav-link text-bold" aria-current="page" href="#">Notícias</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">Sobre</a>
+                <a className="nav-link text-bold" href="#">Sobre</a>
               </li>
               <li className="nav-item">
                 <Link href="/docentes">
-                  <a className="nav-link">Docentes</a>
+                  <a className="nav-link text-bold">Docentes</a>
                 </Link>
               </li>
-
             </ul>
           </div>
+          
         </div>
       </nav>
     </header>
