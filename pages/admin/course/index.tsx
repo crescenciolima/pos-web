@@ -68,7 +68,7 @@ export default function Admin({course}: AdminProps) {
       )
       const result = await res.json();
       setCourseObject(result[0] ?? result[0]);
-      //setLoading(false);
+      setLoading(false);
       console.log(result)
     };
 
