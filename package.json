@@ -13,6 +13,7 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "bootstrap": "^5.0.0-beta3",
     "bootstrap-icons": "^1.4.1",
+    "cors": "^2.8.5",
     "date-fns": "^2.11.1",
     "firebase": "^8.4.1",
     "formik": "^2.2.6",
