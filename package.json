@@ -13,6 +13,7 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "bootstrap": "^5.0.0-beta3",
     "bootstrap-icons": "^1.4.1",
+    "cors": "^2.8.5",
     "date-fns": "^2.11.1",
     "firebase": "^8.4.1",
     "firebase-admin": "^9.6.0",
@@ -22,6 +23,7 @@
     "next": "^10.0.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
+    "react-spinners": "^0.10.6",
     "remark": "^12.0.0",
     "remark-html": "^12.0.0",
     "yup": "^0.32.9"
