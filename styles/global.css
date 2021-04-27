@@ -18,6 +18,7 @@ body {
 a {
     color: inherit;
     text-decoration: none;
+    cursor: pointer;
 }
 
 * {
@@ -56,6 +57,15 @@ a {
 
 .btn-round{
     border-radius: 30px;
+}
+
+.link-primary {
+    color: var(--primary);
+
+}
+
+.link-primary:hover {
+    color: var(--primary-dark);
 }
 
 .nav-link {
@@ -153,4 +163,12 @@ a {
     color: #d00e00;
     text-align: left;
     margin-top: 3px;
+}
+
+.nav-link:hover{
+    color: var(--primary-dark) !important;
+}
+
+tr{
+    cursor: pointer;
 }

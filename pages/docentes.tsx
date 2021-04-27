@@ -4,14 +4,14 @@ import { GetStaticProps } from 'next'
 import React from 'react'
 import SiteHeader from '../components/site-header'
 import Image from 'next/image'
-import { Docente } from '../models/docente'
+import { Teacher } from '../models/teacher'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPhoneAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons'
-import DocenteService from '../lib/docente.service'
+import TeacherService from '../lib/teacher.service'
 
 export default function Docentes({ docentes }) {
 
-  const listaDocentes: Docente[] = docentes;
+  const listaDocentes: Teacher[] = docentes;
 
   return (
     <>
@@ -45,14 +45,14 @@ export default function Docentes({ docentes }) {
                     <div className="col-sm-6 col-md-4 col-xl-4" key={i}>
                       <div className={style.card + ' card mt-3 mt-md-2'}>
                         <div className="card-body text-center mb-3">
-                          <Image src={docente.fotoUrl} className={style.avatar + ''} alt="Foto do docente" width={150} height={150} />
+                          <Image src={docente.photo} className={style.avatar + ''} alt="Foto do docente" width={150} height={150} />
 
-                          <h5 className="card-title mt-4 text-primary-dark ">{docente.nome}</h5>
-                          <p className="card-text mt-4 text-primary-dark ">{docente.sobre}</p>
+                          <h5 className="card-title mt-4 text-primary-dark ">{docente.name}</h5>
+                          <p className="card-text mt-4 text-primary-dark ">{docente.about}</p>
 
-                          <a target="_blank" rel="noopener noreferrer" href={'tel:'+docente.telefone} className=" mt-4 d-block">
+                          <a target="_blank" rel="noopener noreferrer" href={'tel:'+docente.phone} className=" mt-4 d-block">
                             <FontAwesomeIcon icon={faPhoneAlt} size="sm" className="sm-icon  mr-2"/>
-                            {docente.telefone}
+                            {docente.phone}
                           </a>
 
                           <a target="_blank" rel="noopener noreferrer" href={'mailto:'+docente.email} className=" mt-2 d-block">
@@ -78,9 +78,9 @@ export default function Docentes({ docentes }) {
 
 export const getStaticProps: GetStaticProps = async () => {
 
-  const docenteService = DocenteService();
+  const teacherService = TeacherService();
 
-  const docenteList = await docenteService.getAll();
+  const docenteList = await teacherService.getAll();
 
   return {
     props: {

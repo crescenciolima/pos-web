@@ -4,11 +4,12 @@
 }
 
 .icon{
-    padding: 10px;
+    padding: 1rem;
 }
 
 .sidebarLabel{
-    font-size: 14px;
+    font-size: 1rem;
+    cursor: pointer;
 }
 
 .content {

@@ -1,8 +1,8 @@
-import { Docente } from "../models/docente";
+import { Teacher } from "../models/teacher";
 import firestore from "../utils/firestore-util";
 
 
-export default function DocenteService() {
+export default function TeacherService() {
 
     const docenteRef = firestore.collection("docente");
 
@@ -16,12 +16,12 @@ export default function DocenteService() {
                     (result) => {
                         const id = result.id;
                         const doc = result.data();
-                        const docente: Docente = {
+                        const docente: Teacher = {
                             id: id,
-                            nome: doc['nome'],
-                            sobre: doc['sobre'],
-                            fotoUrl: doc['fotoUrl'],
-                            telefone: doc['telefone'],
+                            name: doc['nome'],
+                            about: doc['sobre'],
+                            photo: doc['fotoUrl'],
+                            phone: doc['telefone'],
                             email: doc['email'],
                         }
                         docentes.push(docente);
@@ -35,27 +35,27 @@ export default function DocenteService() {
 
     }
 
-    async function save(docente: Docente) {
+    async function save(docente: Teacher) {
         docenteRef.add(docente);
     }
 
-    async function update(docente: Docente) {
+    async function update(docente: Teacher) {
         docenteRef.doc(docente.id).set(docente);
     }
 
-    async function remove(docente: Docente) {
+    async function remove(docente: Teacher) {
         docenteRef.doc(docente.id).delete();
     }
 
     async function getById(id) {
         let snapshot = await docenteRef.doc(id).get();
         const doc = snapshot.data;
-        const docente: Docente = {
+        const docente: Teacher = {
             id: id,
-            nome: doc['nome'],
-            sobre: doc['sobre'],
-            fotoUrl: doc['fotoUrl'],
-            telefone: doc['telefone'],
+            name: doc['nome'],
+            about: doc['sobre'],
+            photo: doc['fotoUrl'],
+            phone: doc['telefone'],
             email: doc['email'],
         }
 
