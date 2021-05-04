@@ -1,52 +1,28 @@
 import storage from "../utils/storage-util";
 import { StoragePaths } from "./storage-path";
 import fire from "../utils/firebase-util";
+import { BlobCorrected } from "../utils/types-util";
 
 export default function FileUploadService() {
 
 
 
-    function upload(folder: StoragePaths, file:File) {
+    async function upload(folder: StoragePaths, blob: BlobCorrected, fileName: string): Promise<string> {
 
-        const fileName = file['name'];
-        console.log(file);
-        console.log(fileName);
-        console.log(folder);
-        // const arrayBuffer: ArrayBuffer = await 
-        // file.arrayBuffer().then(
-        //     array =>{
-        //         const uploadTask = storage.ref(`${folder}${fileName}`).put(array);
+        //Removing spaces from the file name
+        fileName= fileName.trim().replace(" ","");
+        while(fileName.includes(" ")){
+            fileName= fileName.replace(" ","");
+        }
 
-        //     }
-        // )
-        // .then(
-        //     async (snapshot) => {
-        //         return await storage
-        //                     .ref(`${folder}`)
-        //                     .child(fileName)
-        //                     .getDownloadURL();
-        //     }
-        // );
-
-    //    const url =  await storage
-    //         .ref(`${folder}`)
-    //         .child(fileName)
-    //         .getDownloadURL();
-
-    //         console.log(url);
-
-        // uploadTask.on(
-        //     fire.storage.TaskEvent.STATE_CHANGED,
-        //     console.log,
-        //     console.error,
-        //      () => {
-        //           storage
-        //             .ref(`${folder}`)
-        //             .child(fileName)
-        //             .getDownloadURL().then(
-        //                 url =>console.log(url)
-        //             );
-        //     });
+        try {
+            let uploadRef = await storage.ref().child(`${folder}${fileName}`).put(blob.buffer, {contentType: blob['mimetype']});
+            const downloadURL = await uploadRef.ref.getDownloadURL();
+            return downloadURL
+        } catch (err) {
+            console.log(err)
+            return "";
+        }
 
     }
 

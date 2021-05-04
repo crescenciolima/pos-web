@@ -1,11 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import TeacherService from '../../lib/teacher.service'
-import Formidable from 'formidable';
 import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../lib/storage-path';
 import storage from "../../utils/storage-util";
 import multer from 'multer';
 import initMiddleware from '../../lib/init-middleware'
+import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
+import { Teacher } from '../../models/teacher';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer();
@@ -13,19 +14,13 @@ const upload = multer();
 // for parsing multipart/form-data
 // note that Multer limits to 1MB file size by default
 const multerAny = initMiddleware(
-    upload.any()
+  upload.any()
 );
 
-type NextApiRequestWithFormData = NextApiRequest & {
-    files: any[],
-}
-
-type BlobCorrected = Blob & {
-    buffer: Buffer,
-}
 
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
+  const teacherService = TeacherService();
 
   switch (req.method) {
 
@@ -35,39 +30,39 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
       // This operation expects a single file upload. Edit as needed.
       if (!req.files?.length || req.files.length > 1) {
-          res.statusCode = 400;
-          res.end();
-          return;
+        res.statusCode = 400;
+        res.end();
+        return;
       }
-  
+
       const blob: BlobCorrected = req.files[0];
+      const {name, about, email, phone}: Teacher = req.body;
 
-      try {
-        //listar: let list = await storage.ref().listAll().then(function(snapshot) {
-
-        let list = await storage.ref().child('teste2.png').put(blob.buffer).then(function(snapshot) {
-          console.log('Uploaded a blob or file!');
-          console.log(snapshot);
-
-          /*listar: snapshot.items.forEach(function(itemRef) {
-            console.log(itemRef);
-            // All the items under listRef.
-          });*/
-
-        }).catch((err) => {
-          console.log(err);
-        });
-      } catch (err) {
-        console.log(err)
+      const teacher:Teacher = {
+        name:name,
+        about:about,
+        email:email,
+        phone:phone,
+        photo: ""
       }
-      res.status(200).json({oi: "oi"});
+
+      const uploadService = FileUploadService();
+      let url = await uploadService.upload(StoragePaths.TEACHERS, blob, teacher.name);
+
+      teacher.photo = url;
+
+     await teacherService.save(teacher)
+
+      res.status(200).json({ teacher: teacher });
+      break;
 
     case "GET":
-      const teacherService = TeacherService();
 
       const docenteList = await teacherService.getAll();
 
       res.status(200).json(docenteList);
+      break;
+
     default:
       console.log(req.method)
       res.status(405);

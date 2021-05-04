@@ -4,7 +4,7 @@ import firestore from "../utils/firestore-util";
 
 export default function TeacherService() {
 
-    const docenteRef = firestore.collection("docente");
+    const docenteRef = firestore.collection("teacher");
 
     async function getAll() {
         let docentes = [];
@@ -16,15 +16,15 @@ export default function TeacherService() {
                     (result) => {
                         const id = result.id;
                         const doc = result.data();
-                        const docente: Teacher = {
+                        const teacher: Teacher = {
                             id: id,
-                            name: doc['nome'],
-                            about: doc['sobre'],
-                            photo: doc['fotoUrl'],
-                            phone: doc['telefone'],
+                            name: doc['name'],
+                            about: doc['about'],
+                            photo: doc['photo'],
+                            phone: doc['phone'],
                             email: doc['email'],
                         }
-                        docentes.push(docente);
+                        docentes.push(teacher);
                     });
 
             }
@@ -35,31 +35,31 @@ export default function TeacherService() {
 
     }
 
-    async function save(docente: Teacher) {
-        docenteRef.add(docente);
+    async function save(teacher: Teacher) {
+        docenteRef.add(teacher);
     }
 
-    async function update(docente: Teacher) {
-        docenteRef.doc(docente.id).set(docente);
+    async function update(teacher: Teacher) {
+        docenteRef.doc(teacher.id).set(teacher);
     }
 
-    async function remove(docente: Teacher) {
-        docenteRef.doc(docente.id).delete();
+    async function remove(teacher: Teacher) {
+        docenteRef.doc(teacher.id).delete();
     }
 
     async function getById(id) {
         let snapshot = await docenteRef.doc(id).get();
         const doc = snapshot.data;
-        const docente: Teacher = {
+        const teacher: Teacher = {
             id: id,
-            name: doc['nome'],
-            about: doc['sobre'],
-            photo: doc['fotoUrl'],
-            phone: doc['telefone'],
+            name: doc['name'],
+            about: doc['about'],
+            photo: doc['photo'],
+            phone: doc['phone'],
             email: doc['email'],
         }
 
-        return docente;
+        return teacher;
     }
 
 

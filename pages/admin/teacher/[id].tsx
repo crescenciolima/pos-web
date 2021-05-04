@@ -47,32 +47,24 @@ export default function SaveTeacherLayout() {
         try {
             console.log(values)
             console.log(file)
-            //await courseService.save(values);
-            // const courseList = courseService.getAll();
+
 
             let data = new FormData();
             data.append('file', file[0]);
-            data.append('user', 'hubot');
+            for (let key in values) {
+                data.append(key, values[key]);
+            }
+            // data.append('user', 'hubot');
+            // data.append()
 
             const res = await fetch(APIRoutes.TEACHER, {
                 method: 'POST',
                 body: data
             });
 
-            // const res = await fetch(
-            //     APIRoutes.COURSE,
-            //     {
-            //         body: JSON.stringify(values),
-            //         headers: {
-            //             'Content-Type': 'application/json'
-            //         },
-            //         method: 'POST'
-            //     }
-            // )
-
             const result = await res.json();
 
-            console.log(result)
+            console.log(result);
         } catch (error) {
             console.error(error);
         }
