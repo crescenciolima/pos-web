@@ -4,37 +4,63 @@ import Formidable from 'formidable';
 import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../lib/storage-path';
 import storage from "../../utils/storage-util";
+import multer from 'multer';
+import initMiddleware from '../../lib/init-middleware'
 
-async function endpoint(req: NextApiRequest, res: NextApiResponse) {
+global.XMLHttpRequest = require('xhr2');
+const upload = multer();
+
+// for parsing multipart/form-data
+// note that Multer limits to 1MB file size by default
+const multerAny = initMiddleware(
+    upload.any()
+);
+
+type NextApiRequestWithFormData = NextApiRequest & {
+    files: any[],
+}
+
+type BlobCorrected = Blob & {
+    buffer: Buffer,
+}
+
+async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
 
   switch (req.method) {
 
     case "POST":
 
-      const data = await new Promise(async (resolve, reject) => {
-        const form = new Formidable.IncomingForm({ keepExtensions: true });
-        await form.parse(req, async (err, fields, files) => {
-          if (err) return reject(err);
-          resolve({ fields, files });
-        });
-      });
-      // console.log(data['fields'].user);
-      // console.log(data['files'].file);
+      await multerAny(req, res);
 
-      const file: File = data['files'].file;
+      // This operation expects a single file upload. Edit as needed.
+      if (!req.files?.length || req.files.length > 1) {
+          res.statusCode = 400;
+          res.end();
+          return;
+      }
+  
+      const blob: BlobCorrected = req.files[0];
 
       try {
-        let list = await storage.ref().child("docentes").list();
-        console.log(list)
+        //listar: let list = await storage.ref().listAll().then(function(snapshot) {
+
+        let list = await storage.ref().child('teste2.png').put(blob.buffer).then(function(snapshot) {
+          console.log('Uploaded a blob or file!');
+          console.log(snapshot);
+
+          /*listar: snapshot.items.forEach(function(itemRef) {
+            console.log(itemRef);
+            // All the items under listRef.
+          });*/
+
+        }).catch((err) => {
+          console.log(err);
+        });
       } catch (err) {
         console.log(err)
       }
-
-      setTimeout(() => { res.status(200).json({ oi: 'oi' }); }, 5000);
-
-
-      break;
+      res.status(200).json({oi: "oi"});
 
     case "GET":
       const teacherService = TeacherService();

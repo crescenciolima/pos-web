@@ -9,6 +9,7 @@ export default function FileUploadService() {
     function upload(folder: StoragePaths, file:File) {
 
         const fileName = file['name'];
+        console.log(file);
         console.log(fileName);
         console.log(folder);
         // const arrayBuffer: ArrayBuffer = await 
