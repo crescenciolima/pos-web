@@ -4,27 +4,24 @@ import AdminBase from '../../../components/admin-base'
 import { APIRoutes } from '../../../lib/api.routes'
 import { Teacher } from '../../../models/teacher';
 import Link from 'next/link';
+import API from '../../../lib/api.service';
+import { APIResponse } from '../../../models/api-response';
+import Loading from '../../../components/loading';
+
 
 export default function TeacherLayout() {
 
   const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [isLoading, setLoading] = useState<boolean>(true);
+  const api = API(setLoading);
 
   useEffect(() => {
 
-    fetch(
-      APIRoutes.TEACHER, { method: 'GET' }
-    ).then(
-      (response: Response) => {
-        response.json().then(
-          (teachers: Teacher[]) => {
-            setTeachers(teachers)
-          }
-        )
+    api.get(APIRoutes.TEACHER).then(
+      (result: APIResponse) => {
+        setTeachers(result.result);
       }
-    ).catch((error) => {
-      alert("Ocorreu um erro ao buscar os dados");
-    });
-
+    )
 
   }, []);
 
@@ -53,16 +50,29 @@ export default function TeacherLayout() {
             <tbody>
               {teachers.map((teacher, i) => {
                 return (
-                  <tr key={teacher.id}>
-                    <td>{teacher.name}</td>
-                    <td>{teacher.email}</td>
-                  </tr>
+                  <Link href={`/admin/teacher/${encodeURIComponent(teacher.id)}`} key={teacher.id}>
+                    <tr>
+                      <td>{teacher.name}</td>
+                      <td>{teacher.email}</td>
+                    </tr>
+                  </Link>
                 )
               })}
+
             </tbody>
           </table>
+          {(teachers.length == 0 && !isLoading) &&
+            <div className="alert alert-info mt-3 text-center">
+              Nenhum resultado encontrado.
+            </div>
+          }
+
         </div>
       </div>
+      {isLoading &&
+        <Loading />
+      }
+
     </AdminBase>
   )
 }

@@ -7,10 +7,13 @@ import { useRouter } from 'next/router'
 import Link from 'next/link';
 import * as Yup from 'yup'
 import { ErrorMessage, Field, Formik } from 'formik'
+import { toast } from 'react-nextjs-toast'
+import API from '../../../lib/api.service';
 
 export default function SaveTeacherLayout() {
 
     const router = useRouter();
+    const api = API();
 
     const [teacher, setTeacher] = useState<Teacher>({
         name: "",
@@ -19,13 +22,10 @@ export default function SaveTeacherLayout() {
         phone: "",
         photo: "",
     });
-    const [teacherID, setTeacherID] = useState<string>();
     const [file, setFile] = useState<FileList>();
 
     const [newTeacher, setNewTeacher] = useState<boolean>(false);
 
-
-    // setTeacherID(id ? id.toString() : '');
 
     useEffect(() => {
 
@@ -34,40 +34,29 @@ export default function SaveTeacherLayout() {
             if (id.toString() == "new") {
                 setNewTeacher(true);
             } else {
-                //Recupera o valor do banco de dados
+                console.log(id);
+                getTeacher(id.toString());
                 setNewTeacher(false);
             }
         }
 
-
-
     }, [router.query]);
 
+    const getTeacher = async (id: string) => {
+        //Recupera o valor do banco de dados
+        let url = new URL(APIRoutes.TEACHER);
+
+        let params = { 'id': id };
+
+        url.search = new URLSearchParams(params).toString();
+        const res = await fetch(url.toString());
+        const result = await res.json();
+        const teacher:Teacher = result;
+        setTeacher(teacher);
+    }
+
     const saveTeacher = async (values: Teacher) => {
-        try {
-            console.log(values)
-            console.log(file)
-
-
-            let data = new FormData();
-            data.append('file', file[0]);
-            for (let key in values) {
-                data.append(key, values[key]);
-            }
-            // data.append('user', 'hubot');
-            // data.append()
-
-            const res = await fetch(APIRoutes.TEACHER, {
-                method: 'POST',
-                body: data
-            });
-
-            const result = await res.json();
-
-            console.log(result);
-        } catch (error) {
-            console.error(error);
-        }
+        api.postFile(APIRoutes.TEACHER, values, file[0]);
     };
 
     const onSubmit = async (values, actions) => {

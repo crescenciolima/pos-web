@@ -49,7 +49,7 @@ export default function TeacherService() {
 
     async function getById(id) {
         let snapshot = await docenteRef.doc(id).get();
-        const doc = snapshot.data;
+        const doc = snapshot.data();
         const teacher: Teacher = {
             id: id,
             name: doc['name'],

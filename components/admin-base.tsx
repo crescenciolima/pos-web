@@ -6,6 +6,7 @@ import adminStyle from '../styles/admin.module.css'
 import AdminContent from '../components/admin-content'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
+import { ToastContainer } from 'react-nextjs-toast'
 
 export default function AdminBase(props: any) {
   return (
@@ -23,22 +24,24 @@ export default function AdminBase(props: any) {
       </Head>
       <main className={adminStyle.main}>
         <div className="container-fluid">
-            <div className='row'>                
-                <AdminSidebar />
-                <div className="col-md-9 ms-sm-auto col-lg-9 px-md-4">
-                    <div className="text-right p-3 text-primary">
-                        <i className={adminStyle.icon}>
-                            <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon"/>
-                        </i>                     
-                        <label className={adminStyle.sidebarLabel}>Sair</label>
-                    </div>
-                    <AdminContent>
-                        {props.children}
-                    </AdminContent>
-                </div>
+          <div className='row'>
+            <AdminSidebar />
+            <div className="col-md-9 ms-sm-auto col-lg-9 px-md-4">
+              <div className="text-right p-3 text-primary">
+                <i className={adminStyle.icon}>
+                  <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
+                </i>
+                <label className={adminStyle.sidebarLabel}>Sair</label>
+              </div>
+              <AdminContent>
+                {props.children}
+              </AdminContent>
             </div>
+          </div>
         </div>
       </main>
+      <ToastContainer align={"right"} position={"bottom"} />
+
     </>
   )
 }

@@ -1,6 +1,7 @@
 .main {
     background-color: #FCFCFC;
     min-height: 600px;
+    position: relative;
 }
 
 .icon{

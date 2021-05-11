@@ -1,12 +1,12 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiResponse } from 'next'
 import TeacherService from '../../lib/teacher.service'
 import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../lib/storage-path';
-import storage from "../../utils/storage-util";
 import multer from 'multer';
 import initMiddleware from '../../lib/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { Teacher } from '../../models/teacher';
+import { APIResponse } from '../../models/api-response';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer();
@@ -36,13 +36,13 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       }
 
       const blob: BlobCorrected = req.files[0];
-      const {name, about, email, phone}: Teacher = req.body;
+      const { id, name, about, email, phone }: Teacher = req.body;
 
-      const teacher:Teacher = {
-        name:name,
-        about:about,
-        email:email,
-        phone:phone,
+      const teacher: Teacher = {
+        name: name,
+        about: about,
+        email: email,
+        phone: phone,
         photo: ""
       }
 
@@ -51,18 +51,33 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
       teacher.photo = url;
 
-     await teacherService.save(teacher)
+      await teacherService.save(teacher)
 
-      res.status(200).json({ teacher: teacher });
+      let response: APIResponse = {
+        msg: "Docente cadastrado com sucesso!",
+        result: teacher
+      }
+
+      res.status(200).json(response);
       break;
 
     case "GET":
 
-      const docenteList = await teacherService.getAll();
+      let getResponse: APIResponse = {
+        msg: "",
+        result: null
+      };
 
-      res.status(200).json(docenteList);
-      break;
+      if (req.query.id) {
+        const teacher = await teacherService.getById(req.query.id);
+        getResponse.result = teacher;
+      } else {
+        const docenteList = await teacherService.getAll();
+        getResponse.result = docenteList;
+      }
 
+      res.status(200).json(getResponse);
+      break
     default:
       console.log(req.method)
       res.status(405);
