@@ -25,40 +25,45 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
   switch (req.method) {
 
     case "POST":
+      try{
+        await multerAny(req, res);
 
-      await multerAny(req, res);
-
-      // This operation expects a single file upload. Edit as needed.
-      if (!req.files?.length || req.files.length > 1) {
-        res.statusCode = 400;
-        res.end();
-        return;
+        const blob: BlobCorrected = req.files?.length ? req.files[0] : null;
+        const { id, name, about, email, phone, photo }: Teacher = req.body;
+  
+        const teacher: Teacher = {
+          name: name,
+          about: about,
+          email: email,
+          phone: phone,
+          photo: blob ? "" : photo
+        }
+  
+        if(blob){
+          const uploadService = FileUploadService();
+          let url = await uploadService.upload(StoragePaths.TEACHERS, blob, teacher.name);
+    
+          teacher.photo = url;
+        }
+  
+        if(id){
+          teacher.id = id;
+          await teacherService.update(teacher);
+        }else{
+          await teacherService.save(teacher);
+        }
+  
+        let response: APIResponse = {
+          msg: "Docente salvo com sucesso!",
+          result: teacher
+        }
+  
+        res.status(200).json(response);
+      }catch(e){
+        console.log(e);
+        return res.json({error: "error"});
       }
 
-      const blob: BlobCorrected = req.files[0];
-      const { id, name, about, email, phone }: Teacher = req.body;
-
-      const teacher: Teacher = {
-        name: name,
-        about: about,
-        email: email,
-        phone: phone,
-        photo: ""
-      }
-
-      const uploadService = FileUploadService();
-      let url = await uploadService.upload(StoragePaths.TEACHERS, blob, teacher.name);
-
-      teacher.photo = url;
-
-      await teacherService.save(teacher)
-
-      let response: APIResponse = {
-        msg: "Docente cadastrado com sucesso!",
-        result: teacher
-      }
-
-      res.status(200).json(response);
       break;
 
     case "GET":

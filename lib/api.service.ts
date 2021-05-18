@@ -20,7 +20,6 @@ export default function API(setLoading?: Function) {
 
             const result: APIResponse = await res.json();
 
-            // console.log(result);
             toast.notify(result.msg, {
                 duration: 3,
                 type: "success",
@@ -39,14 +38,13 @@ export default function API(setLoading?: Function) {
         try {
             if (setLoading) setLoading(true);
 
+            console.log(body);
             const res = await fetch(url, {
                 method: 'POST',
                 body: body
             });
-
             const result: APIResponse = await res.json();
 
-            // console.log(result);
             toast.notify(result.msg, {
                 duration: 3,
                 type: "success",
@@ -55,12 +53,11 @@ export default function API(setLoading?: Function) {
             if (setLoading) setLoading(false);
             return result;
         } catch (error) {
-            console.error(error);
             if (setLoading) setLoading(false);
+            return error;
         }
 
     }
-
 
     async function get(url: string) {
         try {
@@ -72,7 +69,6 @@ export default function API(setLoading?: Function) {
 
             const result: APIResponse = await res.json();
 
-            // console.log(result);
             if (setLoading) setLoading(false);
             return result;
 

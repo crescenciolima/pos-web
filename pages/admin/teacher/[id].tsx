@@ -50,13 +50,19 @@ export default function SaveTeacherLayout() {
 
         url.search = new URLSearchParams(params).toString();
         const res = await fetch(url.toString());
-        const result = await res.json();
+        const { result } = await res.json();
         const teacher:Teacher = result;
+        console.log(teacher);
         setTeacher(teacher);
     }
 
     const saveTeacher = async (values: Teacher) => {
-        api.postFile(APIRoutes.TEACHER, values, file[0]);
+        console.log(values);
+        console.log(teacher);
+        if(teacher.photo != ""){
+            values = {...values, photo: teacher.photo};
+        }
+        api.postFile(APIRoutes.TEACHER, values, file && file.length > 0 ? file[0] : null);
     };
 
     const onSubmit = async (values, actions) => {
@@ -81,12 +87,12 @@ export default function SaveTeacherLayout() {
             </div>
             <Formik
                 enableReinitialize
-                initialValues={{ ...teacher, file: undefined }}
+                initialValues={{ ...teacher, photo: '', file: undefined }}
                 validationSchema={
                     Yup.object().shape({
                         name: Yup.string().required('Preencha este campo.'),
                         about: Yup.string().required('Preencha este campo.'),
-                        photo: Yup.string().required('Preencha este campo.'),
+                        photo: teacher.photo ? null : Yup.string().required('Preencha este campo.'),
                         email: Yup.string().required('Preencha este campo.'),
                         phone: Yup.string().required('Preencha este campo.'),
                     })}
@@ -126,6 +132,7 @@ export default function SaveTeacherLayout() {
 
                             <ErrorMessage name="photo" className="input-error" />
                         </div>
+                        {teacher.photo && <img src={teacher.photo} height="50" width="50" /> }
                         <div className="mb-3">
                             <label htmlFor="about" className="form-label">Sobre</label>
                             <textarea
