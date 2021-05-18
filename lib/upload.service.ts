@@ -26,10 +26,15 @@ export default function FileUploadService() {
 
     }
 
+    async function remove(downloadURL: string) {
+        await storage.refFromURL(downloadURL).delete();
+    }
+
 
 
     return {
         upload,
+        remove
     }
 
 }

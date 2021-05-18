@@ -44,7 +44,7 @@ export default function TeacherService() {
     }
 
     async function remove(teacherID: string) {
-        docenteRef.doc(teacherID).delete();
+        await docenteRef.doc(teacherID).delete();
     }
 
     async function getById(id) {
