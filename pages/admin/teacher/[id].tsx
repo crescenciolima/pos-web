@@ -24,22 +24,18 @@ export default function SaveTeacherLayout() {
         photo: "",
     });
     const [file, setFile] = useState<FileList>();
-    const [localFileURL, setLocalFileURL] = useState<FileList>();
-
-    const [newTeacher, setNewTeacher] = useState<boolean>(false);
-    const [editingPhoto, setEditingPhoto] = useState<boolean>(false);
-
+    // const [newTeacher, setNewTeacher] = useState<boolean>(false);
 
     useEffect(() => {
 
         const { id } = router.query;
         if (id) {
             if (id.toString() == "new") {
-                setNewTeacher(true);
+                // setNewTeacher(true);
             } else {
                 console.log(id);
                 getTeacher(id.toString());
-                setNewTeacher(false);
+                // setNewTeacher(false);
             }
         }
 
@@ -48,17 +44,17 @@ export default function SaveTeacherLayout() {
     const getTeacher = async (id: string) => {
         //Recupera o valor do banco de dados
         const result: APIResponse = await api.get(APIRoutes.TEACHER, { 'id': id });
-
         const teacher: Teacher = result.result;
         setTeacher(teacher);
     }
 
     const saveTeacher = async (values: Teacher) => {
-        if(file[0]){
-            api.postFile(APIRoutes.TEACHER, values, file[0]);
-        }else{
-            api.postFile(APIRoutes.TEACHER, values, null);
+        console.log(values);
+        console.log(teacher);
+        if(teacher.photo != ""){
+            values = {...values, photo: teacher.photo};
         }
+        api.postFile(APIRoutes.TEACHER, values, file && file.length > 0 ? file[0] : null);
     };
 
     const onSubmit = async (values, actions) => {
@@ -70,11 +66,7 @@ export default function SaveTeacherLayout() {
             actions.setSubmitting(false);
         }
     }
-    const editPhoto = () =>{
-        
-        setFile(undefined);
-        setEditingPhoto(true);
-    }
+ 
 
 
     return (
@@ -88,12 +80,12 @@ export default function SaveTeacherLayout() {
             </div>
             <Formik
                 enableReinitialize
-                initialValues={{ ...teacher, file: undefined, localFileURL }}
+                initialValues={{ ...teacher, photo: '', file: undefined }}
                 validationSchema={
                     Yup.object().shape({
                         name: Yup.string().required('Preencha este campo.'),
                         about: Yup.string().required('Preencha este campo.'),
-                        localFileURL: Yup.string().required('Preencha este campo.'),
+                        photo: teacher.photo ? null : Yup.string().required('Preencha este campo.'),
                         email: Yup.string().required('Preencha este campo.'),
                         phone: Yup.string().required('Preencha este campo.'),
                     })}
@@ -118,28 +110,27 @@ export default function SaveTeacherLayout() {
                                 onChange={handleChange} />
                             <ErrorMessage name="name" className="input-error" />
                         </div>
-                        { newTeacher || editingPhoto ?
-                            <div className="mb-3">
-                                <label htmlFor="localFileURL" className="form-label">Foto</label>
-                                <input
-                                    type="file"
-                                    className="form-control"
-                                    name="localFileURL"
-                                    id="localFileURL"
-                                    value={values.localFileURL}
-                                    onChange={(event) => {
-                                        handleChange(event);
-                                        setFile(event.currentTarget.files);
-                                    }} />
+                        <div className="mb-3">
+                            <label htmlFor="photo" className="form-label">Foto</label>
+                            <input
+                                type="file"
+                                className="form-control"
+                                name="photo"
+                                id="photo"
+                                value={values.photo}
+                                onChange={(event) => {
+                                    handleChange(event);
+                                    setFile(event.currentTarget.files);
+                                }} />
 
-                                <ErrorMessage name="localFileURL" className="input-error" />
-                            </div> :
-                            <div className="mb-3 text-center">
-                            <img src={teacher.photo} className="img-thumbnail" alt="..."></img>
-                            <a  className="link-primary d-block mt-3" onClick={editPhoto}>Editar</a>
-                            </div>
+                            <ErrorMessage name="photo" className="input-error" />
+                        </div>
+                        {teacher.photo &&
+                         <div className="mb-3 text-center">
+                         <img src={teacher.photo} className="img-thumbnail" alt="..."></img>
+                         </div>
                         }
-
+                       
                         <div className="mb-3">
                             <label htmlFor="about" className="form-label">Sobre</label>
                             <textarea
@@ -176,7 +167,9 @@ export default function SaveTeacherLayout() {
                                 onChange={handleChange} />
                             <ErrorMessage name="phone" className="input-error" />
                         </div>
-                        <button type="submit" className="btn btn-primary mt-3" disabled={isSubmitting}>Salvar</button>
+                        <div className="text-right">
+                        <button type="submit" className="btn btn-primary mt-3 me-auto" disabled={isSubmitting}>Salvar</button>
+                        </div>
                     </form>
                 )}
             </Formik>
