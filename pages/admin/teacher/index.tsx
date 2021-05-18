@@ -7,12 +7,19 @@ import Link from 'next/link';
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
 import Loading from '../../../components/loading';
+import ConfirmDialog from '../../../components/confirm-dialog';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash } from '@fortawesome/free-solid-svg-icons'
 
 
 export default function TeacherLayout() {
 
   const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [selectedTeacher, setSelectedTeacher] = useState<Teacher>({name:"", about:"",email:"",phone:"",photo:""});
   const [isLoading, setLoading] = useState<boolean>(true);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [modalText, setModalText] = useState<string>("Tem certeza que deseja excluir esse docente?");
+
   const api = API(setLoading);
 
   useEffect(() => {
@@ -24,6 +31,23 @@ export default function TeacherLayout() {
     )
 
   }, []);
+
+  function removeTeacher(event, teacher: Teacher) {
+    event.stopPropagation();
+    setSelectedTeacher(teacher);
+    setOpenModal(true);
+  }
+
+  async function confirmTeacherRemoval(){
+   await api.exclude(APIRoutes.TEACHER, {id:selectedTeacher.id});
+   let newTeacherList =  teachers.filter(teacher => teacher.id != selectedTeacher.id);
+   setTeachers(newTeacherList);
+   closeModal();
+  }
+
+  function closeModal() {
+    setOpenModal(false);
+  }
 
 
   return (
@@ -45,6 +69,7 @@ export default function TeacherLayout() {
               <tr>
                 <th>Nome</th>
                 <th>Email</th>
+                <th>Excluir</th>
               </tr>
             </thead>
             <tbody>
@@ -54,6 +79,9 @@ export default function TeacherLayout() {
                     <tr>
                       <td>{teacher.name}</td>
                       <td>{teacher.email}</td>
+                      <td><button className="btn btn-sm btn-danger" onClick={(e) => removeTeacher(e, teacher)} >
+                        <FontAwesomeIcon icon={faTrash} className="sm-icon" />
+                      </button></td>
                     </tr>
                   </Link>
                 )
@@ -72,7 +100,7 @@ export default function TeacherLayout() {
       {isLoading &&
         <Loading />
       }
-
+      <ConfirmDialog open={openModal} actionButtonText="Excluir" title="Excluir" text={"Tem certeza que deseja excluir "+selectedTeacher.name+"?"} onClose={closeModal} onConfirm={confirmTeacherRemoval} />
     </AdminBase>
   )
 }

@@ -9,6 +9,7 @@ import * as Yup from 'yup'
 import { ErrorMessage, Field, Formik } from 'formik'
 import { toast } from 'react-nextjs-toast'
 import API from '../../../lib/api.service';
+import { APIResponse } from '../../../models/api-response';
 
 export default function SaveTeacherLayout() {
 
@@ -23,8 +24,10 @@ export default function SaveTeacherLayout() {
         photo: "",
     });
     const [file, setFile] = useState<FileList>();
+    const [localFileURL, setLocalFileURL] = useState<FileList>();
 
     const [newTeacher, setNewTeacher] = useState<boolean>(false);
+    const [editingPhoto, setEditingPhoto] = useState<boolean>(false);
 
 
     useEffect(() => {
@@ -44,19 +47,18 @@ export default function SaveTeacherLayout() {
 
     const getTeacher = async (id: string) => {
         //Recupera o valor do banco de dados
-        let url = new URL(APIRoutes.TEACHER);
+        const result: APIResponse = await api.get(APIRoutes.TEACHER, { 'id': id });
 
-        let params = { 'id': id };
-
-        url.search = new URLSearchParams(params).toString();
-        const res = await fetch(url.toString());
-        const result = await res.json();
-        const teacher:Teacher = result;
+        const teacher: Teacher = result.result;
         setTeacher(teacher);
     }
 
     const saveTeacher = async (values: Teacher) => {
-        api.postFile(APIRoutes.TEACHER, values, file[0]);
+        if(file[0]){
+            api.postFile(APIRoutes.TEACHER, values, file[0]);
+        }else{
+            api.postFile(APIRoutes.TEACHER, values, null);
+        }
     };
 
     const onSubmit = async (values, actions) => {
@@ -67,6 +69,11 @@ export default function SaveTeacherLayout() {
             console.error(error);
             actions.setSubmitting(false);
         }
+    }
+    const editPhoto = () =>{
+        
+        setFile(undefined);
+        setEditingPhoto(true);
     }
 
 
@@ -81,12 +88,12 @@ export default function SaveTeacherLayout() {
             </div>
             <Formik
                 enableReinitialize
-                initialValues={{ ...teacher, file: undefined }}
+                initialValues={{ ...teacher, file: undefined, localFileURL }}
                 validationSchema={
                     Yup.object().shape({
                         name: Yup.string().required('Preencha este campo.'),
                         about: Yup.string().required('Preencha este campo.'),
-                        photo: Yup.string().required('Preencha este campo.'),
+                        localFileURL: Yup.string().required('Preencha este campo.'),
                         email: Yup.string().required('Preencha este campo.'),
                         phone: Yup.string().required('Preencha este campo.'),
                     })}
@@ -111,21 +118,28 @@ export default function SaveTeacherLayout() {
                                 onChange={handleChange} />
                             <ErrorMessage name="name" className="input-error" />
                         </div>
-                        <div className="mb-3">
-                            <label htmlFor="photo" className="form-label">Foto</label>
-                            <input
-                                type="file"
-                                className="form-control"
-                                name="photo"
-                                id="photo"
-                                value={values.photo}
-                                onChange={(event) => {
-                                    handleChange(event);
-                                    setFile(event.currentTarget.files);
-                                }} />
+                        { newTeacher || editingPhoto ?
+                            <div className="mb-3">
+                                <label htmlFor="localFileURL" className="form-label">Foto</label>
+                                <input
+                                    type="file"
+                                    className="form-control"
+                                    name="localFileURL"
+                                    id="localFileURL"
+                                    value={values.localFileURL}
+                                    onChange={(event) => {
+                                        handleChange(event);
+                                        setFile(event.currentTarget.files);
+                                    }} />
 
-                            <ErrorMessage name="photo" className="input-error" />
-                        </div>
+                                <ErrorMessage name="localFileURL" className="input-error" />
+                            </div> :
+                            <div className="mb-3 text-center">
+                            <img src={teacher.photo} className="img-thumbnail" alt="..."></img>
+                            <a  className="link-primary d-block mt-3" onClick={editPhoto}>Editar</a>
+                            </div>
+                        }
+
                         <div className="mb-3">
                             <label htmlFor="about" className="form-label">Sobre</label>
                             <textarea

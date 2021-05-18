@@ -62,9 +62,15 @@ export default function API(setLoading?: Function) {
     }
 
 
-    async function get(url: string) {
+    async function get(url: string, params?) {
         try {
             if (setLoading) setLoading(true);
+
+            if (params) {
+                let urlBuilder = new URL(url);
+                urlBuilder.search = new URLSearchParams(params).toString();
+                url = urlBuilder.toString();
+            }
 
             const res = await fetch(url, {
                 method: 'GET',
@@ -89,10 +95,47 @@ export default function API(setLoading?: Function) {
 
     }
 
+    async function exclude(url: string, params?) {
+        try {
+            if (setLoading) setLoading(true);
+
+            if (params) {
+                let urlBuilder = new URL(url);
+                urlBuilder.search = new URLSearchParams(params).toString();
+                url = urlBuilder.toString();
+            }
+
+            const res = await fetch(url, {
+                method: 'DELETE',
+            });
+
+            const result: APIResponse = await res.json();
+
+            toast.notify(result.msg, {
+                duration: 3,
+                type: "success",
+                title: "Notificação"
+            });
+            if (setLoading) setLoading(false);
+            return result;
+
+        } catch (error) {
+            console.error(error);
+            toast.notify("Ocorreu um erro ao buscar os dados", {
+                duration: 3,
+                type: "error",
+                title: "Erro"
+            });
+            if (setLoading) setLoading(false);
+
+        }
+    }
+
     return {
         postFile,
         post,
         get,
+        exclude
     }
 
 }

@@ -29,13 +29,16 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       await multerAny(req, res);
 
       // This operation expects a single file upload. Edit as needed.
-      if (!req.files?.length || req.files.length > 1) {
-        res.statusCode = 400;
-        res.end();
-        return;
+      // if (!req.files?.length || req.files.length > 1) {
+      //   res.statusCode = 400;
+      //   res.end();
+      //   return;
+      // }
+      let blob: BlobCorrected;
+      if (req.files) {
+        blob = req.files[0];
       }
 
-      const blob: BlobCorrected = req.files[0];
       const { id, name, about, email, phone }: Teacher = req.body;
 
       const teacher: Teacher = {
@@ -45,7 +48,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         phone: phone,
         photo: ""
       }
-
+      
       const uploadService = FileUploadService();
       let url = await uploadService.upload(StoragePaths.TEACHERS, blob, teacher.name);
 
@@ -78,6 +81,18 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
       res.status(200).json(getResponse);
       break
+
+    case "DELETE":
+      let teacherID = req.query.id.toString();
+      await teacherService.remove(teacherID);
+
+      let deleteResponse: APIResponse = {
+        msg: "Docente removido com sucesso!",
+        result: {}
+      }
+
+      res.status(200).json(deleteResponse);
+
     default:
       console.log(req.method)
       res.status(405);

@@ -43,8 +43,8 @@ export default function TeacherService() {
         docenteRef.doc(teacher.id).set(teacher);
     }
 
-    async function remove(teacher: Teacher) {
-        docenteRef.doc(teacher.id).delete();
+    async function remove(teacherID: string) {
+        docenteRef.doc(teacherID).delete();
     }
 
     async function getById(id) {
