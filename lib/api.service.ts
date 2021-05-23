@@ -37,9 +37,12 @@ export default function API(setLoading?: Function) {
     async function post(url: string, body) {
         try {
             if (setLoading) setLoading(true);
-            const res = await fetch(url, {
+            const res = await fetch(url, {          
+                body: JSON.stringify(body),
+                headers: {
+                  'Content-Type': 'application/json'
+                },
                 method: 'POST',
-                body: body
             });
             const result: APIResponse = await res.json();
 

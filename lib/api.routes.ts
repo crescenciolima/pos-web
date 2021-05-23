@@ -6,4 +6,7 @@ export class APIRoutes {
 
     static COURSE:string = APIRoutes.API_URL + "/api/course"
 
+    static SIGNIN:string = APIRoutes.API_URL + "/api/auth/signin"
+
+    static SIGNUP:string = APIRoutes.API_URL + "/api/auth/signup"
 }
