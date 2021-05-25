@@ -14,8 +14,24 @@ export default function AuthService() {
     }
 
     async function signIn(user: User) {
-        fire.auth().signInWithEmailAndPassword(user.email, user.password);
+        return fire.auth().signInWithEmailAndPassword(user.email, user.password).then((userCredential) => {
+            return formatUser(userCredential.user);
+        });
     }
+
+    const formatUser = async (user) => {
+        const decodedToken = await user.getIdTokenResult(true);
+        const { token, expirationTime } = decodedToken;
+        return {
+          uid: user.uid,
+          email: user.email,
+          name: user.displayName,
+          provider: user.providerData[0].providerId,
+          photoUrl: user.photoURL,
+          token,
+          expirationTime,
+        };
+      };
 
     return {
         signUp,

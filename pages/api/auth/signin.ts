@@ -4,6 +4,8 @@ import { Course } from '../../../models/course';
 import Cors from 'cors'
 import initMiddleware from '../../../lib/init-middleware'
 import { APIResponse } from '../../../models/api-response';
+import AuthService from '../../../lib/auth.service';
+import { User } from '../../../models/user';
 
 const cors = initMiddleware(
     // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -14,27 +16,29 @@ const cors = initMiddleware(
 )
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-    //Create a firestore course service
-    const courseService = CourseService();
+    const authService = AuthService();
 
     await cors(req, res);
 
     if (req.method === 'POST') {
-        let response: APIResponse = {
-            msg: "Usuário autenticado com sucesso!",
-            result: null
-          }
-        res.status(200).json(response);
+        const {email, password} = req.body;
 
-    } else if (req.method === 'GET'){
-        //Getting all Courses 
-        const courseList = await courseService.getAll();
+        let user: User = {
+            email: email,
+            password: password
+        }
+        console.log(user);
 
-        //Sending the response
-        res.status(200).json(courseList);
+        await authService.signIn(user).then((user) =>{
+            let response: APIResponse = {
+                msg: "Login efetuado com sucesso!",
+                result: user
+            }
+            res.status(200).json(response);
+        });
+
+
     } else {
-        // Handle any other HTTP method
-        //TO DO
         res.status(200).json([]);
     }
 

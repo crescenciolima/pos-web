@@ -37,6 +37,7 @@ export default function API(setLoading?: Function) {
     async function post(url: string, body) {
         try {
             if (setLoading) setLoading(true);
+            
             const res = await fetch(url, {          
                 body: JSON.stringify(body),
                 headers: {
@@ -44,6 +45,7 @@ export default function API(setLoading?: Function) {
                 },
                 method: 'POST',
             });
+
             const result: APIResponse = await res.json();
 
             toast.notify(result.msg, {
@@ -51,9 +53,12 @@ export default function API(setLoading?: Function) {
                 type: "success",
                 title: "Notificação"
             });
+
             if (setLoading) setLoading(false);
+
             return result;
         } catch (error) {
+            console.log(error)
             if (setLoading) setLoading(false);
             return error;
         }

@@ -16,31 +16,23 @@ const cors = initMiddleware(
 )
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-    //Create a firestore course service
     const authService = AuthService();
 
     await cors(req, res);
 
     if (req.method === 'POST') {
-        // Process a POST request
-
-        //Getting all data from the request body
         const {email, password} = req.body;
-        console.log(req.body)
-        console.log(email, password)
 
-        //Instantiating a Course
         let user: User = {
             email: email,
             password: password
         }
-        console.log(user);
 
-        await authService.signUp(user);
+        const result: any = await authService.signUp(user);
 
         let response: APIResponse = {
             msg: "Usuário cadastrado com sucesso!",
-            result: null
+            result
           }
         res.status(200).json(response);
 
