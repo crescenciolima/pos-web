@@ -31,7 +31,7 @@ export default function AdminSidebar() {
                     </li>
                     <li>
                         <Link href="/admin/teacher">
-                            <a  className="nav-link text-primary">
+                            <a className="nav-link text-primary">
                                 <i className={adminStyle.icon}>
                                     <FontAwesomeIcon icon={faChalkboardTeacher} className="sm-icon" />
                                 </i>
@@ -40,12 +40,14 @@ export default function AdminSidebar() {
                         </Link>
                     </li>
                     <li>
-                        <a href="#" className="nav-link text-primary ">
-                            <i className={adminStyle.icon}>
-                                <FontAwesomeIcon icon={faFile} className="sm-icon" />
-                            </i>
-                            <label className={adminStyle.sidebarLabel}>Posts</label>
-                        </a>
+                        <Link href="/admin/news">
+                            <a className="nav-link text-primary ">
+                                <i className={adminStyle.icon}>
+                                    <FontAwesomeIcon icon={faFile} className="sm-icon" />
+                                </i>
+                                <label className={adminStyle.sidebarLabel}>Posts</label>
+                            </a>
+                        </Link>
                     </li>
                     <li>
                         <a href="#" className="nav-link text-primary ">

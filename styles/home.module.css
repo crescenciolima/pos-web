@@ -1,10 +1,27 @@
-.sectionInicio {
+.homeSection {
     max-height: max(560px, 70vh);
-    padding:2rem;
+    padding: 2rem;
     background-color: var(--background-color);
+    border-bottom-left-radius: 120px;
+    border-bottom-right-radius: 120px;
 }
 
 .headerBackground {
     background-color: var(--background-color);
 }
 
+.sectionPadding {
+    padding: 5rem;
+}
+
+.cardImg {
+    width: 100%;
+    height: auto;
+    max-width: 180px !important;
+}
+
+.newsSection {
+    background-color: var(--background-color);
+    border-bottom-left-radius: 120px;
+    border-top-right-radius: 120px;
+}

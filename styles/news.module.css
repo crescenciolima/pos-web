@@ -1,0 +1,28 @@
+.newsCard {
+    box-shadow: 1px 1px 0px 1px var(--background-color-shadow);
+    cursor: pointer;
+}
+
+.newsCard:hover .cardTitle {
+    color: var(--primary)!important;
+}
+
+.detailNewsMain{
+    min-height: 90vh;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    background-color: var(--background-color);
+}
+
+.detailNewsCard{
+    border-width: 0px;
+    border-radius: 30px;
+    box-shadow: 1px 1px 0px 1px var(--background-color-shadow);
+
+}
+
+.newsCover{
+    width: 100%;
+    height: auto;
+}

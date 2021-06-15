@@ -1,5 +1,4 @@
 import { NextApiRequest } from "next"
-
 export type NextApiRequestWithFormData = NextApiRequest & {
     files: any[],
 }

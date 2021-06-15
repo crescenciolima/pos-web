@@ -18,5 +18,4 @@ try {
 
 const fire = firebase;
 
-// export default fire;
 export default fire;

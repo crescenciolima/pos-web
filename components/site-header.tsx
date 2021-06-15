@@ -13,7 +13,7 @@ export default function SiteHeader() {
 
   return (
     <header className={homeStyle.headerBackground}>
-      <nav className="navbar  bg-transparent navbar-expand-md">
+      <nav className="navbar  bg-white navbar-expand-md">
         <div className="container-fluid mx-1 mx-md-2">
           <Link href="/">
             <a className="navbar-brand">

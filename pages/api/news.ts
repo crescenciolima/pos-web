@@ -1,12 +1,12 @@
 import { NextApiResponse } from 'next'
-import TeacherService from '../../lib/teacher.service'
 import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../lib/storage-path';
 import multer from 'multer';
 import initMiddleware from '../../lib/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
-import { Teacher } from '../../models/teacher';
 import { APIResponse } from '../../models/api-response';
+import NewsService from '../../lib/news.service';
+import { News } from '../../models/news';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer();
@@ -20,7 +20,7 @@ const multerAny = initMiddleware(
 
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
-  const teacherService = TeacherService();
+  const newsService = NewsService();
 
   switch (req.method) {
 
@@ -29,36 +29,33 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         await multerAny(req, res);
 
         const blob: BlobCorrected = req.files?.length ? req.files[0] : null;
-        const { id, name, about, email, phone, photo }: Teacher = req.body;
+        const { id, title, text, coverURL, date }: News = req.body;
   
-        const teacher: Teacher = {
-          name: name,
-          about: about,
-          email: email,
-          phone: phone,
-          photo: blob ? "" : photo
+        const news: News = {
+          title: title,
+          text: text,
+          coverURL: coverURL,
+          date: date,
+          slug: newsService.createSlugFromTilte(title)
         }
   
         if(blob){
           const uploadService = FileUploadService();
-          if(id){
-            await uploadService.remove(photo);
-          }
-          let url = await uploadService.upload(StoragePaths.TEACHERS, blob, teacher.name);
-    
-          teacher.photo = url;
+          let url = await uploadService.upload(StoragePaths.NEWS_COVER, blob, date.toString());
+  
+          news.coverURL = url;
         }
   
         if(id){
-          teacher.id = id;
-          await teacherService.update(teacher);
+          news.id = id;
+          await newsService.update(news);
         }else{
-          await teacherService.save(teacher);
+          await newsService.save(news);
         }
   
         let response: APIResponse = {
-          msg: "Docente salvo com sucesso!",
-          result: teacher
+          msg: "Notícia salva com sucesso!",
+          result: news
         }
   
         res.status(200).json(response);
@@ -77,26 +74,26 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       };
 
       if (req.query.id) {
-        const teacher = await teacherService.getById(req.query.id);
-        getResponse.result = teacher;
+        const news = await newsService.getById(req.query.id);
+        getResponse.result = news;
       } else {
-        const docenteList = await teacherService.getAll();
-        getResponse.result = docenteList;
+        const newsList = req.query.page ? await newsService.getPage(+req.query.page.toString()) : await newsService.getAll();
+        getResponse.result = newsList;
       }
 
       res.status(200).json(getResponse);
       break
 
     case "DELETE":
-      let teacherID = req.query.id.toString();
-      const deletedTeacher = await teacherService.getById(teacherID);
+      let newsID = req.query.id.toString();
+      const deletedNews = await newsService.getById(newsID);
       let uploadService = FileUploadService();
-      await uploadService.remove(deletedTeacher.photo);
+      await uploadService.remove(deletedNews.coverURL);
 
-      await teacherService.remove(teacherID);
+      await newsService.remove(newsID);
 
       let deleteResponse: APIResponse = {
-        msg: "Docente removido com sucesso!",
+        msg: "Notícia removida com sucesso!",
         result: {}
       }
 

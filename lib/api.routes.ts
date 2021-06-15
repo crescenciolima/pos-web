@@ -6,4 +6,6 @@ export class APIRoutes {
 
     static COURSE:string = APIRoutes.API_URL + "/api/course"
 
+    static NEWS:string = APIRoutes.API_URL + "/api/news"
+
 }

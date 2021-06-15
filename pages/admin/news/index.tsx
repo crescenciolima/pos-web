@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 
 import AdminBase from '../../../components/admin-base'
 import { APIRoutes } from '../../../lib/api.routes'
-import { Teacher } from '../../../models/teacher';
 import Link from 'next/link';
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
@@ -10,12 +9,14 @@ import Loading from '../../../components/loading';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { News } from '../../../models/news';
+import fire from '../../../utils/firebase-util';
 
 
-export default function TeacherLayout() {
+export default function NewsLayout() {
 
-  const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [selectedTeacher, setSelectedTeacher] = useState<Teacher>({name:"", about:"",email:"",phone:"",photo:""});
+  const [newsList, setNewsList] = useState<News[]>([]);
+  const [selectedNews, setSelectedNews] = useState<News>({ title: "", text: "", coverURL: "", date: fire.firestore.Timestamp.now().seconds, slug: "" });
   const [isLoading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState<boolean>(false);
 
@@ -23,25 +24,30 @@ export default function TeacherLayout() {
 
   useEffect(() => {
 
-    api.get(APIRoutes.TEACHER).then(
+    api.get(APIRoutes.NEWS).then(
       (result: APIResponse) => {
-        setTeachers(result.result);
+        let newsList: News[] = result.result;
+        for (let news of newsList) {
+          const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
+          news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
+        }
+        setNewsList(newsList);
       }
     )
 
   }, []);
 
-  function removeTeacher(event, teacher: Teacher) {
+  function removeTeacher(event, news: News) {
     event.stopPropagation();
-    setSelectedTeacher(teacher);
+    setSelectedNews(news);
     setOpenModal(true);
   }
 
-  async function confirmTeacherRemoval(){
-   await api.exclude(APIRoutes.TEACHER, {id:selectedTeacher.id});
-   let newTeacherList =  teachers.filter(teacher => teacher.id != selectedTeacher.id);
-   setTeachers(newTeacherList);
-   closeModal();
+  async function confirmNewsRemoval() {
+    await api.exclude(APIRoutes.NEWS, { id: selectedNews.id });
+    let newNewsist = newsList.filter(news => news.id != selectedNews.id);
+    setNewsList(newNewsist);
+    closeModal();
   }
 
   function closeModal() {
@@ -53,10 +59,10 @@ export default function TeacherLayout() {
     <AdminBase>
       <div className="row">
         <div className="col-6">
-          <h3 className="text-primary-dark">Docentes</h3>
+          <h3 className="text-primary-dark">Notícias</h3>
         </div>
         <div className="col-6 text-right">
-          <Link href="/admin/teacher/new">
+          <Link href="/admin/news/new">
             <a className="btn btn-primary">Cadastrar</a>
           </Link>
         </div>
@@ -66,19 +72,19 @@ export default function TeacherLayout() {
           <table className="table table-striped table-hover">
             <thead>
               <tr>
-                <th>Nome</th>
-                <th>Email</th>
+                <th>Título</th>
+                <th>Data</th>
                 <th>Excluir</th>
               </tr>
             </thead>
             <tbody>
-              {teachers.map((teacher, i) => {
+              {newsList.map((newsItem, i) => {
                 return (
-                  <Link href={`/admin/teacher/${encodeURIComponent(teacher.id)}`} key={teacher.id}>
+                  <Link href={`/admin/news/${encodeURIComponent(newsItem.id)}`} key={newsItem.id}>
                     <tr>
-                      <td>{teacher.name}</td>
-                      <td>{teacher.email}</td>
-                      <td><button className="btn btn-sm btn-danger" onClick={(e) => removeTeacher(e, teacher)} >
+                      <td>{newsItem.title}</td>
+                      <td>{newsItem.dateString}</td>
+                      <td><button className="btn btn-sm btn-danger" onClick={(e) => removeTeacher(e, newsItem)} >
                         <FontAwesomeIcon icon={faTrash} className="sm-icon" />
                       </button></td>
                     </tr>
@@ -88,7 +94,7 @@ export default function TeacherLayout() {
 
             </tbody>
           </table>
-          {(teachers.length == 0 && !isLoading) &&
+          {(newsList.length == 0 && !isLoading) &&
             <div className="alert alert-info mt-3 text-center">
               Nenhum resultado encontrado.
             </div>
@@ -99,7 +105,7 @@ export default function TeacherLayout() {
       {isLoading &&
         <Loading />
       }
-      <ConfirmDialog open={openModal} actionButtonText="Excluir" title="Excluir" text={"Tem certeza que deseja excluir "+selectedTeacher.name+"?"} onClose={closeModal} onConfirm={confirmTeacherRemoval} />
+      <ConfirmDialog open={openModal} actionButtonText="Excluir" title="Excluir" text={"Tem certeza que deseja excluir " + selectedNews.title + "?"} onClose={closeModal} onConfirm={confirmNewsRemoval} />
     </AdminBase>
   )
 }

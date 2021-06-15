@@ -13,6 +13,7 @@ body {
     --complementary: #F48221;
     --background-light: #FFFFFF;
     --background-color: #F7FDF4;
+    --background-color-shadow: #cae7d2;
 }
 
 a {
@@ -41,8 +42,16 @@ a {
     font-size: clamp(1.5rem, 4vw, 2.5rem);
 }
 
+.heading-font-size{
+    font-size: clamp(1.3rem, 3.5vw, 2rem);
+}
+
 .title-font-size{
     font-size: clamp(2rem, 5vw, 3.3rem);
+}
+
+.bg-color{
+    background-color: var(--background-color);
 }
 
 .btn-primary {

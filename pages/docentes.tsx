@@ -45,8 +45,9 @@ export default function Docentes({ docentes }) {
                     <div className="col-sm-6 col-md-4 col-xl-4" key={i}>
                       <div className={style.card + ' card mt-3 mt-md-2'}>
                         <div className="card-body text-center mb-3">
-                          <Image src={docente.photo} className={style.avatar + ''} alt="Foto do docente" width={150} height={150} />
-
+                          {docente.photo ? 
+                            <Image src={docente.photo} className={style.avatar + ''} alt="Foto do docente" width={150} height={150} /> : <></>
+                          }
                           <h5 className="card-title mt-4 text-primary-dark ">{docente.name}</h5>
                           <p className="card-text mt-4 text-primary-dark ">{docente.about}</p>
 
@@ -81,6 +82,8 @@ export const getStaticProps: GetStaticProps = async () => {
   const teacherService = TeacherService();
 
   const docenteList = await teacherService.getAll();
+
+  console.log(docenteList)
 
   return {
     props: {
