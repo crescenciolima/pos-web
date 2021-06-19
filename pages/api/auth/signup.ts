@@ -4,6 +4,7 @@ import { Course } from '../../../models/course';
 import Cors from 'cors'
 import initMiddleware from '../../../lib/init-middleware'
 import AuthService from '../../../lib/auth.service';
+import UserService from '../../../lib/user.service';
 import { User } from '../../../models/user';
 import { APIResponse } from '../../../models/api-response';
 
@@ -17,23 +18,34 @@ const cors = initMiddleware(
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const authService = AuthService();
+    const userService = UserService();
 
     await cors(req, res);
 
     if (req.method === 'POST') {
-        const {email, password} = req.body;
+        const {name, email, password, type} = req.body;
 
         let user: User = {
+            name: name,
             email: email,
-            password: password
+            password: password,
+            type: type
         }
 
-        const result: any = await authService.signUp(user);
+        const result: User = await authService.signUp(user);
+
+        delete user.password;
+        
+        if(result.id){
+            user.id = result.id;
+            await userService.update(user);
+            user.token = result.token;
+        }
 
         let response: APIResponse = {
             msg: "Usuário cadastrado com sucesso!",
-            result
-          }
+            result: user
+        }
         res.status(200).json(response);
 
     } else {

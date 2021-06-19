@@ -1,8 +1,11 @@
 import { toast } from 'react-nextjs-toast'
 import { APIResponse } from '../models/api-response';
+import Cookies from '../lib/cookies.service';
 
 export default function API(setLoading?: Function) {
-
+    const header =  {
+        'Content-Type': 'application/json'
+    };
 
     async function postFile(url: string, body, file) {
         try {
@@ -36,13 +39,12 @@ export default function API(setLoading?: Function) {
 
     async function post(url: string, body) {
         try {
+
             if (setLoading) setLoading(true);
             
             const res = await fetch(url, {          
                 body: JSON.stringify(body),
-                headers: {
-                  'Content-Type': 'application/json'
-                },
+                headers: header,
                 method: 'POST',
             });
 
@@ -65,9 +67,8 @@ export default function API(setLoading?: Function) {
 
     }
 
-
     async function get(url: string, params?) {
-        try {
+        try {     
             if (setLoading) setLoading(true);
 
             if (params) {
@@ -99,7 +100,8 @@ export default function API(setLoading?: Function) {
     }
 
     async function exclude(url: string, params?) {
-        try {
+        try {           
+
             if (setLoading) setLoading(true);
 
             if (params) {

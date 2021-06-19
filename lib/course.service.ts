@@ -11,7 +11,6 @@ export default function CourseService() {
 
         await courseRef.get().then(
             (snapshot) => {
-
                 snapshot.forEach(
                     (result) => {
                         const id = result.id;
@@ -32,11 +31,11 @@ export default function CourseService() {
 
     }
 
-    async function save(course: Course) {
+    async function save(course: Course, token: string) {
         courseRef.add(course);
     }
 
-    async function update(course: Course) {
+    async function update(course: Course, token: string) {
         courseRef.doc(course.id).set(course);
     }
 

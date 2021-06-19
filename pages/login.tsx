@@ -1,35 +1,64 @@
-import Head from 'next/head'
-import style from '../styles/login.module.css'
-import { GetStaticProps } from 'next'
-import React, { useState } from 'react'
-import SiteHeader from '../components/site-header'
-import { ErrorMessage, Formik } from 'formik'
-import * as Yup from 'yup'
-import API from '../lib/api.service'
-import { APIRoutes } from '../lib/api.routes'
+import Head from 'next/head';
+import style from '../styles/login.module.css';
+import { GetStaticProps } from 'next';
+import React, { useState } from 'react';
+import SiteHeader from '../components/site-header';
+import { ErrorMessage, Formik } from 'formik';
+import * as Yup from 'yup';
+import API from '../lib/api.service';
+import Cookies from '../lib/cookies.service';
+import { APIRoutes } from '../lib/api.routes';
 import { User } from '../models/user'
 import { APIResponse } from '../models/api-response';
-import Image from 'next/image'
-import { ToastContainer } from 'react-nextjs-toast'
+import { ToastContainer } from 'react-nextjs-toast';
+import { useRouter } from 'next/router';
+import { UserType } from '../enum/type-user.enum';
 
 export default function Login() {
     const [pageName, setPageName] = useState('Login');
     const [pageType, setPageType] = useState('login');
-
+    const router = useRouter();
     const api = API();
+    const cookie = Cookies();
 
     const changePage = () => {
         setPageName( pageName === 'Login' ? 'Cadastre-se' : 'Login');
         setPageType( pageType === 'login' ? 'signup' : 'login');
     };
 
+    const redirectAfterLogin = (type) => {
+        if(type = UserType.STUDENT){
+            router.push("/selective-process");
+        }else{            
+            router.push("/admin");
+        }
+    }
+
+    const signIn = async (values) => {
+        const response: APIResponse = await api.post(APIRoutes.SIGNIN, values);    
+        const user: User =  response.result;      
+        await cookie.setToken(user.token);
+        router.push("/admin");
+        return;
+    }
+
+    const signUp = async (values) => {
+        values.type = UserType.STUDENT;
+        const response: APIResponse = await api.post(APIRoutes.SIGNUP, values);
+        setPageName('Login');
+        setPageType('login');
+    }
+
     const onSubmit = async (values: User, actions) => {
-        console.log(values);
         try {
             actions.setSubmitting(true);
-            const response: APIResponse = pageType === 'login' ? await api.post(APIRoutes.SIGNIN, values) :  await api.post(APIRoutes.SIGNUP, values);
-            console.log(response);
-            //await api.post(APIRoutes.SIGNIN, values) 
+            
+            if(pageType === 'login'){     
+                await signIn(values);
+            } else { 
+                await signUp(values);
+            }   
+
         } catch (error) {
             console.error(error);
             actions.setSubmitting(false);
@@ -46,9 +75,10 @@ export default function Login() {
                 <h1 className="h3 mb-3 fw-normal text-center">{pageType === 'login' ? 'Login' : 'Cadastre-se'}</h1>
                 <Formik
                     enableReinitialize
-                    initialValues={{ email: '', password: ''}}
+                    initialValues={{ name: '', email: '', password: ''}}
                     validationSchema={
                         Yup.object().shape({
+                            name: pageType !== 'login' ? Yup.string().required('Preencha este campo.') : null,
                             email: Yup.string().required('Preencha este campo.'),
                             password: Yup.string().required('Preencha este campo.'),
                         })}
@@ -60,7 +90,19 @@ export default function Login() {
                         handleChange,
                         setFieldValue
                     }) => (
-                        <form onSubmit={handleSubmit}>
+                        <form onSubmit={handleSubmit}>          
+                            {pageType !== 'login' && (<div className="form-floating mb-3">
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="name"
+                                    id="name"
+                                    placeholder="Nome Completo"
+                                    value={values.name}
+                                    onChange={handleChange} />
+                                <ErrorMessage name="name" className="input-error" />
+                                <label htmlFor="name" className="form-label">Nome Completo</label>
+                            </div>)}            
                             <div className="form-floating mb-3">
                                 <input
                                     type="text"
@@ -75,7 +117,7 @@ export default function Login() {
                             </div>
                             <div className="form-floating mb-3">
                                 <input
-                                    type="text"
+                                    type="password"
                                     className="form-control"
                                     name="password"
                                     id="password"
@@ -86,7 +128,7 @@ export default function Login() {
                                 <ErrorMessage name="password" className="input-error" />
                             </div>
                             <div className="text-right">
-                                <button type="submit" className="w-100 btn btn-lg btn-primary" disabled={isSubmitting}>Entrar</button>
+                                <button type="submit" className="w-100 btn btn-lg btn-primary" disabled={isSubmitting}>{pageType === 'login' ? 'Entrar' : 'Cadastrar'}</button>
                             </div>
                             <div className="text-center">
                                 <a onClick={() => changePage()}>

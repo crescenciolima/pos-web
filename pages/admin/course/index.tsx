@@ -1,43 +1,35 @@
-import { GetStaticProps } from 'next'
+import { GetServerSidePropsContext, GetStaticProps, InferGetServerSidePropsType } from 'next'
 import React, {useEffect, useState, useRef} from 'react'
 import * as Yup from 'yup'
 import {ErrorMessage, Field, Formik} from 'formik'
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 
-import AdminBase from '../../../components/admin-base'
-import CourseService from '../../../lib/course.service'
+import AdminBase from '../../../components/admin-base';
 import { Course } from "../../../models/course";
-import { APIRoutes } from '../../../lib/api.routes'
+import { APIRoutes } from '../../../lib/api.routes';
+import API from '../../../lib/api.service';
+import Cookies from '../../../lib/cookies.service';
+import { authAdmin } from '../../../utils/firebase-admin';
 
 interface AdminProps{
   course: Course;
 }
 
-export default function Admin({course}: AdminProps) {
+export default function Admin({course}: AdminProps, props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState(true);
   const [courseObject, setCourseObject] = useState(course);
   const [reload, setReload] = useState(true);
-
-  const courseService = CourseService();
+  const api = API(setLoading);
 
   const saveCourse = async (values: Course) => {
     try {
       if(courseObject){
         values = {...values, id: courseObject.id};
       }
-      const res = await fetch(
-        APIRoutes.COURSE,
-        {
-          body: JSON.stringify(values),
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          method: 'POST'
-        }
-      )
-  
-      const result = await res.json();
+      
+      const result = await api.post(APIRoutes.COURSE, values);
+
       setReload(!reload);
       console.log(result)
     } catch (error) {
@@ -57,16 +49,8 @@ export default function Admin({course}: AdminProps) {
 
   useEffect(() => {
     const loadCourse = async () => {
-      const res = await fetch(
-        APIRoutes.COURSE,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          method: 'GET'
-        }
-      )
-      const result = await res.json();
+      const result = await api.get(APIRoutes.COURSE);
+      console.log(result);
       setCourseObject(result[0] ?? result[0]);
       setLoading(false);
       console.log(result)
@@ -140,4 +124,23 @@ export default function Admin({course}: AdminProps) {
     </AdminBase>
   )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  try {
+    const cookie = Cookies();
+    const token = await cookie.getTokenServer(ctx);
+    await authAdmin.verifyIdToken(token);
+    return {
+      props: { message: `Authorized.` },
+    };
+  } catch (err) {
+    return {
+      redirect: {
+        permanent: false,
+        destination: "/login",
+      },
+      props: {} as never,
+    };
+  }
+};
 

@@ -1,14 +1,28 @@
-import Head from 'next/head'
-import { GetStaticProps } from 'next'
-import React from 'react'
-import AdminSidebar from './admin-sidebar'
-import adminStyle from '../styles/admin.module.css'
-import AdminContent from '../components/admin-content'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
-import { ToastContainer } from 'react-nextjs-toast'
+import Head from 'next/head';
+import { GetStaticProps } from 'next';
+import React from 'react';
+import AdminSidebar from './admin-sidebar';
+import adminStyle from '../styles/admin.module.css';
+import AdminContent from '../components/admin-content';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { ToastContainer } from 'react-nextjs-toast';
+import { APIRoutes } from '../lib/api.routes';
+import API from '../lib/api.service';
+import Cookies from '../lib/cookies.service';
+import { useRouter } from 'next/router';
 
 export default function AdminBase(props: any) {
+  const router = useRouter();
+  const api = API();
+  const cookie = Cookies();
+
+  const logout = async () => {
+    await api.get(APIRoutes.SIGNOUT);
+    await cookie.removeToken();
+    router.push("/login");
+  }
+
   return (
     <>
       <Head>
@@ -31,7 +45,7 @@ export default function AdminBase(props: any) {
                 <i className={adminStyle.icon}>
                   <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
                 </i>
-                <label className={adminStyle.sidebarLabel}>Sair</label>
+                <label className={adminStyle.sidebarLabel} onClick={() => logout()}>Sair</label>
               </div>
               <AdminContent>
                 {props.children}
