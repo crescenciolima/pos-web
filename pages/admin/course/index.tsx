@@ -12,11 +12,11 @@ import API from '../../../lib/api.service';
 import Cookies from '../../../lib/cookies.service';
 import { authAdmin } from '../../../utils/firebase-admin';
 
-interface AdminProps{
+interface CourseProps{
   course: Course;
 }
 
-export default function Admin({course}: AdminProps, props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function CourseLayout({course}: CourseProps, props: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [loading, setLoading] = useState(true);
   const [courseObject, setCourseObject] = useState(course);
   const [reload, setReload] = useState(true);

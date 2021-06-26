@@ -28,6 +28,12 @@ export default function AuthService() {
         });
     }
 
+    async function removeUser(user: User) {
+        return authAdmin.deleteUser(user.id).then(async () => {
+            return true;
+        });
+    }
+
     const formatUser = async (user: firebase.User) => {
         const decodedToken = await user.getIdTokenResult(true);
         const { token } = decodedToken;
@@ -39,7 +45,7 @@ export default function AuthService() {
         return userFormat;
       };
 
-    const checkAuthentication = async (req: NextApiRequest) => {
+    const checkAuthentication = async () => {
         if(!firestore.app.auth().currentUser){
             return false;
         }
@@ -63,7 +69,8 @@ export default function AuthService() {
         signUp,
         signIn,
         checkAuthentication,
-        signOut
+        signOut,
+        removeUser
     }
 
 }

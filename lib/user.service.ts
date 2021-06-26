@@ -45,7 +45,7 @@ export default function UserService() {
         userRef.doc(user.id).delete();
     }
 
-    async function getById(id) {
+    async function getById(id: any) {
         let snapshot = await userRef.doc(id).get();
         const doc = snapshot.data;
         const user: User = {

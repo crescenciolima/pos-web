@@ -11,4 +11,6 @@ export class APIRoutes {
     static SIGNUP:string = APIRoutes.API_URL + "/api/auth/signup"
     
     static SIGNOUT:string = APIRoutes.API_URL + "/api/auth/signout"
+
+    static USER:string = APIRoutes.API_URL + "/api/user"
 }

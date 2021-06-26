@@ -41,7 +41,7 @@ export default function API(setLoading?: Function) {
         try {
 
             if (setLoading) setLoading(true);
-            
+            console.log(body);
             const res = await fetch(url, {          
                 body: JSON.stringify(body),
                 headers: header,
