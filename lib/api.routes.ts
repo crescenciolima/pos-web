@@ -8,4 +8,7 @@ export class APIRoutes {
 
     static NEWS:string = APIRoutes.API_URL + "/api/news"
 
+    static SELECTIVE_PROCESS:string = APIRoutes.API_URL + "/api/selectiveprocess"
+
+
 }

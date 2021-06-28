@@ -7,7 +7,7 @@ import Link from 'next/link'
 export default function AdminSidebar() {
 
     return (
-        <nav className="col-md-3 col-lg-3 d-md-block sidebar">
+        <nav className="col-md-3 col-lg-2 d-md-block sidebar">
             <div className="d-flex flex-column p-3 text-primary">
                 <a className="navbar-brand text-center" href="/">
                     <Image src="/images/ifbavca.png" className="d-inline-block align-text-top" alt="Logo" width={140} height={40} priority={true} />
@@ -66,12 +66,15 @@ export default function AdminSidebar() {
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="nav-link text-primary ">
-                            <i className={adminStyle.icon}>
-                                <FontAwesomeIcon icon={faFolder} className="sm-icon" />
-                            </i>
-                            <label className={adminStyle.sidebarLabel}>Processos Seletivos</label>
-                        </a>
+                        <Link href="/admin/selectiveprocess">
+                            <a href="#" className="nav-link text-primary ">
+                                <i className={adminStyle.icon}>
+                                    <FontAwesomeIcon icon={faFolder} className="sm-icon" />
+                                </i>
+                                <label className={adminStyle.sidebarLabel}>Processo Seletivo</label>
+                            </a>
+                        </Link>
+
                     </li>
                     <li>
                         <a href="#" className="nav-link text-primary ">

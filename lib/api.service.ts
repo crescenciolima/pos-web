@@ -39,7 +39,10 @@ export default function API(setLoading?: Function) {
             if (setLoading) setLoading(true);
             const res = await fetch(url, {
                 method: 'POST',
-                body: body
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
             const result: APIResponse = await res.json();
 

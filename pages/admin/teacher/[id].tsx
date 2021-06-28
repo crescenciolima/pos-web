@@ -24,18 +24,14 @@ export default function SaveTeacherLayout() {
         photo: "",
     });
     const [file, setFile] = useState<FileList>();
-    // const [newTeacher, setNewTeacher] = useState<boolean>(false);
 
     useEffect(() => {
 
         const { id } = router.query;
         if (id) {
             if (id.toString() == "new") {
-                // setNewTeacher(true);
             } else {
-                console.log(id);
                 getTeacher(id.toString());
-                // setNewTeacher(false);
             }
         }
 
@@ -49,8 +45,6 @@ export default function SaveTeacherLayout() {
     }
 
     const saveTeacher = async (values: Teacher) => {
-        console.log(values);
-        console.log(teacher);
         if(teacher.photo != ""){
             values = {...values, photo: teacher.photo};
         }

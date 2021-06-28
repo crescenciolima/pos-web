@@ -26,7 +26,7 @@ export default function AdminBase(props: any) {
         <div className="container-fluid">
           <div className='row'>
             <AdminSidebar />
-            <div className="col-md-9 ms-sm-auto col-lg-9 px-md-4">
+            <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
               <div className="text-right p-3 text-primary">
                 <i className={adminStyle.icon}>
                   <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />

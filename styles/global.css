@@ -206,3 +206,11 @@ tr{
     max-width: 150px;
     border-radius: 9999px;
 }
+
+.nav-fill .nav-item .active{
+    color: var(--primary);
+}
+
+.nav-fill .nav-item .sm-icon{
+    height: 20px;
+}
