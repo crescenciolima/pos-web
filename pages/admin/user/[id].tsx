@@ -19,28 +19,18 @@ export default function SaveUserLayout() {
     const [user, setUser] = useState<User>({
         name: "",
         email: "",
-        type: "",
     });
     const [file, setFile] = useState<FileList>();
-    // const [newUser, setNewUser] = useState<boolean>(false);
 
     useEffect(() => {
-
         const { id } = router.query;
-        if (id) {
-            if (id.toString() == "new") {
-                // setNewUser(true);
-            } else {
-                console.log(id);
-                getUser(id.toString());
-                // setNewUser(false);
-            }
+        if (id && id.toString() !== "new") {
+            getUser(id.toString());
         }
 
     }, [router.query]);
 
     const getUser = async (id: string) => {
-        //Recupera o valor do banco de dados
         const result: APIResponse = await api.get(APIRoutes.USER, { 'id': id });
         const user: User = result.result;
         setUser(user);
@@ -75,7 +65,7 @@ export default function SaveUserLayout() {
             </div>
             <Formik
                 enableReinitialize
-                initialValues={{ ...user}}
+                initialValues={{ ...user, type: user ? user.type : 'master'}}
                 validationSchema={
                     Yup.object().shape({
                         name: Yup.string().required('Preencha este campo.'),

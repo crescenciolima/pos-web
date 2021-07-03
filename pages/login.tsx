@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import style from '../styles/login.module.css';
-import { GetStaticProps } from 'next';
+import { GetServerSidePropsContext, GetStaticProps, InferGetServerSidePropsType } from 'next';
 import React, { useState } from 'react';
 import SiteHeader from '../components/site-header';
 import { ErrorMessage, Formik } from 'formik';
@@ -13,8 +13,9 @@ import { APIResponse } from '../models/api-response';
 import { ToastContainer } from 'react-nextjs-toast';
 import { useRouter } from 'next/router';
 import { UserType } from '../enum/type-user.enum';
+import { authAdmin } from '../utils/firebase-admin';
 
-export default function Login() {
+export default function Login(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [pageName, setPageName] = useState('Login');
     const [pageType, setPageType] = useState('login');
     const router = useRouter();
@@ -26,19 +27,20 @@ export default function Login() {
         setPageType( pageType === 'login' ? 'signup' : 'login');
     };
 
-    const redirectAfterLogin = (type) => {
-        if(type = UserType.STUDENT){
+    const redirectAfterLogin = (type: string) => {
+        if(type === UserType.STUDENT){
             router.push("/selective-process");
         }else{            
             router.push("/admin");
         }
     }
 
-    const signIn = async (values) => {
+    const signIn = async (values: any) => {
         const response: APIResponse = await api.post(APIRoutes.SIGNIN, values);    
-        const user: User =  response.result;      
+        const user: User =  response.result;    
+        console.log(user);  
         await cookie.setToken(user.token);
-        router.push("/admin");
+        redirectAfterLogin(user.type);
         return;
     }
 
@@ -144,12 +146,36 @@ export default function Login() {
         )
 }
 
-export const getStaticProps: GetStaticProps = async () => {
-    const allPostsData = []
-    return {
-      props: {
-        allPostsData
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+    try {
+      const cookie = Cookies();
+      const token = await cookie.getTokenServer(ctx);
+      await authAdmin.verifyIdToken(token);
+      
+      const api = API();
+      const response: APIResponse = await api.get(APIRoutes.CURRENT_USER);    
+      const user: User =  response.result;   
+      let redirect =  '';
+      console.log(user);  
+      
+      if(user.type === UserType.STUDENT){
+        redirect = "/selective-process";
+      }else if ([UserType.MASTER, UserType.ADMIN].includes(user.type as UserType)){            
+        redirect = "/admin";
       }
+      
+      return  {
+        redirect: {
+          permanent: false,
+          destination: redirect,
+        },
+        props: {} as never,
+      };
+
+    } catch (err) {
+      return {
+        props: {} as never
+      };
     }
-  }
+  };
   

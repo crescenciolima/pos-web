@@ -47,7 +47,7 @@ export default function UserService() {
 
     async function getById(id: any) {
         let snapshot = await userRef.doc(id).get();
-        const doc = snapshot.data;
+        const doc = snapshot.data();
         const user: User = {
             id: id,
             email: doc['email'],

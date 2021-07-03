@@ -22,20 +22,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     await cors(req, res);
 
-    if (req.method === 'POST') {
-        const {email, password} = req.body;
-
-        let user: User = {
-            email: email,
-            password: password
-        }
-        
-        user = await authService.signIn(user);        
-        const userData = await userService.getById(user.id);
-        user.type = userData.type;
+    if (req.method === 'GET') {        
+        const currentUser = await authService.currentUser();        
+        const user = await userService.getById(currentUser.uid);
 
         let response: APIResponse = {
-            msg: "Login efetuado com sucesso!",
+            msg: "Usuário atual encontrado com sucesso!",
             result: user
         }
         res.status(200).json(response);

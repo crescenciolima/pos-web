@@ -31,21 +31,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       try{
         console.log(req.body);
         const id = req.body.id;
-        const { name, email, password }: User = req.body;
+        const { name, email, password, type }: User = req.body;
   
-        const user: User = {
+        let user: User = {
           name: name,
           email: email,
-          password: password
+          password: password,
+          type: type
         }
 
         if(id){
           user.id = id;
-          await userService.update(user);
         }else{
-          await userService.save(user);
-          await authService.signUp(user);
+          const result: User = await authService.signUp(user);
+          user.id = result.id;
+          delete user.password;
         }
+        await userService.update(user);
   
         let response: APIResponse = {
           msg: "Usuário salvo com sucesso!",

@@ -34,16 +34,9 @@ export default function AuthService() {
         });
     }
 
-    const formatUser = async (user: firebase.User) => {
-        const decodedToken = await user.getIdTokenResult(true);
-        const { token } = decodedToken;
-        const userFormat: User = {
-          id: user.uid,
-          email: user.email,
-          token,
-        };
-        return userFormat;
-      };
+    async function currentUser() {
+        return firestore.app.auth().currentUser;
+    }
 
     const checkAuthentication = async () => {
         if(!firestore.app.auth().currentUser){
@@ -65,12 +58,25 @@ export default function AuthService() {
         return true;
     } 
 
+
+    const formatUser = async (user: firebase.User) => {
+        const decodedToken = await user.getIdTokenResult(true);
+        const { token } = decodedToken;
+        const userFormat: User = {
+          id: user.uid,
+          email: user.email,
+          token,
+        };
+        return userFormat;
+    };
+
     return {
         signUp,
         signIn,
         checkAuthentication,
         signOut,
-        removeUser
+        removeUser,
+        currentUser
     }
 
 }
