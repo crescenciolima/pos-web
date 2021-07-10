@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react'
-
-import AdminBase from '../../../components/admin-base'
-import { APIRoutes } from '../../../lib/api.routes'
-import { User } from '../../../models/user';
 import { useRouter } from 'next/router'
 import Link from 'next/link';
-import * as Yup from 'yup'
-import { ErrorMessage, Field, Formik } from 'formik'
-import { toast } from 'react-nextjs-toast'
+import { GetServerSidePropsContext } from 'next';
+import * as Yup from 'yup';
+import ClipLoader from "react-spinners/ClipLoader";
+import { css } from "@emotion/core";
+import { ErrorMessage, Field, Formik } from 'formik';
+import { toast } from 'react-nextjs-toast';
+
+import AdminBase from '../../../components/admin-base';
+import { APIRoutes } from '../../../lib/api.routes';
 import API from '../../../lib/api.service';
+import Permission from '../../../lib/permission.service';
 import { APIResponse } from '../../../models/api-response';
+import { User } from '../../../models/user';
+import { UserType } from '../../../enum/type-user.enum';
 
 export default function SaveUserLayout() {
-
+    const [loading, setLoading] = useState(true);
     const router = useRouter();
     const api = API();
 
@@ -26,33 +31,55 @@ export default function SaveUserLayout() {
         const { id } = router.query;
         if (id && id.toString() !== "new") {
             getUser(id.toString());
+        } else {
+            setLoading(false);
         }
-
     }, [router.query]);
 
     const getUser = async (id: string) => {
         const result: APIResponse = await api.get(APIRoutes.USER, { 'id': id });
         const user: User = result.result;
-        setUser(user);
+        setUser(user);     
+        setLoading(false);  
     }
 
-    const saveUser = async (values: User) => {
-        console.log(values);
-        console.log(user);
-        api.post(APIRoutes.USER, values);
+    const saveUser = async (values: User, actions) => {
+        try{
+            const result = await api.post(APIRoutes.USER, values);
+            if(result){
+                router.push("/admin/user");
+            }
+            actions.setSubmitting(false);
+        }catch(e){
+            actions.setSubmitting(false);          
+        }
     };
 
     const onSubmit = async (values, actions) => {
+        console.log('teste');
         try {
             actions.setSubmitting(true);
-            await saveUser(values);
+            await saveUser(values, actions);
         } catch (error) {
-            console.error(error);
+            console.error(error, actions);
             actions.setSubmitting(false);
         }
     }
  
+    const override = css`  
+        display: block;
+        margin: 0 auto;
+    `;
 
+    if(loading){
+        return (
+          <AdminBase>
+            <div>
+              <ClipLoader color="#34A853" loading={loading} size={50} css={override}/>
+            </div>
+          </AdminBase>
+        );
+    }
 
     return (
         <AdminBase>
@@ -65,13 +92,13 @@ export default function SaveUserLayout() {
             </div>
             <Formik
                 enableReinitialize
-                initialValues={{ ...user, type: user ? user.type : 'master'}}
+                initialValues={{ ...user, type: user.id ? user.type : 'admin'}}
                 validationSchema={
                     Yup.object().shape({
                         name: Yup.string().required('Preencha este campo.'),
                         email: Yup.string().required('Preencha este campo.'),
                         type: Yup.string().required('Preencha este campo.'),
-                        password: Yup.string().required('Preencha este campo.'),
+                        password: !user.id ? Yup.string().required('Preencha este campo.') : null,
                     })}
                 onSubmit={onSubmit}>
                 {({
@@ -92,7 +119,7 @@ export default function SaveUserLayout() {
                                 placeholder="Nome do usuário"
                                 value={values.name}
                                 onChange={handleChange} />
-                            <ErrorMessage name="name" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="name"/></p>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="name" className="form-label">E-mail</label>
@@ -104,7 +131,7 @@ export default function SaveUserLayout() {
                                 placeholder="E-mail"
                                 value={values.email}
                                 onChange={handleChange} />
-                            <ErrorMessage name="email" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="email" /></p>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="type" className="form-label">Tipo</label>
@@ -119,7 +146,7 @@ export default function SaveUserLayout() {
                                 <option value="admin">Administrativo</option>
                                 <option value="master">Master</option>
                             </select>
-                            <ErrorMessage name="type" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="type" /></p>
                         </div>
                         {!user.id && (<div className="mb-3">
                             <label htmlFor="password" className="form-label">Senha</label>
@@ -131,7 +158,7 @@ export default function SaveUserLayout() {
                                 placeholder="Senha"
                                 value={values.password}
                                 onChange={handleChange} />
-                            <ErrorMessage name="password" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="password" /></p>
                         </div>)}
                         <div className="text-right">
                         <button type="submit" className="btn btn-primary mt-3 me-auto" disabled={isSubmitting}>Salvar</button>
@@ -142,4 +169,9 @@ export default function SaveUserLayout() {
         </AdminBase>
     )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+    const permission = Permission();
+    return await permission.checkPermission(ctx, [UserType.MASTER]);
+};
 

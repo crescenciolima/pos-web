@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import { GetStaticProps } from 'next';
+import { GetServerSidePropsContext, GetStaticProps } from 'next';
 import React from 'react';
 import AdminSidebar from './admin-sidebar';
 import adminStyle from '../styles/admin.module.css';
@@ -11,6 +11,9 @@ import { APIRoutes } from '../lib/api.routes';
 import API from '../lib/api.service';
 import Cookies from '../lib/cookies.service';
 import { useRouter } from 'next/router';
+import { UserType } from '../enum/type-user.enum';
+import Permission from '../lib/permission.service';
+import { InferGetServerSidePropsType } from 'next';
 
 export default function AdminBase(props: any) {
   const router = useRouter();
@@ -59,3 +62,4 @@ export default function AdminBase(props: any) {
     </>
   )
 }
+

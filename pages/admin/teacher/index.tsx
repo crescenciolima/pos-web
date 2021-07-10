@@ -10,6 +10,9 @@ import Loading from '../../../components/loading';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { GetServerSidePropsContext } from 'next';
+import { UserType } from '../../../enum/type-user.enum';
+import Permission from '../../../lib/permission.service';
 
 
 export default function TeacherLayout() {
@@ -26,6 +29,7 @@ export default function TeacherLayout() {
 
     api.get(APIRoutes.TEACHER).then(
       (result: APIResponse) => {
+        console.log(result);
         setTeachers(result.result);
       }
     )
@@ -104,4 +108,9 @@ export default function TeacherLayout() {
     </AdminBase>
   )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const permission = Permission();
+  return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
+};
 

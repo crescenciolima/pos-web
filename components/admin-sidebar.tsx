@@ -3,9 +3,12 @@ import adminStyle from '../styles/admin.module.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChartLine, faBookReader, faChalkboardTeacher, faFile, faFileAlt, faFileInvoice, faFolder, faCopy, faUser } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import Permission from '../lib/permission.service'
+import { UserType } from '../enum/type-user.enum'
 
 export default function AdminSidebar() {
-
+    //const { userType } = props; 
     return (
         <nav className="col-md-3 col-lg-3 d-md-block sidebar">
             <div className="d-flex flex-column p-3 text-primary">

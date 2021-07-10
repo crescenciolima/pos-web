@@ -11,6 +11,8 @@ import { APIRoutes } from '../../../lib/api.routes';
 import API from '../../../lib/api.service';
 import Cookies from '../../../lib/cookies.service';
 import { authAdmin } from '../../../utils/firebase-admin';
+import Permission from '../../../lib/permission.service';
+import { UserType } from '../../../enum/type-user.enum';
 
 interface CourseProps{
   course: Course;
@@ -50,10 +52,8 @@ export default function CourseLayout({course}: CourseProps, props: InferGetServe
   useEffect(() => {
     const loadCourse = async () => {
       const result = await api.get(APIRoutes.COURSE);
-      console.log(result);
       setCourseObject(result[0] ?? result[0]);
       setLoading(false);
-      console.log(result)
     };
 
     loadCourse();
@@ -126,21 +126,7 @@ export default function CourseLayout({course}: CourseProps, props: InferGetServe
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  try {
-    const cookie = Cookies();
-    const token = await cookie.getTokenServer(ctx);
-    await authAdmin.verifyIdToken(token);
-    return {
-      props: { message: `Authorized.` },
-    };
-  } catch (err) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/login",
-      },
-      props: {} as never,
-    };
-  }
+  const permission = Permission();
+  return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
 };
 

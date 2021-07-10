@@ -1,11 +1,9 @@
 import { toast } from 'react-nextjs-toast'
 import { APIResponse } from '../models/api-response';
 import Cookies from '../lib/cookies.service';
+import { GetServerSidePropsContext } from 'next';
 
 export default function API(setLoading?: Function) {
-    const header =  {
-        'Content-Type': 'application/json'
-    };
 
     async function postFile(url: string, body, file) {
         try {
@@ -44,25 +42,29 @@ export default function API(setLoading?: Function) {
             console.log(body);
             const res = await fetch(url, {          
                 body: JSON.stringify(body),
-                headers: header,
                 method: 'POST',
             });
+            console.log(res);
 
             const result: APIResponse = await res.json();
 
-            toast.notify(result.msg, {
-                duration: 3,
-                type: "success",
-                title: "Notificação"
-            });
-
+            if(result.error){                
+                showNotify(result.msg, "error","Erro");                
+                if (setLoading) setLoading(false);
+                return;
+            }
+            
+            showNotify(result.msg, "success","Notificação");
             if (setLoading) setLoading(false);
 
             return result;
         } catch (error) {
             console.log(error)
+            showNotify(error.msg, "error","Erro");
+
             if (setLoading) setLoading(false);
-            return error;
+
+            return;
         }
 
     }
@@ -126,14 +128,23 @@ export default function API(setLoading?: Function) {
 
         } catch (error) {
             console.error(error);
+
             toast.notify("Ocorreu um erro ao buscar os dados", {
                 duration: 3,
                 type: "error",
                 title: "Erro"
             });
-            if (setLoading) setLoading(false);
 
+            if (setLoading) setLoading(false);
         }
+    }
+
+    async function showNotify(message, type, title) {
+        toast.notify(message, {
+            duration: 3,
+            type: type,
+            title: title
+        });
     }
 
     return {

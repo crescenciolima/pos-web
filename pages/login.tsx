@@ -7,6 +7,7 @@ import { ErrorMessage, Formik } from 'formik';
 import * as Yup from 'yup';
 import API from '../lib/api.service';
 import Cookies from '../lib/cookies.service';
+import Permission from '../lib/permission.service';
 import { APIRoutes } from '../lib/api.routes';
 import { User } from '../models/user'
 import { APIResponse } from '../models/api-response';
@@ -147,35 +148,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-    try {
-      const cookie = Cookies();
-      const token = await cookie.getTokenServer(ctx);
-      await authAdmin.verifyIdToken(token);
-      
-      const api = API();
-      const response: APIResponse = await api.get(APIRoutes.CURRENT_USER);    
-      const user: User =  response.result;   
-      let redirect =  '';
-      console.log(user);  
-      
-      if(user.type === UserType.STUDENT){
-        redirect = "/selective-process";
-      }else if ([UserType.MASTER, UserType.ADMIN].includes(user.type as UserType)){            
-        redirect = "/admin";
-      }
-      
-      return  {
-        redirect: {
-          permanent: false,
-          destination: redirect,
-        },
-        props: {} as never,
-      };
-
-    } catch (err) {
-      return {
-        props: {} as never
-      };
-    }
-  };
+    const permission = Permission();
+    return await permission.checkPermissionLogin(ctx);
+};
   

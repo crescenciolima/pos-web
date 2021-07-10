@@ -10,9 +10,12 @@ import Loading from '../../../components/loading';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { UserType } from '../../../enum/type-user.enum';
+import Permission from '../../../lib/permission.service';
 
 
-export default function UserLayout() {
+export default function UserLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User>({name:"",email:"",});
@@ -104,4 +107,9 @@ export default function UserLayout() {
     </AdminBase>
   )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const permission = Permission();
+  return await permission.checkPermission(ctx, [UserType.MASTER]);
+};
 

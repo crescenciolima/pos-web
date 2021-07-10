@@ -9,46 +9,15 @@ import { APIResponse } from "../../models/api-response";
 import { User } from "../../models/user";
 import { UserType } from "../../enum/type-user.enum";
 import { useRouter } from "next/router";
+import Permission from "../../lib/permission.service";
 
 export default function Admin(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  console.log(props);
   return (
         <AdminBase />
   )
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-  try {
-    const cookie = Cookies();
-    const token = await cookie.getTokenServer(ctx);
-    await authAdmin.verifyIdToken(token);
-    
-    const api = API();
-    const response: APIResponse = await api.get(APIRoutes.CURRENT_USER);    
-    const user: User =  response.result;   
-    console.log(user);  
-
-    if([UserType.MASTER, UserType.ADMIN].includes(user.type as UserType)){
-      return {
-        props: { message: `Authorized.` },
-      };
-    }
-
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/login",
-      },
-      props: {} as never,
-    };
-
-  } catch (err) {
-    return {
-      redirect: {
-        permanent: false,
-        destination: "/login",
-      },
-      props: {} as never,
-    };
-  }
+  const permission = Permission();
+  return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
 };
