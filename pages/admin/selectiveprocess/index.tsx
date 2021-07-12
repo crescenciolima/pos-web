@@ -14,6 +14,8 @@ import { SelectiveProcess } from '../../../models/selective-process';
 import fire from '../../../utils/firebase-util';
 import SelectiveProcessBasicInfo from '../../../components/selectiveprocess/basic-info';
 import SelectiveProcessPlaces from '../../../components/selectiveprocess/places';
+import SelectiveProcessBarema from '../../../components/selectiveprocess/barema';
+import SelectiveProcessDocuments from '../../../components/selectiveprocess/documents';
 
 
 export default function SelectiveProcessLayout() {
@@ -73,7 +75,7 @@ export default function SelectiveProcessLayout() {
   // }
 
   function menusSaveCallback(process:SelectiveProcess) {
-    setSelectiveProcess(process);
+    setSelectiveProcess({...selectiveProcess, ...process});
   }
 
 
@@ -83,11 +85,6 @@ export default function SelectiveProcessLayout() {
         <div className="col-6">
           <h3 className="text-primary-dark">Processo Seletivo</h3>
         </div>
-        {/* <div className="col-6 text-right">
-          <Link href="/admin/teacher/new">
-            <a className="btn btn-primary">Cadastrar</a>
-          </Link>
-        </div> */}
       </div>
       {(!inConstruction && !isLoading) &&
         <>
@@ -124,18 +121,16 @@ export default function SelectiveProcessLayout() {
             <div className="col-12">
               <ul className="nav nav-tabs nav-fill">
                 <li className="nav-item">
-                  <a className={'nav-link ' + (menuSelection == 'dadosbasicos' ? 'active' : '')} onClick={(e) => setMenuSelection('dadosbasicos')} aria-current="page" >
-                  <FontAwesomeIcon icon={faFileAlt} className="sm-icon me-2" />Dados básicos</a>
+                  <a className={'nav-link ' + (menuSelection == 'dadosbasicos' ? 'active' : '')} onClick={(e) => setMenuSelection('dadosbasicos')} aria-current="page" >Dados básicos</a>
                 </li>
                 <li className="nav-item">
-                  <a className={'nav-link ' + (menuSelection == 'vagas' ? 'active' : '')} onClick={(e) => setMenuSelection('vagas')}>
-                    <FontAwesomeIcon icon={faUniversalAccess} className="sm-icon me-2" /> Vagas</a>
+                  <a className={'nav-link ' + (menuSelection == 'vagas' ? 'active' : '')} onClick={(e) => setMenuSelection('vagas')}> Vagas</a>
                 </li>
                 <li className="nav-item">
-                  <a className={'nav-link ' + (menuSelection == 'edital' ? 'active' : '')} onClick={(e) => setMenuSelection('edital')} href="#">Edital</a>
+                  <a className={'nav-link ' + (menuSelection == 'documents' ? 'active' : '')} onClick={(e) => setMenuSelection('documents')} >Documentos</a>
                 </li>
                 <li className="nav-item">
-                  <a className={'nav-link ' + (menuSelection == 'outro' ? 'active' : '')} href="#" aria-disabled="true">Disabled</a>
+                  <a className={'nav-link ' + (menuSelection == 'barema' ? 'active' : '')}   aria-disabled="true" onClick={(e) => setMenuSelection('barema')} >Barema</a>
                 </li>
               </ul>
             </div>
@@ -144,6 +139,8 @@ export default function SelectiveProcessLayout() {
             <div className="col-12">
               {(menuSelection == 'dadosbasicos') && <SelectiveProcessBasicInfo process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessBasicInfo>}
               {(menuSelection == 'vagas') && <SelectiveProcessPlaces process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessPlaces>}
+              {(menuSelection == 'barema') && <SelectiveProcessBarema process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessBarema>}
+              {(menuSelection == 'documents') && <SelectiveProcessDocuments process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessDocuments>}
             </div>
           </div>
 

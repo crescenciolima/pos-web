@@ -129,11 +129,59 @@ export default function API(setLoading?: Function) {
         }
     }
 
+
+    async function excludeFormData(url: string, body?) {
+        try {
+            if (setLoading) setLoading(true);
+
+            let data = new FormData();
+            for (let key in body) {
+                if(typeof body[key] == "object"){
+                    data.append(key, JSON.stringify(body[key]));
+                }else{
+                    data.append(key, body[key]);
+                }
+            }
+
+            // if (params) {
+            //     let urlBuilder = new URL(url);
+            //     urlBuilder.search = new URLSearchParams(params).toString();
+            //     url = urlBuilder.toString();
+            // }
+
+            const res = await fetch(url, {
+                method: 'DELETE',
+                body: data
+            });
+
+            const result: APIResponse = await res.json();
+
+            toast.notify(result.msg, {
+                duration: 3,
+                type: "success",
+                title: "Notificação"
+            });
+            if (setLoading) setLoading(false);
+            return result;
+
+        } catch (error) {
+            console.error(error);
+            toast.notify("Ocorreu um erro ao buscar os dados", {
+                duration: 3,
+                type: "error",
+                title: "Erro"
+            });
+            if (setLoading) setLoading(false);
+
+        }
+    }
+
     return {
         postFile,
         post,
         get,
-        exclude
+        exclude,
+        excludeFormData
     }
 
 }

@@ -130,6 +130,7 @@ async function endpoint(req: NextApiRequest , res: NextApiResponse) {
       }
 
       res.status(200).json(deleteResponse);
+      break;
 
     default:
       console.log(req.method)

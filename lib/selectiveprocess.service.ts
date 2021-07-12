@@ -9,7 +9,7 @@ export default function SelectiveProcessService() {
 
     async function getInConstruction() {
         let snapshot = await selectiveProcessRef.where('inConstruction', '==', true).get();
-        if(snapshot.size > 0){
+        if (snapshot.size > 0) {
             const doc = snapshot.docs[0];
             const data = doc.data();
             const selectiveProcess: SelectiveProcess = {
@@ -19,9 +19,12 @@ export default function SelectiveProcessService() {
                 inConstruction: data['inConstruction'],
                 numberPlaces: data['numberPlaces'],
                 description: data['description'],
-                reservedPlaces: data['reservedPlaces']
+                reservedPlaces: data['reservedPlaces'],
+                baremaCategories: data['baremaCategories'],
+                processForms: data['processForms'],
+                processNotices: data['processNotices'],
             }
-            
+
             return selectiveProcess;
         }
         return null;
@@ -67,14 +70,20 @@ export default function SelectiveProcessService() {
 
     async function getById(id) {
         let snapshot = await selectiveProcessRef.doc(id).get();
-        const doc = snapshot.data;
-        const course: Course = {
+        const doc = snapshot.data();
+        const process: SelectiveProcess = {
             id: id,
-            name: doc['name'],
+            title: doc['title'],
+            open: doc['open'],
+            inConstruction: doc['inConstruction'],
+            numberPlaces: doc['numberPlaces'],
             description: doc['description'],
+            reservedPlaces: doc['reservedPlaces'],
+            baremaCategories: doc['baremaCategories'],
+            processForms: doc['processForms'],
+            processNotices: doc['processNotices'],
         }
-
-        return course;
+        return process;
     }
 
 
