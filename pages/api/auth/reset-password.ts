@@ -26,27 +26,18 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     if (req.method === 'POST') {
         console.log(req.body);
-        const { email, password } = req.body;
-        console.log(req.body.email, password);
+        const { code, password } = req.body;
 
-        let user: User = {
-            email: email,
-            password: password
-        }
-        console.log(user);
 
-        const result: any = await authService.signIn(user);
+        const result: any = await authService.confirmPasswordReset(code, password);
           
         if(result.error){        
           return res.status(400).json(await treatError.firebase(result));
         }
-      
-        const userData = await userService.getById(result.id);
-        result.type = userData.type;
 
         let response: APIResponse = {
-            msg: "Login efetuado com sucesso!",
-            result: result
+            msg: "A senha foi redefinida com sucesso!",
+            result: {}
         }
         res.status(200).json(response);
 

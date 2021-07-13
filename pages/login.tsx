@@ -1,20 +1,19 @@
 import Head from 'next/head';
-import style from '../styles/login.module.css';
 import { GetServerSidePropsContext, GetStaticProps, InferGetServerSidePropsType } from 'next';
 import React, { useState } from 'react';
-import SiteHeader from '../components/site-header';
 import { ErrorMessage, Formik } from 'formik';
 import * as Yup from 'yup';
+import { ToastContainer } from 'react-nextjs-toast';
+import { useRouter } from 'next/router';
+
+import style from '../styles/login.module.css';
+import SiteHeader from '../components/site-header';
 import API from '../lib/api.service';
 import Cookies from '../lib/cookies.service';
 import Permission from '../lib/permission.service';
 import { APIRoutes } from '../lib/api.routes';
-import { User } from '../models/user'
-import { APIResponse } from '../models/api-response';
-import { ToastContainer } from 'react-nextjs-toast';
-import { useRouter } from 'next/router';
+import { User } from '../models/user';
 import { UserType } from '../enum/type-user.enum';
-import { authAdmin } from '../utils/firebase-admin';
 
 export default function Login(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [pageName, setPageName] = useState('Login');
@@ -23,9 +22,32 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
     const api = API();
     const cookie = Cookies();
 
-    const changePage = () => {
-        setPageName( pageName === 'Login' ? 'Cadastre-se' : 'Login');
-        setPageType( pageType === 'login' ? 'signup' : 'login');
+    const PAGES = {
+        LOGIN: 'login',
+        SIGNUP: 'signup',
+        FORGOT_PASSWORD: 'forgot-password',
+      };
+      
+
+    const buildPage = (): { [key: string]: string; } => {
+        return {
+            [PAGES.LOGIN]: 'Login',
+            [PAGES.SIGNUP]: 'Cadastre-se',
+            [PAGES.FORGOT_PASSWORD]: 'Esqueceu a sua senha?',
+        };
+    };
+
+    const buildButton = (): { [key: string]: string; } => {
+        return {
+            [PAGES.LOGIN]: 'Entrar',
+            [PAGES.SIGNUP]: 'Cadastrar',
+            [PAGES.FORGOT_PASSWORD]: 'Enviar e-mail',
+        };
+    };
+
+    const changePage = (page) => {
+        setPageName(buildPage()[page]);
+        setPageType(page);
     };
 
     const redirectAfterLogin = (type: string) => {
@@ -37,29 +59,43 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
     }
 
     const signIn = async (values: any) => {
-        const response: APIResponse = await api.post(APIRoutes.SIGNIN, values);    
-        const user: User =  response.result;    
-        console.log(user);  
-        await cookie.setToken(user.token);
-        redirectAfterLogin(user.type);
-        return;
+        const response = await api.post(APIRoutes.SIGNIN, values);            
+        if(response){
+            const user: User =  response.result;    
+            console.log(user);  
+            await cookie.setToken(user.token);
+            redirectAfterLogin(user.type);
+            return;
+        }
     }
 
     const signUp = async (values) => {
         values.type = UserType.STUDENT;
-        const response: APIResponse = await api.post(APIRoutes.SIGNUP, values);
-        setPageName('Login');
-        setPageType('login');
+        const result = await api.post(APIRoutes.SIGNUP, values);
+        if(result){
+            setPageName(buildPage()[PAGES.LOGIN]);
+            setPageType(PAGES.LOGIN);
+        }
+    }
+
+    const forgotPassword = async (values) => {
+        const result = await api.post(APIRoutes.FORGOT_PASSWORD, values);
+        if(result){
+            setPageName(buildPage()[PAGES.LOGIN]);
+            setPageType(PAGES.LOGIN);
+        }
     }
 
     const onSubmit = async (values: User, actions) => {
         try {
             actions.setSubmitting(true);
             
-            if(pageType === 'login'){     
+            if(pageType === PAGES.LOGIN){     
                 await signIn(values);
-            } else { 
+            } else if (pageType === PAGES.SIGNUP) { 
                 await signUp(values);
+            } else if (pageType === PAGES.FORGOT_PASSWORD) { 
+                await forgotPassword(values);
             }   
 
         } catch (error) {
@@ -75,15 +111,15 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
             </Head>
             <SiteHeader></SiteHeader>
             <main className={style.formSignin}>                
-                <h1 className="h3 mb-3 fw-normal text-center">{pageType === 'login' ? 'Login' : 'Cadastre-se'}</h1>
+                <h1 className="h3 mb-3 fw-normal text-center">{pageName}</h1>
                 <Formik
                     enableReinitialize
                     initialValues={{ name: '', email: '', password: ''}}
                     validationSchema={
                         Yup.object().shape({
-                            name: pageType !== 'login' ? Yup.string().required('Preencha este campo.') : null,
+                            name: pageType === PAGES.SIGNUP ? Yup.string().required('Preencha este campo.') : null,
                             email: Yup.string().required('Preencha este campo.'),
-                            password: Yup.string().required('Preencha este campo.'),
+                            password: pageType === PAGES.LOGIN ? Yup.string().required('Preencha este campo.') : null,
                         })}
                     onSubmit={onSubmit}>
                     {({
@@ -94,18 +130,20 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
                         setFieldValue
                     }) => (
                         <form onSubmit={handleSubmit}>          
-                            {pageType !== 'login' && (<div className="form-floating mb-3">
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    name="name"
-                                    id="name"
-                                    placeholder="Nome Completo"
-                                    value={values.name}
-                                    onChange={handleChange} />
-                                <ErrorMessage name="name" className="input-error" />
-                                <label htmlFor="name" className="form-label">Nome Completo</label>
-                            </div>)}            
+                            {pageType === PAGES.SIGNUP && (
+                                <div className="form-floating mb-3">
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        name="name"
+                                        id="name"
+                                        placeholder="Nome Completo"
+                                        value={values.name}
+                                        onChange={handleChange} />
+                                    <p className="input-error"><ErrorMessage name="name" className="input-error" /></p>
+                                    <label htmlFor="name" className="form-label">Nome Completo</label>
+                                </div>
+                            )}            
                             <div className="form-floating mb-3">
                                 <input
                                     type="text"
@@ -115,28 +153,39 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
                                     placeholder="E-mail"
                                     value={values.email}
                                     onChange={handleChange} />
-                                <ErrorMessage name="email" className="input-error" />
+                                <p className="input-error"><ErrorMessage name="email" className="input-error" /></p>
                                 <label htmlFor="email" className="form-label">E-mail</label>
                             </div>
-                            <div className="form-floating mb-3">
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    name="password"
-                                    id="password"
-                                    placeholder="Senha"
-                                    value={values.password}
-                                    onChange={handleChange} />
-                                <label htmlFor="password" className="form-label">Senha</label>
-                                <ErrorMessage name="password" className="input-error" />
-                            </div>
+                            {pageType === PAGES.LOGIN && (
+                                <div className="form-floating mb-3">
+                                    <input
+                                        type="password"
+                                        className="form-control"
+                                        name="password"
+                                        id="password"
+                                        placeholder="Senha"
+                                        value={values.password}
+                                        onChange={handleChange} />
+                                    <label htmlFor="password" className="form-label">Senha</label>
+                                    <p className="input-error"><ErrorMessage name="password" className="input-error" /></p>
+                                </div>
+                            )}
                             <div className="text-right">
-                                <button type="submit" className="w-100 btn btn-lg btn-primary" disabled={isSubmitting}>{pageType === 'login' ? 'Entrar' : 'Cadastrar'}</button>
+                                    <button type="submit" className="w-100 btn btn-lg btn-primary" disabled={isSubmitting}>{buildButton()[pageType]}</button>
                             </div>
                             <div className="text-center">
-                                <a onClick={() => changePage()}>
-                                    {pageType === 'login' ? 'Cadastre-se' : 'Login'}
-                                </a>
+                                <div className={"mt-1 " + style.buttonSignin}>
+                                    <a className="mt-1" onClick={() => changePage(pageType === PAGES.LOGIN ? PAGES.SIGNUP : PAGES.LOGIN)}>
+                                        {pageType === PAGES.LOGIN ? 'Cadastre-se' : 'Login'}
+                                    </a>
+                                </div>
+                                {pageType === PAGES.LOGIN && (
+                                    <div className={style.buttonForgotPassword}>
+                                        <a onClick={() => changePage(PAGES.FORGOT_PASSWORD)}>
+                                            Esqueci a senha
+                                        </a>
+                                    </div>
+                                )}
                             </div>
                         </form>
                     )}

@@ -58,6 +58,42 @@ export default function AuthService() {
         });
     }
 
+    async function forgotPassword(user: User) {
+        return fire.auth().sendPasswordResetEmail(user.email, {url: 'http://localhost:3000/reset-password'}).then(async (userCredential) => {
+            return true;
+        })
+        .catch(async (err) => {
+            return {
+                error: true,
+                message: err.code
+            }
+        });
+    }
+
+    async function verifyPasswordResetCode(code: string) {
+        return fire.auth().verifyPasswordResetCode(code).then(async (email) => {
+            return email;
+        })
+        .catch(async (err) => {
+            return {
+                error: true,
+                message: err.code
+            }
+        });
+    }
+
+    async function confirmPasswordReset(code: string, newPassword: string) {
+        return fire.auth().confirmPasswordReset(code, newPassword).then(async (userCredential) => {
+            return true;
+        })
+        .catch(async (err) => {
+            return {
+                error: true,
+                message: err.code
+            }
+        });
+    }
+
     async function currentUser() {
         return firestore.app.auth().currentUser;
         /*const authorization = req.cookies;
@@ -116,7 +152,10 @@ export default function AuthService() {
         checkAuthentication,
         signOut,
         removeUser,
-        currentUser
+        forgotPassword,
+        currentUser,
+        verifyPasswordResetCode,
+        confirmPasswordReset
     }
 
 }

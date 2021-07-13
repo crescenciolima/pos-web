@@ -21,7 +21,6 @@ export default function Permission() {
     }
 
     async function getCurrentUser(){
-        console.log('teste2');
         const response: APIResponse = await api.get(APIRoutes.CURRENT_USER);    
         const user: User =  response.result; 
         return user;

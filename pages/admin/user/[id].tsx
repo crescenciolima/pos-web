@@ -6,7 +6,6 @@ import * as Yup from 'yup';
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import { ErrorMessage, Field, Formik } from 'formik';
-import { toast } from 'react-nextjs-toast';
 
 import AdminBase from '../../../components/admin-base';
 import { APIRoutes } from '../../../lib/api.routes';

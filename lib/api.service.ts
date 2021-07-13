@@ -4,6 +4,9 @@ import Cookies from '../lib/cookies.service';
 import { GetServerSidePropsContext } from 'next';
 
 export default function API(setLoading?: Function) {
+    const header = {
+        'Content-Type': 'application/json'
+    };
 
     async function postFile(url: string, body, file) {
         try {
@@ -42,6 +45,7 @@ export default function API(setLoading?: Function) {
             console.log(body);
             const res = await fetch(url, {          
                 body: JSON.stringify(body),
+                headers: header,
                 method: 'POST',
             });
             console.log(res);
@@ -54,8 +58,9 @@ export default function API(setLoading?: Function) {
                 return;
             }
             
-            showNotify(result.msg, "success","Notificação");
             if (setLoading) setLoading(false);
+            
+            showNotify(result.msg, "success","Notificação");
 
             return result;
         } catch (error) {

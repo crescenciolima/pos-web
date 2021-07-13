@@ -38,3 +38,13 @@
     border-top-left-radius: 0;
     border-top-right-radius: 0;
   }
+
+  .buttonSignin{
+    font-weight: 500;
+    text-decoration: underline;
+  }
+
+  .buttonForgotPassword{
+    font-size: 13px;
+    color: #459e45;
+  }
