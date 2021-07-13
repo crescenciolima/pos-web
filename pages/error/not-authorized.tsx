@@ -4,6 +4,7 @@ import React from 'react'
 import SiteHeaderLogo from '../../components/site-header-logo'
 
 export default function NotAuthorized() {
+  
   return (
     <>
       <Head>
@@ -25,10 +26,11 @@ export default function NotAuthorized() {
             <div className="col-md-6 d-flex justify-content-center align-items-center">
               <div className="p-4">
                 <h1 className="d-inline text-primary-dark title-sm-font-size">Acesso</h1>
-                <h1 className="d-inline text-primary fw-bold title-sm-font-size" > não autorizado</h1>
+                <h1 className="d-inline text-primary-dark fw-bold title-sm-font-size" > não autorizado</h1>
                 <h1 className="text-primary-dark mt-4 title-font-size">
                     Você não possui permissão para acessar essa página.
                 </h1>
+                <a className="d-inline text-primary-dark"  href="/login">Voltar</a>
               </div>
             </div>
             <div className="col-md-6 d-flex justify-content-center align-items-center mh-100">
