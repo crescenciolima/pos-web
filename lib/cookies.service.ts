@@ -16,7 +16,6 @@ export default function Cookies() {
 
     async function getTokenClient() {
         const cookies = await getClient();
-        console.log('teste4', cookies, process.env.NEXT_PUBLIC_TOKEN);
         return cookies[process.env.NEXT_PUBLIC_TOKEN];
     }
 

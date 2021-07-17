@@ -15,7 +15,7 @@ import { APIResponse } from '../../../models/api-response';
 import { User } from '../../../models/user';
 import { UserType } from '../../../enum/type-user.enum';
 
-export default function SaveUserLayout() {
+export default function ProfileLayout() {
     const [loading, setLoading] = useState(true);
     const router = useRouter();
     const api = API();
@@ -23,20 +23,15 @@ export default function SaveUserLayout() {
     const [user, setUser] = useState<User>({
         name: "",
         email: "",
+        password: "",
     });
-    const [file, setFile] = useState<FileList>();
 
     useEffect(() => {
-        const { id } = router.query;
-        if (id && id.toString() !== "new") {
-            getUser(id.toString());
-        } else {
-            setLoading(false);
-        }
+        getCurrentUser();
     }, [router.query]);
 
-    const getUser = async (id: string) => {
-        const result = await api.get(APIRoutes.USER, { 'id': id });
+    const getCurrentUser = async () => {
+        const result = await api.get(APIRoutes.CURRENT_USER);        
         if(result){
             const user: User = (result as APIResponse).result;
             setUser(user);     
@@ -46,10 +41,7 @@ export default function SaveUserLayout() {
 
     const saveUser = async (values: User, actions) => {
         try{
-            const result = await api.post(APIRoutes.USER, values);
-            if(result){
-                router.push("/admin/user");
-            }
+            const result = await api.post(APIRoutes.USER_PROFILE, values);
             actions.setSubmitting(false);
         }catch(e){
             actions.setSubmitting(false);          
@@ -59,7 +51,7 @@ export default function SaveUserLayout() {
     const onSubmit = async (values, actions) => {
         try {
             actions.setSubmitting(true);
-            await saveUser(values, actions);
+            await saveUser({...user, name: values.name, password: values.password}, actions);
         } catch (error) {
             console.error(error, actions);
             actions.setSubmitting(false);
@@ -85,20 +77,18 @@ export default function SaveUserLayout() {
         <AdminBase>
             <div className="row mb-3">
                 <div className="col-12 text-right">
-                    <Link href="/admin/user">
+                    <Link href="/admin">
                         <a className="link-primary ">Voltar</a>
                     </Link>
                 </div>
             </div>
             <Formik
                 enableReinitialize
-                initialValues={{ ...user, type: user.id ? user.type : 'admin'}}
+                initialValues={{ ...user}}
                 validationSchema={
                     Yup.object().shape({
                         name: Yup.string().required('Preencha este campo.'),
                         email: Yup.string().required('Preencha este campo.'),
-                        type: Yup.string().required('Preencha este campo.'),
-                        password: !user.id ? Yup.string().required('Preencha este campo.') : null,
                     })}
                 onSubmit={onSubmit}>
                 {({
@@ -130,25 +120,11 @@ export default function SaveUserLayout() {
                                 id="email"
                                 placeholder="E-mail"
                                 value={values.email}
-                                onChange={handleChange} />
+                                onChange={handleChange} 
+                                disabled={true}/>
                             <p className="input-error"><ErrorMessage name="email" /></p>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="type" className="form-label">Tipo</label>
-                            <select 
-                                className="form-select form-control" 
-                                name="type"
-                                id="type"
-                                placeholder=""
-                                value={values.type}
-                                onChange={handleChange}
-                            >
-                                <option value="admin">Administrativo</option>
-                                <option value="master">Master</option>
-                            </select>
-                            <p className="input-error"><ErrorMessage name="type" /></p>
-                        </div>
-                        {!user.id && (<div className="mb-3">
                             <label htmlFor="password" className="form-label">Senha</label>
                             <input
                                 type="password"
@@ -159,7 +135,7 @@ export default function SaveUserLayout() {
                                 value={values.password}
                                 onChange={handleChange} />
                             <p className="input-error"><ErrorMessage name="password" /></p>
-                        </div>)}
+                        </div>
                         <div className="text-right">
                         <button type="submit" className="btn btn-primary mt-3 me-auto" disabled={isSubmitting}>Salvar</button>
                         </div>

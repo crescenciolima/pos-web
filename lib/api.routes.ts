@@ -21,4 +21,6 @@ export class APIRoutes {
     static CURRENT_USER:string = APIRoutes.API_URL + "/api/auth/user"
 
     static USER:string = APIRoutes.API_URL + "/api/user"
+
+    static USER_PROFILE:string = APIRoutes.API_URL + "/api/user-profile"
 }

@@ -5,6 +5,7 @@ import { Course } from '../../models/course';
 import Cors from 'cors';
 import initMiddleware from '../../lib/init-middleware';
 import { authAdmin } from "./../../utils/firebase-admin";
+import TreatError from '../../lib/treat-error.service';
 
 const authService = AuthService();
 const cors = initMiddleware(
@@ -17,12 +18,13 @@ const cors = initMiddleware(
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const courseService = CourseService();
+    const treatError = TreatError();
 
     await cors(req, res);
 
     if (req.method === 'POST') {
-        if (!await authService.checkAuthentication()){
-            return res.status(401).send({ message: 'Unauthorized' });
+        if (!await authService.checkAuthentication(req)){
+            return res.status(401).send(await treatError.general('Usuário não autorizado.'));
         }
 
         const {id, name, description} = req.body;
@@ -31,13 +33,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             name: name,
             description: description
         }
-        console.log(course)
 
         if(id){
             course.id = id;
-            await courseService.update(course, req.headers.authorization);
+            await courseService.update(course);
         }else{
-            await courseService.save(course, req.headers.authorization);
+            await courseService.save(course);
         }
 
         const courseList = await courseService.getAll();
@@ -46,14 +47,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     } else if (req.method === 'GET'){
         
-        //Getting all Courses 
         const courseList = await courseService.getAll();
 
-        //Sending the response
         res.status(200).json(courseList);
     } else {
-        // Handle any other HTTP method
-        //TO DO
         res.status(200).json([]);
     }
 

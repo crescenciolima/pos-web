@@ -109,7 +109,6 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       res.status(200).json(deleteResponse);
 
     default:
-      console.log(req.method)
       res.status(405);
       break;
   }

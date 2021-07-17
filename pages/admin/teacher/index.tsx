@@ -29,7 +29,6 @@ export default function TeacherLayout() {
 
     api.get(APIRoutes.TEACHER).then(
       (result: APIResponse) => {
-        console.log(result);
         setTeachers(result.result);
       }
     )

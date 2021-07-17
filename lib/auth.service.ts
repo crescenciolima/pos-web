@@ -5,6 +5,7 @@ import { authAdmin } from "../utils/firebase-admin";
 import firebase from "firebase";
 import { NextApiRequest } from "next";
 import firestore from "../utils/firestore-util";
+import { NextApiRequestWithFormData } from "../utils/types-util";
 
 export default function AuthService() {
 
@@ -94,46 +95,36 @@ export default function AuthService() {
         });
     }
 
-    async function currentUser() {
-        return firestore.app.auth().currentUser;
-        /*const authorization = req.cookies;
-        console.log('teste server');
-        console.log(authorization);
+    async function updateUser(user: User) {
+        return authAdmin.updateUser(user.id, {password: user.password}).then(async () => {
+            return true;
+        })
+        .catch(async (err) => {
+            console.log(err);
+            return {
+                error: true,
+                message: err.code
+            }
+        });
+    }
+
+    async function currentUser(authorization: string) {
         if (!authorization){
             return false;
         }
     
         try {
             const result = await authAdmin.verifyIdToken(authorization);
-            console.log(result);
-            return true;
+            return result.uid;
         } catch (err) {
             console.log(err);
             return false;
-        }*/
-
+        }
     }
 
-    const checkAuthentication = async () => {
-        if(!firestore.app.auth().currentUser){
-            return false;
-        }
-        /*const authorization = req.headers.authorization;
-        
-        if (!authorization){
-            return false;
-        }
-    
-        try {
-            await authAdmin.verifyIdToken(authorization);
-        } catch (err) {
-            console.log(err);
-            return false;
-        }*/
-
-        return true;
-    } 
-
+    const checkAuthentication = async (req: NextApiRequest|NextApiRequestWithFormData) => {
+        return await currentUser(req.headers.authorization);
+    }
 
     const formatUser = async (user: firebase.User) => {
         const decodedToken = await user.getIdTokenResult(true);
@@ -155,7 +146,8 @@ export default function AuthService() {
         forgotPassword,
         currentUser,
         verifyPasswordResetCode,
-        confirmPasswordReset
+        confirmPasswordReset,
+        updateUser,
     }
 
 }

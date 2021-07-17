@@ -25,14 +25,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     await cors(req, res);
 
     if (req.method === 'POST') {
-        console.log(req.body);
         const { email } = req.body;
-        console.log(req.body.email);
 
         let user: User = {
             email: email
         }
-        console.log(user);
 
         const result: any = await authService.forgotPassword(user);
           

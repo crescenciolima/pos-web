@@ -31,11 +31,11 @@ export default function CourseService() {
 
     }
 
-    async function save(course: Course, token: string) {
+    async function save(course: Course) {
         courseRef.add(course);
     }
 
-    async function update(course: Course, token: string) {
+    async function update(course: Course) {
         courseRef.doc(course.id).set(course);
     }
 

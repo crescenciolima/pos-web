@@ -5,7 +5,7 @@ import AdminSidebar from './admin-sidebar';
 import adminStyle from '../styles/admin.module.css';
 import AdminContent from '../components/admin-content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer } from 'react-nextjs-toast';
 import { APIRoutes } from '../lib/api.routes';
 import API from '../lib/api.service';
@@ -26,6 +26,10 @@ export default function AdminBase(props: any) {
     router.push("/login");
   }
 
+  const profile = async () => {
+    router.push("/admin/profile");
+  }
+
   return (
     <>
       <Head>
@@ -44,7 +48,11 @@ export default function AdminBase(props: any) {
           <div className='row'>
             <AdminSidebar />
             <div className="col-md-9 ms-sm-auto col-lg-9 px-md-4">
-              <div className="text-right p-3 text-primary">
+              <div className="text-right p-3 text-primary">                
+                <i className={adminStyle.icon}>
+                  <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
+                </i>
+                <label className={adminStyle.sidebarLabel} onClick={() => profile()}>Perfil</label>
                 <i className={adminStyle.icon}>
                   <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
                 </i>

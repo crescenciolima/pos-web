@@ -36,7 +36,6 @@ export default function SaveTeacherLayout() {
             if (id.toString() == "new") {
                 // setNewTeacher(true);
             } else {
-                console.log(id);
                 getTeacher(id.toString());
                 // setNewTeacher(false);
             }
@@ -46,14 +45,14 @@ export default function SaveTeacherLayout() {
 
     const getTeacher = async (id: string) => {
         //Recupera o valor do banco de dados
-        const result: APIResponse = await api.get(APIRoutes.TEACHER, { 'id': id });
-        const teacher: Teacher = result.result;
-        setTeacher(teacher);
+        const result = await api.get(APIRoutes.TEACHER, { 'id': id });
+        if(result){
+            const teacher: Teacher = (result as APIResponse).result;
+            setTeacher(teacher);
+        }
     }
 
     const saveTeacher = async (values: Teacher) => {
-        console.log(values);
-        console.log(teacher);
         if(teacher.photo != ""){
             values = {...values, photo: teacher.photo};
         }

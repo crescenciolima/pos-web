@@ -20,9 +20,12 @@ export default function Permission() {
         await authAdmin.verifyIdToken(token);
     }
 
-    async function getCurrentUser(){
-        const response: APIResponse = await api.get(APIRoutes.CURRENT_USER);    
-        const user: User =  response.result; 
+    async function getCurrentUser(ctx: GetServerSidePropsContext){
+        const response = await api.getWithContext(ctx, APIRoutes.CURRENT_USER);  
+        if(!response){
+            throw new Error();
+        }  
+        const user: User = (response as APIResponse).result; 
         return user;
     }
 
@@ -30,7 +33,7 @@ export default function Permission() {
         try {
             await checkToken(ctx);
 
-            const user: User = await getCurrentUser();   
+            const user: User = await getCurrentUser(ctx);   
         
             return await buildReturn({ userType: user.type as UserType });
         
@@ -43,9 +46,7 @@ export default function Permission() {
         try {
             await checkToken(ctx);
 
-            console.log('teste');
-
-            const user: User =  await getCurrentUser();   
+            const user: User =  await getCurrentUser(ctx);   
             let redirect =  '';
             
             if(user.type === UserType.STUDENT){
@@ -67,9 +68,7 @@ export default function Permission() {
         try {
             await checkToken(ctx);
 
-            const user: User =  await getCurrentUser();   
-        
-            console.log(user);
+            const user: User =  await getCurrentUser(ctx);   
 
             if(typesAllowed.includes(user.type as UserType)){
                 return await buildReturnMessage(Message.AUTHORIZED);

@@ -28,37 +28,31 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   await cors(req, res);
 
-  if (!await authService.checkAuthentication(req)){
-    return res.status(401).send(await treatError.general('Usuário não autorizado.'));
-}
-
   switch (req.method) {
 
     case "POST":
       try{
-        const id = req.body.id;
-        const { name, email, password, type }: User = req.body;
+        const { id, name, email, password, type }: User = req.body;
   
+        const currentUserId = await authService.checkAuthentication(req);
+
+        if (!currentUserId || currentUserId !== id){
+          return res.status(401).send(await treatError.general('Usuário não autorizado.'));
+        }
+
         let user: User = {
+          id: id,
           name: name,
           email: email,
           password: password,
           type: type
         }
 
-        if (id) {
-          user.id = id;
-        } else {
-          const result: any = await authService.signUp(user);
-          
-          if(result.error){        
-            return res.status(400).json(await treatError.firebase(result));
-          }
-
-          user.id = result.id;
-          delete user.password;
+        if(user.password !== ''){
+          await authService.updateUser(user);
         }
 
+        delete user.password;
         await userService.update(user);
   
         let response: APIResponse = {
@@ -68,53 +62,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   
         res.status(200).json(response);
       }catch(e){
-        console.log(e);
         return res.status(400).json(treatError.general("Erro ao salvar usuário"));
       }
 
       break;
-
-    case "GET":
-
-      let getResponse: APIResponse = {
-        msg: "",
-        result: null
-      };
-
-      if (req.query.id) {
-        const user = await userService.getById(req.query.id);
-        getResponse.result = user;
-      } else {
-        const userList = await userService.getAll();
-        getResponse.result = userList;
-      }
-
-      res.status(200).json(getResponse);
-      break
-
-    case "DELETE":
-      try{
-        let userID = req.query.id.toString();
-        const deletedUser = await userService.getById(userID);
-
-        await userService.remove(deletedUser);
-        
-        const result: any = await authService.removeUser(deletedUser);
-
-        if(result.error){        
-          return res.status(400).json(treatError.firebase(result));
-        }
-
-        let deleteResponse: APIResponse = {
-          msg: "Usuário removido com sucesso!",
-          result: {}
-        }
-
-        res.status(200).json(deleteResponse);
-      }catch(e){
-        console.log(e);
-        return res.status(400).json(treatError.general("Erro ao salvar remover usuário"));
-      }
     default:
       res.status(405);
       break;

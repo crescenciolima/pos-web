@@ -61,8 +61,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
     const signIn = async (values: any) => {
         const response = await api.post(APIRoutes.SIGNIN, values);            
         if(response){
-            const user: User =  response.result;    
-            console.log(user);  
+            const user: User =  response.result;   
             await cookie.setToken(user.token);
             redirectAfterLogin(user.type);
             return;
@@ -156,7 +155,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
                                 <p className="input-error"><ErrorMessage name="email" className="input-error" /></p>
                                 <label htmlFor="email" className="form-label">E-mail</label>
                             </div>
-                            {pageType === PAGES.LOGIN && (
+                            {pageType !== PAGES.FORGOT_PASSWORD && (
                                 <div className="form-floating mb-3">
                                     <input
                                         type="password"

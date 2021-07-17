@@ -25,7 +25,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     await cors(req, res);
 
     if (req.method === 'POST') {
-        console.log(req.body);
         const { code } = req.body;
 
 
