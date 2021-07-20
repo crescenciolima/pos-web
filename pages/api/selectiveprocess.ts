@@ -1,25 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import FileUploadService from '../../lib/upload.service';
-import { StoragePaths } from '../../lib/storage-path';
-import multer from 'multer';
-import initMiddleware from '../../lib/init-middleware'
-import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { APIResponse } from '../../models/api-response';
-import { News } from '../../models/news';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
 import { SelectiveProcess } from '../../models/selective-process';
 
-// global.XMLHttpRequest = require('xhr2');
-// const upload = multer();
 
-// for parsing multipart/form-data
-// note that Multer limits to 1MB file size by default
-// const multerAny = initMiddleware(
-//   upload.any()
-// );
-
-
-async function endpoint(req: NextApiRequest , res: NextApiResponse) {
+async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   const selectiveProcessService = SelectiveProcessService();
 
@@ -34,62 +20,35 @@ async function endpoint(req: NextApiRequest , res: NextApiResponse) {
           result: null
         }
         const body = await req.body;
-     
+
         if (!body.id) {
           //New Process
 
-          const { title, creationDate, open, inConstruction }: SelectiveProcess = body
+          const { title, creationDate, state }: SelectiveProcess = body
 
           const newProcess: SelectiveProcess = {
             title: title,
             creationDate: creationDate,
-            open: open,
-            inConstruction: inConstruction,
+            state: state,
             numberPlaces: 0,
             reservedPlaces: [
-              {name:"Servidores do IFBA", numberPlaces: 0},
-              {name:"Pessoas com Deficiência", numberPlaces: 0},
-              {name:"Negros (Pretos e Pardos) ", numberPlaces: 0},
-              {name:"Indígenas", numberPlaces: 0},
-              {name:"Quilombolas", numberPlaces: 0},
-              {name:"Pessoas Trans (Transexuais, Transgêneros e Travestis)", numberPlaces: 0},
+              { name: "Servidores do IFBA", numberPlaces: 0 },
+              { name: "Pessoas com Deficiência", numberPlaces: 0 },
+              { name: "Negros (Pretos e Pardos) ", numberPlaces: 0 },
+              { name: "Indígenas", numberPlaces: 0 },
+              { name: "Quilombolas", numberPlaces: 0 },
+              { name: "Pessoas Trans (Transexuais, Transgêneros e Travestis)", numberPlaces: 0 },
             ]
           }
 
           await selectiveProcessService.save(newProcess);
 
           response.result = newProcess;
-        }else{
+        } else {
           await selectiveProcessService.update(body);
           response.result = body;
         }
 
-
-        // const { id, title, text, coverURL, date }: News = req.body;
-
-        // const news: News = {
-        //   title: title,
-        //   text: text,
-        //   coverURL: coverURL,
-        //   date: date,
-        //   slug: ""
-        // }
-
-        // if(blob){
-        //   const uploadService = FileUploadService();
-        //   let url = await uploadService.upload(StoragePaths.NEWS_COVER, blob, date.toString());
-
-        //   news.coverURL = url;
-        // }
-
-        // if(id){
-        //   news.id = id;
-        //   // await selectiveProcessService.update(news);
-        // }else{
-        //   // await selectiveProcessService.save(news);
-        // }
-
-      
         res.status(200).json(response);
       } catch (e) {
         console.log(e);
@@ -107,6 +66,9 @@ async function endpoint(req: NextApiRequest , res: NextApiResponse) {
 
       if (req.query.inconstruction == "true") {
         const process = await selectiveProcessService.getInConstruction();
+        getResponse.result = process;
+      } else if (req.query.open == "true") {
+        const process = await selectiveProcessService.getOpen();
         getResponse.result = process;
       } else {
         // const newsList = req.query.page ? await selectiveProcessService.getPage(+req.query.page.toString()) : await selectiveProcessService.getAll();

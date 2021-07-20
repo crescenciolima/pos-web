@@ -9,18 +9,19 @@ import { APIResponse } from '../../../models/api-response';
 import Loading from '../../../components/loading';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUniversalAccess, faFileAlt } from '@fortawesome/free-solid-svg-icons'
-import { SelectiveProcess } from '../../../models/selective-process';
+import { faRocket } from '@fortawesome/free-solid-svg-icons'
+import { ProcessStepsState, SelectiveProcess } from '../../../models/selective-process';
 import fire from '../../../utils/firebase-util';
 import SelectiveProcessBasicInfo from '../../../components/selectiveprocess/basic-info';
 import SelectiveProcessPlaces from '../../../components/selectiveprocess/places';
 import SelectiveProcessBarema from '../../../components/selectiveprocess/barema';
 import SelectiveProcessDocuments from '../../../components/selectiveprocess/documents';
+import SelectiveProcessSteps from '../../../components/selectiveprocess/steps';
 
 
 export default function SelectiveProcessLayout() {
 
-  const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', inConstruction: false, open: false });
+  const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
   const [isLoading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState<boolean>(false);
   const [inConstruction, setInConstruction] = useState<boolean>(false);
@@ -50,8 +51,7 @@ export default function SelectiveProcessLayout() {
     event.stopPropagation();
     const process: SelectiveProcess = {
       title: newProcessTitle,
-      open: false,
-      inConstruction: true,
+      state: ProcessStepsState.IN_CONSTRUCTION,
       creationDate: fire.firestore.Timestamp.now().seconds
     }
     console.log(process)
@@ -67,23 +67,54 @@ export default function SelectiveProcessLayout() {
     );
   }
 
-  // function selectMenu(selection:string) {
-  //   setMenuSelection(selection);
-  // }
-  // function closeModal() {
-  //   setOpenModal(false);
-  // }
+  function openProcess(event) {
+    event.stopPropagation();
+    setOpenModal(true);
+  }
 
-  function menusSaveCallback(process:SelectiveProcess) {
-    setSelectiveProcess({...selectiveProcess, ...process});
+  async function confirmOpenProcess() {
+
+    let body = {
+      id: selectiveProcess.id,
+      open: true,
+      inConstruction: false
+    }
+
+    const result = await api.post(APIRoutes.SELECTIVE_PROCESS, body);
+
+    setSelectiveProcess(result.result);
+    closeModal();
+
+  }
+
+  function closeModal() {
+    setOpenModal(false);
+  }
+
+  function menusSaveCallback(process: SelectiveProcess) {
+    setSelectiveProcess({ ...selectiveProcess, ...process });
   }
 
 
   return (
     <AdminBase>
-      <div className="row">
+      <div className="row mb-2">
         <div className="col-6">
           <h3 className="text-primary-dark">Processo Seletivo</h3>
+        </div>
+        <div className="col-6 text-right">
+          {selectiveProcess.state == ProcessStepsState.IN_CONSTRUCTION ?
+            <button type="button" className="btn btn-success mt-3 me-auto" onClick={openProcess}>
+              <FontAwesomeIcon icon={faRocket} className="sm-icon" /> Abrir Processo Seletivo
+            </button>
+            : null
+          }
+          {selectiveProcess.state == ProcessStepsState.OPEN ?
+            <h4 className="text-success mt-3 me-auto" >
+              Em Andamento
+            </h4>
+            : null
+          }
         </div>
       </div>
       {(!inConstruction && !isLoading) &&
@@ -124,13 +155,16 @@ export default function SelectiveProcessLayout() {
                   <a className={'nav-link ' + (menuSelection == 'dadosbasicos' ? 'active' : '')} onClick={(e) => setMenuSelection('dadosbasicos')} aria-current="page" >Dados básicos</a>
                 </li>
                 <li className="nav-item">
-                  <a className={'nav-link ' + (menuSelection == 'vagas' ? 'active' : '')} onClick={(e) => setMenuSelection('vagas')}> Vagas</a>
+                  <a className={'nav-link ' + (menuSelection == 'places' ? 'active' : '')} onClick={(e) => setMenuSelection('places')}> Vagas</a>
                 </li>
                 <li className="nav-item">
                   <a className={'nav-link ' + (menuSelection == 'documents' ? 'active' : '')} onClick={(e) => setMenuSelection('documents')} >Documentos</a>
                 </li>
                 <li className="nav-item">
-                  <a className={'nav-link ' + (menuSelection == 'barema' ? 'active' : '')}   aria-disabled="true" onClick={(e) => setMenuSelection('barema')} >Barema</a>
+                  <a className={'nav-link ' + (menuSelection == 'barema' ? 'active' : '')} aria-disabled="true" onClick={(e) => setMenuSelection('barema')} >Barema</a>
+                </li>
+                <li className="nav-item">
+                  <a className={'nav-link ' + (menuSelection == 'steps' ? 'active' : '')} aria-disabled="true" onClick={(e) => setMenuSelection('steps')} >Etapas</a>
                 </li>
               </ul>
             </div>
@@ -138,9 +172,10 @@ export default function SelectiveProcessLayout() {
           <div className="row mt-5">
             <div className="col-12">
               {(menuSelection == 'dadosbasicos') && <SelectiveProcessBasicInfo process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessBasicInfo>}
-              {(menuSelection == 'vagas') && <SelectiveProcessPlaces process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessPlaces>}
+              {(menuSelection == 'places') && <SelectiveProcessPlaces process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessPlaces>}
               {(menuSelection == 'barema') && <SelectiveProcessBarema process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessBarema>}
               {(menuSelection == 'documents') && <SelectiveProcessDocuments process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessDocuments>}
+              {(menuSelection == 'steps') && <SelectiveProcessSteps process={selectiveProcess} saveCallback={menusSaveCallback}></SelectiveProcessSteps>}
             </div>
           </div>
 
@@ -149,7 +184,7 @@ export default function SelectiveProcessLayout() {
       {isLoading &&
         <Loading />
       }
-      {/* <ConfirmDialog open={openModal} actionButtonText="Excluir" title="Excluir" text={"Tem certeza que deseja excluir " + selectedTeacher.name + "?"} onClose={closeModal} onConfirm={confirmTeacherRemoval} /> */}
+      <ConfirmDialog open={openModal} actionButtonText="Abrir Processo Seletivo" title="Abrir Processo Seletivo" text={"Tem certeza que deseja abrir esse processo seletivo para o público?"} onClose={closeModal} onConfirm={confirmOpenProcess} />
     </AdminBase>
   )
 }

@@ -1,8 +1,7 @@
 export interface SelectiveProcess {
-    id?:string;
+    id?: string;
     title: string;
-    open:boolean;
-    inConstruction:boolean;
+    state: ProcessStepsState;
     creationDate?: number;
     numberPlaces?: number;
     description?: string;
@@ -10,35 +9,66 @@ export interface SelectiveProcess {
     baremaCategories?: BaremaCategory[];
     processForms?: ProcessDocument[];
     processNotices?: ProcessDocument[];
+    steps?: ProcessStep[];
 }
 
 
 export interface ReservedPlace {
 
-    name:string;
-    numberPlaces:number;
+    name: string;
+    numberPlaces: number;
 
 }
 
 
 export interface BaremaCategory {
 
-    name:string;
-    maxPoints:number;
+    name: string;
+    maxPoints: number;
     subcategories: BaremaSubCategory[];
 }
 
 
 export interface BaremaSubCategory {
 
-    name:string;
-    points:number;
+    name: string;
+    points: number;
 
 }
 
 export interface ProcessDocument {
 
-    name:string;
-    url:string;
+    name: string;
+    url: string;
 
+}
+
+
+export interface ProcessStep {
+
+    order: number;
+    startDate: number;
+    finishDate: number;
+    weight: number;
+    passingScore: number;
+    type: ProcessStepsTypes;
+    
+
+}
+
+export enum ProcessStepsTypes {
+    INSCRICAO = "Inscrição",
+    HOMOLOGACAO_PRELIMINAR_INSCRICAO = "Homologação Preliminar Inscrição",
+    HOMOLOGACAO_DEFINITIVA_INSCRICAO = "Homologação Definitiva Inscrição",
+    PROVA = "Prova",
+    ENTREVISTA = "Entrevista",
+    AVALIACAO_BAREMA = "Avaliação Barema",
+    RECURSO = "Recurso",
+}
+
+
+export enum ProcessStepsState {
+    IN_CONSTRUCTION = "in_construction",
+    OPEN = "open",
+    FINISHED = "finished",
 }
