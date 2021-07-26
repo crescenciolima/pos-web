@@ -10,6 +10,9 @@ import { ErrorMessage, Field, Formik } from 'formik'
 import { toast } from 'react-nextjs-toast'
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
+import { GetServerSidePropsContext } from 'next';
+import { UserType } from '../../../enum/type-user.enum';
+import Permission from '../../../lib/permission.service';
 
 export default function SaveTeacherLayout() {
 
@@ -39,9 +42,11 @@ export default function SaveTeacherLayout() {
 
     const getTeacher = async (id: string) => {
         //Recupera o valor do banco de dados
-        const result: APIResponse = await api.get(APIRoutes.TEACHER, { 'id': id });
-        const teacher: Teacher = result.result;
-        setTeacher(teacher);
+        const result = await api.get(APIRoutes.TEACHER, { 'id': id });
+        if(result){
+            const teacher: Teacher = (result as APIResponse).result;
+            setTeacher(teacher);
+        }
     }
 
     const saveTeacher = async (values: Teacher) => {
@@ -170,4 +175,9 @@ export default function SaveTeacherLayout() {
         </AdminBase>
     )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+    const permission = Permission();
+    return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
+  };
 

@@ -1,8 +1,10 @@
 import { toast } from 'react-nextjs-toast'
 import { APIResponse } from '../models/api-response';
+import Cookies from '../lib/cookies.service';
+import { GetServerSidePropsContext } from 'next';
 
 export default function API(setLoading?: Function) {
-
+    const cookies = Cookies();
 
     async function postFile(url: string, body, file) {
         try {
@@ -36,34 +38,46 @@ export default function API(setLoading?: Function) {
 
     async function post(url: string, body) {
         try {
+
             if (setLoading) setLoading(true);
-            const res = await fetch(url, {
-                method: 'POST',
+            (body);
+            const res = await fetch(url, {          
                 body: JSON.stringify(body),
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: await buildHeaders(),
+                method: 'POST',
             });
+            (res);
+
             const result: APIResponse = await res.json();
 
-            toast.notify(result.msg, {
-                duration: 3,
-                type: "success",
-                title: "Notificação"
-            });
+            if(result.error){                
+                showNotify(result.msg, "error","Erro");                
+                if (setLoading) setLoading(false);
+                return;
+            }
+            
             if (setLoading) setLoading(false);
+            
+            showNotify(result.msg, "success","Notificação");
+
             return result;
         } catch (error) {
+            (error)
+            showNotify(error.msg, "error","Erro");
+
             if (setLoading) setLoading(false);
-            return error;
+
+            return;
         }
 
     }
 
-
     async function get(url: string, params?) {
-        try {
+        try {     
             if (setLoading) setLoading(true);
+
+            ('current user 5');
+            (await cookies.getTokenClient());
 
             if (params) {
                 let urlBuilder = new URL(url);
@@ -73,9 +87,15 @@ export default function API(setLoading?: Function) {
 
             const res = await fetch(url, {
                 method: 'GET',
+                headers: await buildHeaders(),
             });
 
             const result: APIResponse = await res.json();
+
+            if(result.error){                              
+                if (setLoading) setLoading(false);
+                return false;
+            }
 
             if (setLoading) setLoading(false);
             return result;
@@ -93,8 +113,52 @@ export default function API(setLoading?: Function) {
 
     }
 
+    async function getWithContext(ctx: GetServerSidePropsContext, url: string, params?) {
+        try {     
+            if (setLoading) setLoading(true);
+
+            ('current user 5');
+
+            if (params) {
+                let urlBuilder = new URL(url);
+                urlBuilder.search = new URLSearchParams(params).toString();
+                url = urlBuilder.toString();
+            }
+
+            const res = await fetch(url, {
+                method: 'GET',
+                headers: await buildHeadersWithContext(ctx),
+            });
+
+            const result: APIResponse = await res.json();
+
+            ('response current user',result);
+            if(result.error){                              
+                if (setLoading) setLoading(false);
+                return false;
+            }
+
+            ('response current user2',result);
+            if (setLoading) setLoading(false);
+            return result;
+
+        } catch (error) {
+            console.error(error);
+            toast.notify("Ocorreu um erro ao buscar os dados", {
+                duration: 3,
+                type: "error",
+                title: "Erro"
+            });
+            if (setLoading) setLoading(false);
+
+        }
+
+    }
+
+
     async function exclude(url: string, params?) {
-        try {
+        try {           
+
             if (setLoading) setLoading(true);
 
             if (params) {
@@ -119,13 +183,14 @@ export default function API(setLoading?: Function) {
 
         } catch (error) {
             console.error(error);
+
             toast.notify("Ocorreu um erro ao buscar os dados", {
                 duration: 3,
                 type: "error",
                 title: "Erro"
             });
-            if (setLoading) setLoading(false);
 
+            if (setLoading) setLoading(false);
         }
     }
 
@@ -176,12 +241,38 @@ export default function API(setLoading?: Function) {
         }
     }
 
+    async function showNotify(message, type, title) {
+        toast.notify(message, {
+            duration: 3,
+            type: type,
+            title: title
+        });
+    }
+
+    async function buildHeaders(){
+        const token = await cookies.getTokenClient();
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+        };
+    }
+
+    async function buildHeadersWithContext(ctx: GetServerSidePropsContext){
+        const token = await cookies.getTokenServer(ctx);
+        return {
+            'Content-Type': 'application/json',
+            'Authorization': token,
+        };
+    }
+
     return {
         postFile,
         post,
         get,
         exclude,
         excludeFormData
+        getWithContext,
+        exclude
     }
 
 }

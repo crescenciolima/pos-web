@@ -43,6 +43,11 @@ export default function SiteHeader() {
                   <a className="nav-link text-bold">Docentes</a>
                 </Link>
               </li>
+              <li className="nav-item">
+                <Link href="/login">
+                  <a className={"nav-link text-bold " + homeStyle.login}>Entrar</a>
+                </Link>
+              </li>
             </ul>
           </div>
           
