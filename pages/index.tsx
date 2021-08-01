@@ -5,12 +5,14 @@ import { GetStaticProps } from 'next'
 import React from 'react'
 import SiteHeader from '../components/site-header'
 import NewsService from '../lib/news.service'
+import CourseService from '../lib/course.service'
 import NewsCard from '../components/news-card'
 import { News } from '../models/news'
+import { Course } from '../models/course'
 import fire from '../utils/firebase-util'
 import Image from 'next/image'
 
-export default function Home({ newsList }) {
+export default function Home({ newsList, course }) {
   return (
     <>
       <Head>
@@ -80,6 +82,26 @@ export default function Home({ newsList }) {
           </div>
 
         </section>
+
+        <section className={homeStyle.sectionPadding +' '+ homeStyle.newSection} >
+            <div className="row justify-content-center">
+              <div className="col-12">
+              
+                <h2 className="d-inline text-primary-dark heading-font-size">Sobre</h2>
+                <br />
+                <h4>{course.name}</h4>
+                <br />
+                <p>{course.description}</p>
+                <div className="col-12">
+                <h3>Contatos</h3>
+                  Coordenador: {course.coordName}< br/>
+                  Telefone: <a href="tel:{coordPhone}">{course.coordPhone}</a> <br />
+                  E-mail:<a href="mailto:{coordMail}">{course.coordMail}</a> <br />
+                </div>
+              </div> 
+            </div>
+        </section>
+
       </main>
 
     </>
@@ -95,9 +117,29 @@ export const getStaticProps: GetStaticProps = async () => {
     news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
   console.log(newsList)
+
+  const courseService = CourseService();
+  
+  let courseData = await courseService.getFirstCourse();
+
+  //mockup de dados quando não houver cadastro do curso 
+  //TODO melhor retornar um componente vazio e não renderizar a seção "Sobre"?
+  let course : Course ={
+    name: '<Nome do Curso>',
+    description: '<Descrição do Curso>',
+    coordName: '<Nome do Coordenador>',
+    coordMail: '<E-mail da Coordenação>',
+    coordPhone: '<Telefone da Coordenação>'
+  }
+
+  if (courseData !== null){
+    course = courseData
+  }
+
   return {
     props: {
-      newsList
+      newsList,
+      course,
     },
     revalidate: 1800
 

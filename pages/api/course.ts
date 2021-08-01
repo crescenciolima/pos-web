@@ -22,13 +22,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         // Process a POST request
 
         //Getting all data from the request body
-        const {id, name, description} = req.body;
+        const {id, name, description, coordName, coordMail, coordPhone} = req.body;
         console.log(req.body)
 
         //Instantiating a Course
         let course: Course = {
             name: name,
-            description: description
+            description: description,
+            coordName: coordName,
+            coordMail: coordMail,
+            coordPhone: coordPhone
         }
         console.log(course)
 
