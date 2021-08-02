@@ -12,7 +12,6 @@ export default function CourseService() {
 
         await courseRef.get().then(
             (snapshot) => {
-
                 snapshot.forEach(
                     (result) => {
                         const id = result.id;

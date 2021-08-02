@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import AdminBase from '../../../components/admin-base'
 import { APIRoutes } from '../../../lib/api.routes'
-import { Teacher } from '../../../models/teacher';
+import { User } from '../../../models/user';
 import Link from 'next/link';
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
@@ -10,40 +10,41 @@ import Loading from '../../../components/loading';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
-import { GetServerSidePropsContext } from 'next';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
 
 
-export default function TeacherLayout() {
+export default function UserLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
-  const [teachers, setTeachers] = useState<Teacher[]>([]);
-  const [selectedTeacher, setSelectedTeacher] = useState<Teacher>({name:"", about:"",email:"",phone:"",photo:""});
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedUser, setSelectedUser] = useState<User>({name:"",email:"",});
   const [isLoading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState<boolean>(false);
+  const [modalText, setModalText] = useState<string>("Tem certeza que deseja excluir esse usuário?");
 
   const api = API(setLoading);
 
   useEffect(() => {
 
-    api.get(APIRoutes.TEACHER).then(
+    api.get(APIRoutes.USER).then(
       (result: APIResponse) => {
-        setTeachers(result.result);
+        setUsers(result.result);
       }
     )
 
   }, []);
 
-  function removeTeacher(event, teacher: Teacher) {
+  function removeUser(event, user: User) {
     event.stopPropagation();
-    setSelectedTeacher(teacher);
+    setSelectedUser(user);
     setOpenModal(true);
   }
 
-  async function confirmTeacherRemoval(){
-   await api.exclude(APIRoutes.TEACHER, {id:selectedTeacher.id});
-   let newTeacherList =  teachers.filter(teacher => teacher.id != selectedTeacher.id);
-   setTeachers(newTeacherList);
+  async function confirmUserRemoval(){
+   await api.exclude(APIRoutes.USER, {id:selectedUser.id});
+   let newUserList =  users.filter(user => user.id != selectedUser.id);
+   setUsers(newUserList);
    closeModal();
   }
 
@@ -56,10 +57,10 @@ export default function TeacherLayout() {
     <AdminBase>
       <div className="row">
         <div className="col-6">
-          <h3 className="text-primary-dark">Docentes</h3>
+          <h3 className="text-primary-dark">Usuários</h3>
         </div>
         <div className="col-6 text-right">
-          <Link href="/admin/teacher/new">
+          <Link href="/admin/user/new">
             <a className="btn btn-primary">Cadastrar</a>
           </Link>
         </div>
@@ -75,13 +76,13 @@ export default function TeacherLayout() {
               </tr>
             </thead>
             <tbody>
-              {teachers.map((teacher, i) => {
+              {users.map((user, i) => {
                 return (
-                  <Link href={`/admin/teacher/${encodeURIComponent(teacher.id)}`} key={teacher.id}>
+                  <Link href={`/admin/user/${encodeURIComponent(user.id)}`} key={user.id}>
                     <tr>
-                      <td>{teacher.name}</td>
-                      <td>{teacher.email}</td>
-                      <td><button className="btn btn-sm btn-danger" onClick={(e) => removeTeacher(e, teacher)} >
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td><button className="btn btn-sm btn-danger" onClick={(e) => removeUser(e, user)} >
                         <FontAwesomeIcon icon={faTrash} className="sm-icon" />
                       </button></td>
                     </tr>
@@ -91,7 +92,7 @@ export default function TeacherLayout() {
 
             </tbody>
           </table>
-          {(teachers.length == 0 && !isLoading) &&
+          {(users.length == 0 && !isLoading) &&
             <div className="alert alert-info mt-3 text-center">
               Nenhum resultado encontrado.
             </div>
@@ -102,13 +103,13 @@ export default function TeacherLayout() {
       {isLoading &&
         <Loading />
       }
-      <ConfirmDialog open={openModal} actionButtonText="Excluir" title="Excluir" text={"Tem certeza que deseja excluir "+selectedTeacher.name+"?"} onClose={closeModal} onConfirm={confirmTeacherRemoval} />
+      <ConfirmDialog open={openModal} actionButtonText="Excluir" title="Excluir" text={"Tem certeza que deseja excluir "+selectedUser.name+"?"} onClose={closeModal} onConfirm={confirmUserRemoval} />
     </AdminBase>
   )
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
   const permission = Permission();
-  return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
+  return await permission.checkPermission(ctx, [UserType.MASTER]);
 };
 
