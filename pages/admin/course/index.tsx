@@ -80,10 +80,16 @@ export default function CourseLayout({course}: CourseProps, props: InferGetServe
         initialValues={{
           name: courseObject ? courseObject.name : '',
           description: courseObject ? courseObject.description : '',
+          coordName: courseObject ? courseObject.coordName: '',
+          coordMail: courseObject ? courseObject.coordMail: '',
+          coordPhone: courseObject ? courseObject.coordPhone: '',
         }}
         validationSchema={Yup.object().shape({
           name: Yup.string().required('Preencha este campo.'),
           description: Yup.string().required('Preencha este campo.'),
+          coordName: Yup.string().required('Preencha este campo.'),
+          coordMail: Yup.string().required('Preencha este campo.'),
+          coordPhone: Yup.string().required('Preencha este campo.'),
         })}
         onSubmit={onSubmit}>
         {({
@@ -117,6 +123,43 @@ export default function CourseLayout({course}: CourseProps, props: InferGetServe
               ></textarea>
               <ErrorMessage name="description" className="input-error" />
             </div>
+            <div>
+              <label htmlFor="coordName" className="form-label">Nome do coordenador</label>
+              <input 
+                type="text" 
+                className="form-control" 
+                name="coordName" 
+                id="coordName" 
+                placeholder="Nome do coordenador"
+                value={values.coordName}                
+                onChange={handleChange} /> 
+              <ErrorMessage name="coordName" className="input-error" />
+            </div>
+            <div>
+              <label htmlFor="coordName" className="form-label">E-mail</label>
+              <input 
+                type="email" 
+                className="form-control" 
+                name="coordMail" 
+                id="coordMail" 
+                placeholder="E-mail do coordenador"
+                value={values.coordMail}                
+                onChange={handleChange} /> 
+              <ErrorMessage name="coordMail" className="input-error" />
+            </div>
+            <div>
+              <label htmlFor="coordName" className="form-label">Telefone</label>
+              <input 
+                type="tel" 
+                className="form-control" 
+                name="coordPhone" 
+                id="coordPhone" 
+                placeholder="Número de telefone do coordenador"
+                value={values.coordPhone}                
+                onChange={handleChange} /> 
+              <ErrorMessage name="coordPhone" className="input-error" />
+            </div>
+            <br />
             <button type="submit" className="btn btn-primary" disabled={isSubmitting}>Salvar</button>
           </form>
         )}

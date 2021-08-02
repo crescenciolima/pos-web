@@ -27,11 +27,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             return res.status(401).send(await treatError.general('Usuário não autorizado.'));
         }
 
-        const {id, name, description} = req.body;
+        //Getting all data from the request body
+        const {id, name, description, coordName, coordMail, coordPhone} = req.body;
+
 
         let course: Course = {
             name: name,
-            description: description
+            description: description,
+            coordName: coordName,
+            coordMail: coordMail,
+            coordPhone: coordPhone
         }
 
         if(id){
