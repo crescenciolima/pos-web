@@ -46,7 +46,6 @@ export default function API(setLoading?: Function) {
                 headers: await buildHeaders(),
                 method: 'POST',
             });
-            (res);
 
             const result: APIResponse = await res.json();
 
@@ -75,9 +74,6 @@ export default function API(setLoading?: Function) {
     async function get(url: string, params?) {
         try {     
             if (setLoading) setLoading(true);
-
-            ('current user 5');
-            (await cookies.getTokenClient());
 
             if (params) {
                 let urlBuilder = new URL(url);
@@ -117,8 +113,6 @@ export default function API(setLoading?: Function) {
         try {     
             if (setLoading) setLoading(true);
 
-            ('current user 5');
-
             if (params) {
                 let urlBuilder = new URL(url);
                 urlBuilder.search = new URLSearchParams(params).toString();
@@ -132,13 +126,11 @@ export default function API(setLoading?: Function) {
 
             const result: APIResponse = await res.json();
 
-            ('response current user',result);
             if(result.error){                              
                 if (setLoading) setLoading(false);
                 return false;
             }
 
-            ('response current user2',result);
             if (setLoading) setLoading(false);
             return result;
 
@@ -270,9 +262,8 @@ export default function API(setLoading?: Function) {
         post,
         get,
         exclude,
-        excludeFormData
+        excludeFormData,
         getWithContext,
-        exclude
     }
 
 }

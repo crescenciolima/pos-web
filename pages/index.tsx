@@ -72,7 +72,7 @@ export default function Home({ newsList, course }) {
             </div>
           </div>
           <div className="row justify-content-center">
-            {newsList.map((news: News, i) => {
+            {newsList && newsList.map((news: News, i) => {
               return (
                 <div className="col-lg-8 mt-5" key={news.id}>
                   <NewsCard title={news.title} coverURL={news.coverURL} text={news.text} date={news.date} dateString={news.dateString} slug={news.slug}></NewsCard>
@@ -84,22 +84,24 @@ export default function Home({ newsList, course }) {
         </section>
 
         <section className={homeStyle.sectionPadding +' '+ homeStyle.newSection} >
-            <div className="row justify-content-center">
-              <div className="col-12">
-              
-                <h2 className="d-inline text-primary-dark heading-font-size">Sobre</h2>
-                <br />
-                <h4>{course.name}</h4>
-                <br />
-                <p>{course.description}</p>
+            {course && 
+              <div className="row justify-content-center">
                 <div className="col-12">
-                <h3>Contatos</h3>
-                  Coordenador: {course.coordName}< br/>
-                  Telefone: <a href="tel:{coordPhone}">{course.coordPhone}</a> <br />
-                  E-mail:<a href="mailto:{coordMail}">{course.coordMail}</a> <br />
-                </div>
+                
+                  <h2 className="d-inline text-primary-dark heading-font-size">Sobre</h2>
+                  <br />
+                  <h4>{course.name}</h4>
+                  <br />
+                  <p>{course.description}</p>
+                  <div className="col-12">
+                  <h3>Contatos</h3>
+                    Coordenador: {course.coordName}< br/>
+                    Telefone: <a href="tel:{coordPhone}">{course.coordPhone}</a> <br />
+                    E-mail:<a href="mailto:{coordMail}">{course.coordMail}</a> <br />
+                  </div>
+                </div> 
               </div> 
-            </div>
+            }
         </section>
 
       </main>
@@ -116,11 +118,12 @@ export const getStaticProps: GetStaticProps = async () => {
     const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
     news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
-  console.log(newsList)
+  console.log('newsList',newsList)
 
   const courseService = CourseService();
   
   let courseData = await courseService.getFirstCourse();
+  console.log('courseData',courseData)
 
   //mockup de dados quando não houver cadastro do curso 
   //TODO melhor retornar um componente vazio e não renderizar a seção "Sobre"?
