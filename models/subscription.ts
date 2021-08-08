@@ -1,8 +1,13 @@
+import { Student } from "./student";
+import { User } from "./user";
+
 export interface Subscription {
-
-
-    protocol: string;
-    name: string;
-    age: number;
-    
+    id?: string
+    student: Student;
+    protocol?: string;
+    handicapped: boolean;
+    disabilityType?: string;
+    specialTreatmentType?: string[];
+    vacancyType: string;    
+    status: string;
 }

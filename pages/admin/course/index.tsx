@@ -5,7 +5,7 @@ import {ErrorMessage, Field, Formik} from 'formik'
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 
-import AdminBase from '../../../components/admin-base';
+import AdminBase from '../../../components/admin/admin-base';
 import { Course } from "../../../models/course";
 import { APIRoutes } from '../../../lib/api.routes';
 import API from '../../../lib/api.service';

@@ -7,7 +7,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import { ErrorMessage, Field, Formik } from 'formik';
 
-import AdminBase from '../../../components/admin-base';
+import AdminBase from '../../../components/admin/admin-base';
 import { APIRoutes } from '../../../lib/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';

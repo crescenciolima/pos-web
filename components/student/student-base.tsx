@@ -1,21 +1,18 @@
 import Head from 'next/head';
 import { GetServerSidePropsContext, GetStaticProps } from 'next';
 import React from 'react';
-import AdminSidebar from './admin-sidebar';
-import adminStyle from '../styles/admin.module.css';
-import AdminContent from '../components/admin-content';
+import AdminSidebar from './student-sidebar';
+import adminStyle from '../../styles/admin.module.css';
+import AdminContent from './student-content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer } from 'react-nextjs-toast';
-import { APIRoutes } from '../lib/api.routes';
-import API from '../lib/api.service';
-import Cookies from '../lib/cookies.service';
+import { APIRoutes } from '../../lib/api.routes';
+import API from '../../lib/api.service';
+import Cookies from '../../lib/cookies.service';
 import { useRouter } from 'next/router';
-import { UserType } from '../enum/type-user.enum';
-import Permission from '../lib/permission.service';
-import { InferGetServerSidePropsType } from 'next';
 
-export default function AdminBase(props: any) {
+export default function StudentBase(props: any) {
   const router = useRouter();
   const api = API();
   const cookie = Cookies();
@@ -27,7 +24,7 @@ export default function AdminBase(props: any) {
   }
 
   const profile = async () => {
-    router.push("/admin/profile");
+    router.push("/student/profile");
   }
 
   return (
