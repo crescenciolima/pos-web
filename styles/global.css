@@ -54,6 +54,11 @@ a {
     background-color: var(--background-color);
 }
 
+.bg-footer{
+    background-color: #263238;
+    font-weight: bolder;
+}
+
 .btn-primary {
     background-color: var(--primary)!important;
     border-color: var(--primary)!important;
