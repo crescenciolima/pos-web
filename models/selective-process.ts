@@ -31,6 +31,7 @@ export interface BaremaCategory {
 
 export interface BaremaSubCategory {
 
+    uuid: string;
     name: string;
     points: number;
 
@@ -46,13 +47,11 @@ export interface ProcessDocument {
 
 export interface ProcessStep {
 
-    order: number;
     startDate: number;
     finishDate: number;
     weight: number;
     passingScore: number;
     type: ProcessStepsTypes;
-    
 
 }
 
@@ -63,7 +62,7 @@ export enum ProcessStepsTypes {
     PROVA = "Prova",
     ENTREVISTA = "Entrevista",
     AVALIACAO_BAREMA = "Avaliação Barema",
-    RECURSO = "Recurso",
+    RECURSO_INSCRICAO = "Recurso da Inscrição",
 }
 
 

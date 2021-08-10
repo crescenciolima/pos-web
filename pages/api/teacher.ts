@@ -3,7 +3,7 @@ import TeacherService from '../../lib/teacher.service'
 import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../lib/storage-path';
 import multer from 'multer';
-import initMiddleware from '../../lib/init-middleware'
+import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { Teacher } from '../../models/teacher';
 import { APIResponse } from '../../models/api-response';

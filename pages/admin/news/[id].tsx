@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import AdminBase from '../../../components/admin-base'
-import { APIRoutes } from '../../../lib/api.routes'
+import { APIRoutes } from '../../../utils/api.routes'
 import { News } from '../../../models/news';
 import { useRouter } from 'next/router'
 import Link from 'next/link';

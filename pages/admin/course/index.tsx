@@ -8,7 +8,7 @@ import { css } from "@emotion/core";
 import AdminBase from '../../../components/admin-base'
 import CourseService from '../../../lib/course.service'
 import { Course } from "../../../models/course";
-import { APIRoutes } from '../../../lib/api.routes'
+import { APIRoutes } from '../../../utils/api.routes'
 
 interface AdminProps{
   course: Course;

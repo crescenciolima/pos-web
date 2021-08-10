@@ -79,19 +79,19 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
       break
 
     case "DELETE":
-      let newsID = req.query.id.toString();
-      const deletedNews = await selectiveProcessService.getById(newsID);
-      let uploadService = FileUploadService();
-      // await uploadService.remove(deletedNews.coverURL);
+      // let newsID = req.query.id.toString();
+      // const deletedNews = await selectiveProcessService.getById(newsID);
+      // let uploadService = FileUploadService();
+      // // await uploadService.remove(deletedNews.coverURL);
 
-      // await selectiveProcessService.remove(newsID);
+      // // await selectiveProcessService.remove(newsID);
 
-      let deleteResponse: APIResponse = {
-        msg: "Notícia removida com sucesso!",
-        result: {}
-      }
+      // let deleteResponse: APIResponse = {
+      //   msg: "Notícia removida com sucesso!",
+      //   result: {}
+      // }
 
-      res.status(200).json(deleteResponse);
+      // res.status(200).json(deleteResponse);
       break;
 
     default:

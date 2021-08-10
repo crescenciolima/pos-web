@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import FileUploadService from '../../lib/upload.service';
-import { StoragePaths } from '../../lib/storage-path';
 import multer from 'multer';
-import initMiddleware from '../../lib/init-middleware'
+import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { APIResponse } from '../../models/api-response';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
 import { ProcessDocument, SelectiveProcess } from '../../models/selective-process';
+import { StoragePaths } from '../../utils/storage-path';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer();
@@ -48,8 +48,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         let updateProcess: SelectiveProcess = {
           id: id,
           title: process.title,
-          open: process.open,
-          inConstruction: process.inConstruction
+          state: process.state
         }
 
         switch (type) {
@@ -109,8 +108,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       let updateProcess: SelectiveProcess = {
         id: id,
         title: process.title,
-        open: process.open,
-        inConstruction: process.inConstruction
+        state: process.state
       }
 
       if (processNotices) {
