@@ -12,6 +12,8 @@ import { Course } from '../models/course'
 import fire from '../utils/firebase-util'
 import Image from 'next/image'
 
+
+
 export default function Home({ newsList, course }) {
   return (
     <>
@@ -82,28 +84,37 @@ export default function Home({ newsList, course }) {
           </div>
 
         </section>
-
-        <section className={homeStyle.sectionPadding +' '+ homeStyle.newSection} >
-            {course && 
-              <div className="row justify-content-center">
-                <div className="col-12">
-                
-                  <h2 className="d-inline text-primary-dark heading-font-size">Sobre</h2>
-                  <br />
-                  <h4>{course.name}</h4>
-                  <br />
-                  <p>{course.description}</p>
+  
+        <footer className={homeStyle.sectionPadding+' bg-footer'}>
+            <div className="row">
+              <div className="col-md-9 text-white">
+                <div className="row">
                   <div className="col-12">
-                  <h3>Contatos</h3>
-                    Coordenador: {course.coordName}< br/>
-                    Telefone: <a href="tel:{coordPhone}">{course.coordPhone}</a> <br />
-                    E-mail:<a href="mailto:{coordMail}">{course.coordMail}</a> <br />
+                    <h4>{course.name}</h4>
                   </div>
-                </div> 
-              </div> 
-            }
-        </section>
-
+                </div>
+                <br />
+                <div className="row">
+                  <div className="col-6">
+                      <p>Coordenação:</p>
+                      <p>
+                        {course.coordName}<br /> 
+                        {course.coordMail}
+                      </p>
+                  </div>
+                  <div className="col-6">
+                    <p>Campus Viória da Conquista</p>
+                    <p>Av. Sérgio Vieira de Mello, 3150 - Zabelê,<br />
+                    Vitória da Conquista - BA, 45078-300
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-3 text-center">
+                <Image src="/images/ifba-logo-footer.png" alt="logo"width="124" height="147" />
+              </div>
+            </div>
+        </footer>
       </main>
 
     </>
