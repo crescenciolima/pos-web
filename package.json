@@ -27,6 +27,7 @@
     "react-datepicker": "^4.1.1",
     "react-dom": "17.0.1",
     "react-firebaseui": "^5.0.2",
+    "react-input-mask": "^2.0.4",
     "react-nextjs-toast": "^1.2.5",
     "react-router-dom": "^5.2.0",
     "react-spinners": "^0.10.6",

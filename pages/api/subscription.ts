@@ -45,21 +45,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             try{
                 const id = req.body.id;
                 let subscription: Subscription = req.body;
-                const { student, handicapped, vacancyType, status }: Subscription = subscription;
-                const studentId = student.id;
         
                 if (id) {
                     subscription.id = id;
                 } 
 
                 const currentUserId = await authService.currentUser(authorization);
-                const responseStudent = await studentService.save({...student, user: { id: currentUserId as string } });
 
-                const newStudent: Student = {
-                    id: responseStudent.id
-                }
-
-                subscription = { ...subscription, student: newStudent };
+                subscription = { ...subscription, user: { id: currentUserId as string } };
 
                 await subscriptionService.save(subscription);
         
