@@ -5,12 +5,16 @@ import { GetStaticProps } from 'next'
 import React from 'react'
 import SiteHeader from '../components/site-header'
 import NewsService from '../lib/news.service'
+import CourseService from '../lib/course.service'
 import NewsCard from '../components/news-card'
 import { News } from '../models/news'
+import { Course } from '../models/course'
 import fire from '../utils/firebase-util'
 import Image from 'next/image'
 
-export default function Home({ newsList }) {
+
+
+export default function Home({ newsList, course }) {
   return (
     <>
       <Head>
@@ -70,7 +74,7 @@ export default function Home({ newsList }) {
             </div>
           </div>
           <div className="row justify-content-center">
-            {newsList.map((news: News, i) => {
+            {newsList && newsList.map((news: News, i) => {
               return (
                 <div className="col-lg-8 mt-5" key={news.id}>
                   <NewsCard title={news.title} coverURL={news.coverURL} text={news.text} date={news.date} dateString={news.dateString} slug={news.slug}></NewsCard>
@@ -80,6 +84,37 @@ export default function Home({ newsList }) {
           </div>
 
         </section>
+  
+        <footer className={homeStyle.sectionPadding+' bg-footer'}>
+            <div className="row">
+              <div className="col-md-9 text-white">
+                <div className="row">
+                  <div className="col-12">
+                    <h4>{course.name}</h4>
+                  </div>
+                </div>
+                <br />
+                <div className="row">
+                  <div className="col-6">
+                      <p>Coordenação:</p>
+                      <p>
+                        {course.coordName}<br /> 
+                        {course.coordMail}
+                      </p>
+                  </div>
+                  <div className="col-6">
+                    <p>Campus Viória da Conquista</p>
+                    <p>Av. Sérgio Vieira de Mello, 3150 - Zabelê,<br />
+                    Vitória da Conquista - BA, 45078-300
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-3 text-center">
+                <Image src="/images/ifba-logo-footer.png" alt="logo"width="124" height="147" />
+              </div>
+            </div>
+        </footer>
       </main>
 
     </>
@@ -94,10 +129,31 @@ export const getStaticProps: GetStaticProps = async () => {
     const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
     news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
-  console.log(newsList)
+  console.log('newsList',newsList)
+
+  const courseService = CourseService();
+  
+  let courseData = await courseService.getFirstCourse();
+  console.log('courseData',courseData)
+
+  //mockup de dados quando não houver cadastro do curso 
+  //TODO melhor retornar um componente vazio e não renderizar a seção "Sobre"?
+  let course : Course ={
+    name: '<Nome do Curso>',
+    description: '<Descrição do Curso>',
+    coordName: '<Nome do Coordenador>',
+    coordMail: '<E-mail da Coordenação>',
+    coordPhone: '<Telefone da Coordenação>'
+  }
+
+  if (courseData !== null){
+    course = courseData
+  }
+
   return {
     props: {
-      newsList
+      newsList,
+      course,
     },
     revalidate: 1800
 

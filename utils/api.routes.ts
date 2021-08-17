@@ -6,6 +6,23 @@ export class APIRoutes {
 
     static COURSE:string = APIRoutes.API_URL + "/api/course"
 
+    static SIGNIN:string = APIRoutes.API_URL + "/api/auth/signin"
+
+    static SIGNUP:string = APIRoutes.API_URL + "/api/auth/signup"
+    
+    static SIGNOUT:string = APIRoutes.API_URL + "/api/auth/signout"
+
+    static FORGOT_PASSWORD:string = APIRoutes.API_URL + "/api/auth/forgot-password"
+
+    static VERIFY_CODE:string = APIRoutes.API_URL + "/api/auth/verify-code"
+
+    static RESET_PASSWORD:string = APIRoutes.API_URL + "/api/auth/reset-password"
+
+    static CURRENT_USER:string = APIRoutes.API_URL + "/api/auth/user"
+
+    static USER:string = APIRoutes.API_URL + "/api/user"
+
+    static USER_PROFILE:string = APIRoutes.API_URL + "/api/user-profile"
     static NEWS:string = APIRoutes.API_URL + "/api/news"
 
     static SUBSCRIPTION:string = APIRoutes.API_URL + "/api/subscription"

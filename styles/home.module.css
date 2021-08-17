@@ -13,6 +13,9 @@
 .sectionPadding {
     padding: 5rem;
 }
+.login {
+    color: #34a853;
+}
 
 .cardImg {
     width: 100%;

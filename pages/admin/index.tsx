@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { GetStaticProps } from 'next'
+import { GetStaticProps, GetServerSidePropsContext,  InferGetServerSidePropsType } from 'next'
 import React, { useEffect, useState } from 'react'
 import AdminBase from '../../components/admin-base'
 import API from '../../lib/api.service';
@@ -13,6 +13,9 @@ import { Subscription, SubscriptionStatus } from '../../models/subscription';
 import SelectiveProcessResourceList from '../../components/selectiveprocess/dashboard/resource-list';
 import SelectiveProcessUtil from '../../lib/selectiveprocess.util';
 import SelectiveProcessSubscriptionGrading from '../../components/selectiveprocess/dashboard/grading';
+import { authAdmin } from "./../../utils/firebase-admin";
+import Permission from '../../lib/permission.service';
+import { UserType } from '../../enum/type-user.enum';
 
 export default function Admin() {
 
@@ -134,3 +137,7 @@ export default function Admin() {
   )
 }
 
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const permission = Permission();
+  return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
+};

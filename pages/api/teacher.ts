@@ -7,6 +7,7 @@ import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { Teacher } from '../../models/teacher';
 import { APIResponse } from '../../models/api-response';
+import Cors from 'cors'
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer();
@@ -17,6 +18,13 @@ const multerAny = initMiddleware(
   upload.any()
 );
 
+const cors = initMiddleware(
+  // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
+  Cors({
+      // Only allow requests with GET, POST and OPTIONS
+      methods: ['GET', 'POST', 'OPTIONS'],
+  })
+)
 
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
@@ -103,7 +111,6 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       res.status(200).json(deleteResponse);
 
     default:
-      console.log(req.method)
       res.status(405);
       break;
   }
