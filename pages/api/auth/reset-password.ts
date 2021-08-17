@@ -2,12 +2,12 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import CourseService from '../../../lib/course.service';
 import { Course } from '../../../models/course';
 import Cors from 'cors'
-import initMiddleware from '../../../lib/init-middleware'
 import { APIResponse } from '../../../models/api-response';
 import AuthService from '../../../lib/auth.service';
 import { User } from '../../../models/user';
 import UserService from '../../../lib/user.service';
 import TreatError from '../../../lib/treat-error.service';
+import initMiddleware from '../../../utils/init-middleware';
 
 const cors = initMiddleware(
     // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options

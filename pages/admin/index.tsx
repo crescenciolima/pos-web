@@ -46,31 +46,37 @@ export default function Admin() {
 
           setSelectiveProcess(process);
           const step = processUtil.getCurrentStep(process);
-          const startDate = new Date(step.startDate);
-          const finishDate = new Date(step.finishDate);
-          setCurrentStep(step);
-          setStartDate(format(startDate, 'dd/MM/yyyy'))
-          setFinishDate(format(finishDate, 'dd/MM/yyyy'))
-
-          //Verificando se todos os recursos foram julgados para homologação definitiva
-          //Se algum recurso de inscrição ainda não foi julgado a homologação definitiva ainda não está completa
-          if (step.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
-            for (let subscription of subsList) {
-              if (subscription.resources) {
-                for (let resource of subscription.resources) {
-                  if (resource.step == ProcessStepsTypes.RECURSO_INSCRICAO && resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
-                    setAllResourcesChecked(false);
-                    break;
+          if(step){
+            const startDate = new Date(step.startDate);
+            const finishDate = new Date(step.finishDate);
+            setCurrentStep(step);
+            setStartDate(format(startDate, 'dd/MM/yyyy'))
+            setFinishDate(format(finishDate, 'dd/MM/yyyy'))
+  
+            //Verificando se todos os recursos foram julgados para homologação definitiva
+            //Se algum recurso de inscrição ainda não foi julgado a homologação definitiva ainda não está completa
+            if (step.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
+              for (let subscription of subsList) {
+                if (subscription.resources) {
+                  for (let resource of subscription.resources) {
+                    if (resource.step == ProcessStepsTypes.RECURSO_INSCRICAO && resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
+                      setAllResourcesChecked(false);
+                      break;
+                    }
                   }
                 }
+  
               }
-
             }
+  
+  
+            setOpen(true);
+  
+          }else{
+            //Final do processo seletivo
+            setOpen(true);
           }
-
-
-          setOpen(true);
-
+         
         } else {
           setOpen(false);
         }
