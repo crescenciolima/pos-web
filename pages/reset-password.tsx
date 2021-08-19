@@ -13,9 +13,9 @@ import SiteHeader from '../components/site-header';
 import API from '../lib/api.service';
 import Cookies from '../lib/cookies.service';
 import Permission from '../lib/permission.service';
-import { APIRoutes } from '../lib/api.routes';
 import { User } from '../models/user';
 import { UserType } from '../enum/type-user.enum';
+import { APIRoutes } from '../utils/api.routes';
 
 export default function ResetPassword(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
 

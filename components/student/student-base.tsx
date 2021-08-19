@@ -7,7 +7,7 @@ import AdminContent from './student-content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignOutAlt, faUserAlt } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer } from 'react-nextjs-toast';
-import { APIRoutes } from '../../lib/api.routes';
+import { APIRoutes } from '../../utils/api.routes';
 import API from '../../lib/api.service';
 import Cookies from '../../lib/cookies.service';
 import { useRouter } from 'next/router';

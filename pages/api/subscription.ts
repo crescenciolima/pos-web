@@ -1,45 +1,33 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import UserService from '../../lib/user.service'
-import FileUploadService from '../../lib/upload.service';
-import { StoragePaths } from '../../lib/storage-path';
-import multer from 'multer';
-import initMiddleware from '../../lib/init-middleware'
-import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
-import { User } from '../../models/user';
 import { APIResponse } from '../../models/api-response';
-import Cors from 'cors'
-import AuthService from '../../lib/auth.service';
-import FirebaseMessage from '../../utils/firebase-message-util';
-import TreatError from '../../lib/treat-error.service';
 import SubscriptionService from '../../lib/subscription.service';
 import { Subscription } from '../../models/subscription';
-import StudentService from '../../lib/student.service';
-import { Student } from '../../models/student';
+import AuthService from '../../lib/auth.service';
+import TreatError from '../../lib/treat-error.service';
+import Cors from 'cors'
+import initMiddleware from '../../utils/init-middleware';
 
 const cors = initMiddleware(
-  // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
   Cors({
-      // Only allow requests with GET, POST and OPTIONS
       methods: ['GET', 'POST', 'OPTIONS'],
   })
 )
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
-    const subscriptionService = SubscriptionService();
-    const studentService = StudentService();
-    const authService = AuthService();
-    const treatError = TreatError();
+  const subscriptionService = SubscriptionService();
+  const authService = AuthService();
+  const treatError = TreatError();
 
-    await cors(req, res);
+  await cors(req, res);
 
-    if (!await authService.checkAuthentication(req)){
-        return res.status(401).send(await treatError.general('Usuário não autorizado.'));
-    }
+  if(!await authService.checkAuthentication(req)){
+    return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+  }
 
-    const authorization = req.headers.authorization;
+  const authorization = req.headers.authorization;
 
-    switch (req.method) {
+  switch (req.method) {
 
         case "POST":
             try{
@@ -49,8 +37,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 if (id) {
                     subscription.id = id;
                 } 
-
                 const currentUserId = await authService.currentUser(authorization);
+
 
                 subscription = { ...subscription, user: { id: currentUserId as string } };
 
@@ -63,37 +51,58 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         
                 res.status(200).json(response);
             }catch(e){
-                console.log(e);
                 return res.status(400).json(treatError.general("Erro ao salvar usuário"));
+                console.log(e);
             }
 
             break;
+    case "GET":
 
-        case "GET":
+      let getResponse: APIResponse = {
+        msg: "",
+      };
+      if (req.query.processID) {
 
-            let getResponse: APIResponse = {
-                msg: "",
-                result: null
-            };
+        result: null
+        const subs = await subscriptionService.getAllByProcessID(req.query.processID.toString());
+        getResponse.result = subs;
+      } else if (req.query.id) {
+        const sub = await subscriptionService.getById(req.query.id);
+        getResponse.result = sub;
+      }
 
-            if (req.query.id) {
-                const user = await subscriptionService.getById(req.query.id);
-                getResponse.result = user;
-            } else {
-                const userList = await subscriptionService.getAll();
-                getResponse.result = userList;
-            }
+      res.status(200).json(getResponse);
+      break
 
-            res.status(200).json(getResponse);
-            break
+    case "DELETE":
+      // let newsID = req.query.id.toString();
+      // const deletedNews = await selectiveProcessService.getById(newsID);
+      // // await uploadService.remove(deletedNews.coverURL);
 
-        case "DELETE":
-            res.status(405);
-        default:
-            res.status(405);
-        break;
-    }
+      // let uploadService = FileUploadService();
+      // // await selectiveProcessService.remove(newsID);
+
+      //   result: {}
+
+      // let deleteResponse: APIResponse = {
+      //   msg: "Notícia removida com sucesso!",
+      // }
+      // res.status(200).json(deleteResponse);
+      break;
+
+      console.log(req.method)
+    default:
+      break;
+      res.status(405);
+  }
 
 }
 
 
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+}
+
+export default endpoint;

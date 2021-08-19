@@ -1,4 +1,4 @@
-import { SelectiveProcess } from "./selective-process";
+import { ProcessStepsTypes, SelectiveProcess } from "./selective-process";
 import { User } from "./user";
 
 export interface Subscription {
@@ -44,9 +44,48 @@ export interface Subscription {
     workRegime?: string,
 
     protocol?: string,
-    handicapped: boolean,
+    handicapped?: boolean,
     disabilityType?: string,
     specialTreatmentTypes?: string[],
-    vacancyType: string,    
-    status?: string,
+    vacancyType?: string,    
+    status?: SubscriptionStatus,
+
+    age?: number;
+    subscriptionDate?: number;
+    selectiveProcessID?: string;
+    statusObservation?: string;
+    reservedPlace?: string;
+    observation?: string;
+    graduationProofFile?: string;
+    resources?: SubscriptionResource[];
+    grades?: SubscriptionGrade[];
+    //Only for UI
+    currentResource?: SubscriptionResource;
+    currentGrade?: SubscriptionGrade;
+    formatedDate?: string;
+}
+
+
+export enum SubscriptionStatus {
+    AGUARDANDO_ANALISE = "Aguardando Análise",
+    DEFERIDA = "Deferida",
+    INDEFERIDA = "Indeferida",
+}
+
+
+export interface SubscriptionResource {
+
+    justification: string;
+    date: number;
+    step: ProcessStepsTypes;
+    status: SubscriptionStatus;
+    statusObservation?: string;
+
+    //Only for UI
+    formatedDate?: string;
+}
+
+export interface SubscriptionGrade{
+    grade: number;
+    step: ProcessStepsTypes;
 }

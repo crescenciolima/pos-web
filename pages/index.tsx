@@ -146,7 +146,7 @@ export const getStaticProps: GetStaticProps = async () => {
     coordPhone: '<Telefone da Coordenação>'
   }
 
-  if (courseData !== null){
+  if (courseData){
     course = courseData
   }
 

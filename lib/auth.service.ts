@@ -3,22 +3,23 @@ import { User } from "../models/user";
 import fire from "../utils/firebase-util";
 import { authAdmin } from "../utils/firebase-admin";
 import firebase from "firebase";
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
 import firestore from "../utils/firestore-util";
 import { NextApiRequestWithFormData } from "../utils/types-util";
 
 export default function AuthService() {
 
-    async function signUp(user: User) {
+    async function signUp(user: User,  res: NextApiResponse) {
         return fire.auth().createUserWithEmailAndPassword(user.email, user.password)
             .then(async (response) => {
                 return await formatUser(response.user);
             })
             .catch(async (err) => {
-                return {
+                res.status(200).json( {
                     error: true,
                     message: err.code
-                }
+                });
+                return null;
             });
     }
 
@@ -27,6 +28,7 @@ export default function AuthService() {
             return await formatUser(userCredential.user);
         })
         .catch(async (err) => {
+            console.log(err)
             return {
                 error: true,
                 message: err.code

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
+import { APIRoutes } from '../../../utils/api.routes'
 import AdminBase from '../../../components/admin/admin-base'
-import { APIRoutes } from '../../../lib/api.routes'
 import { Teacher } from '../../../models/teacher';
 import Link from 'next/link';
 import API from '../../../lib/api.service';
@@ -76,8 +76,7 @@ export default function SelectiveProcessLayout() {
 
     let body = {
       id: selectiveProcess.id,
-      open: true,
-      inConstruction: false
+      state: ProcessStepsState.OPEN,
     }
 
     const result = await api.post(APIRoutes.SELECTIVE_PROCESS, body);

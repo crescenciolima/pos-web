@@ -1,15 +1,6 @@
 
 
-import { GetServerSidePropsContext } from "next";
-import { parseCookies, setCookie, destroyCookie } from "nookies";
-import Cookies from "./cookies.service";
-import { authAdmin } from '../utils/firebase-admin';
-import API from "./api.service";
 import { APIResponse } from "../models/api-response";
-import { APIRoutes } from './api.routes';
-import { User } from "../models/user";
-import { UserType } from "../enum/type-user.enum";
-import { Message } from "../enum/message.enum";
 import FirebaseMessage from "../utils/firebase-message-util";
 
 export default function TreatError() {

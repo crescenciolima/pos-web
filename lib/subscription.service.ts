@@ -6,71 +6,72 @@ export default function SubscriptionService() {
 
     const subscriptionRef = firestore.collection("subscription");
 
-    async function getAll() {
-        let subscriptions = [];
+    async function getAllByProcessID(id: string) {
+        let snapshot = await subscriptionRef.where('selectiveProcessID', "==", id).get();
+        if (snapshot.size > 0) {
+            let subs = [];
 
-        await subscriptionRef.get().then(
-            (snapshot) => {
+            snapshot.forEach(
+                (result) => {
+                    const id = result.id;
+                    const doc = result.data();
+                    const sub: Subscription = {
+                        id: id,
+                        protocol: doc['protocol'],
+                        name: doc['name'],
+                        age: doc['age'],
+                        selectiveProcessID: doc['selectiveProcessID'],
+                        status: doc['status'],
+                        statusObservation: doc['statusObservation'],
+                        reservedPlace: doc['reservedPlace'],
+                        graduationProofFile: doc['graduationProofFile'],
+                        subscriptionDate : doc['subscriptionDate'],
+                        resources: doc['resources']
+                    }
+                    subs.push(sub);
+                });
+            return subs;
 
-                snapshot.forEach(
-                    (result) => {
-                        const id = result.id;
-                        const doc = result.data();
-                        const subscription: Subscription = {
-                            id: id,
-                            student: doc['student'],
-                            handicapped: doc['handicapped'],
-                            disabilityType: doc['disabilityType'],
-                            specialTreatmentType: doc['specialTreatmentType'],
-                            vacancyType: doc['vacancyType'],  
-                            status: doc['status'],
-                        }
-                        subscriptions.push(subscription);
-                    });
-
-            }
-        ).catch(
-        );
-
-        return subscriptions;
-
+        }
+        return null;
     }
 
-    async function save(subscription: Subscription) {
-        subscriptionRef.add(subscription);
-    }
-
-    async function update(subscription: Subscription) {
-        subscriptionRef.doc(subscription.id).set(subscription);
-    }
-
-    async function remove(subscription: Subscription) {
-        subscriptionRef.doc(subscription.id).delete();
-    }
-
-    async function getById(id: any) {
+    async function getById(id) {
         let snapshot = await subscriptionRef.doc(id).get();
         const doc = snapshot.data();
-        const subscription: Subscription = {
+        const sub: Subscription = {
             id: id,
-            student: doc['student'],
-            handicapped: doc['handicapped'],
-            disabilityType: doc['disabilityType'],
-            specialTreatmentType: doc['specialTreatmentType'],
-            vacancyType: doc['vacancyType'],  
+            protocol: doc['protocol'],
+            name: doc['name'],
+            age: doc['age'],
+            selectiveProcessID: doc['selectiveProcessID'],
             status: doc['status'],
+            statusObservation: doc['statusObservation'],
+            reservedPlace: doc['reservedPlace'],
+            graduationProofFile: doc['graduationProofFile'],
+            observation: doc['observation'],
+            subscriptionDate : doc['subscriptionDate'],
+            resources: doc['resources']
+
         }
 
-        return subscription;
+        return sub;
+    }
+
+    async function save(sub: Subscription) {
+        subscriptionRef.add(sub);
+    }
+
+    async function update(sub: Subscription) {
+        subscriptionRef.doc(sub.id).set(sub);
     }
 
 
     return {
-        getAll,
+        getAllByProcessID,
+        getById,
         save,
-        update,
-        remove,
-        getById
+        update
     }
 
 }

@@ -2,8 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import CourseService from '../../lib/course.service';
 import AuthService from '../../lib/auth.service';
 import { Course } from '../../models/course';
-import Cors from 'cors';
-import initMiddleware from '../../lib/init-middleware';
+import Cors from 'cors'
+import initMiddleware from '../../utils/init-middleware'
 import { authAdmin } from "./../../utils/firebase-admin";
 import TreatError from '../../lib/treat-error.service';
 

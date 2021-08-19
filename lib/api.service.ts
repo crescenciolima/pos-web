@@ -90,7 +90,7 @@ export default function API(setLoading?: Function) {
 
             if(result.error){                              
                 if (setLoading) setLoading(false);
-                return false;
+                return null;
             }
 
             if (setLoading) setLoading(false);

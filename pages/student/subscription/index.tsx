@@ -11,7 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import fire from '../../../utils/firebase-util';
 import style from '../../../styles/subscription.module.css';
 import { Subscription } from "../../../models/subscription";
-import { APIRoutes } from '../../../lib/api.routes';
+import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
 import { UserType } from '../../../enum/type-user.enum';

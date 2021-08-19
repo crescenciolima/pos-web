@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import { SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
-import { APIRoutes } from '../../lib/api.routes';
+import { APIRoutes } from '../../utils/api.routes';
 import { APIResponse } from '../../models/api-response';
 
 interface Props {
@@ -59,7 +59,7 @@ export default function SelectiveProcessBasicInfo(props: Props) {
                 }) => (
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <label htmlFor="name" className="form-label">Title</label>
+                            <label htmlFor="name" className="form-label">Título</label>
                             <input
                                 type="text"
                                 className="form-control"

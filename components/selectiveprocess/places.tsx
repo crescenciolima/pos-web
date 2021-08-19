@@ -5,7 +5,7 @@ import * as Yup from 'yup'
 import { ReservedPlace, SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
-import { APIRoutes } from '../../lib/api.routes';
+import { APIRoutes } from '../../utils/api.routes';
 import { APIResponse } from '../../models/api-response';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';

@@ -5,12 +5,13 @@ import * as Yup from 'yup'
 import { BaremaCategory, ReservedPlace, SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
-import { APIRoutes } from '../../lib/api.routes';
+import { APIRoutes } from '../../utils/api.routes';
 import { APIResponse } from '../../models/api-response';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import style from '../../styles/selectiveprocess.module.css'
 // import { toast } from 'react-nextjs-toast'
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
     process: SelectiveProcess;
@@ -67,6 +68,12 @@ export default function SelectiveProcessBarema(props: Props) {
             }
         }
 
+        for (let category of baremaCategories) {
+            for (let subCategory of category.subcategories) {
+                subCategory.uuid = uuidv4();
+            }
+        }
+
         try {
             actions.setSubmitting(true);
 
@@ -107,7 +114,7 @@ export default function SelectiveProcessBarema(props: Props) {
     };
 
     const handleAddNewCategory = () => {
-        const categories = baremaCategories.concat([{ name: "", maxPoints: 0, subcategories: [{ name: "", points: 1 }] }]);
+        const categories = baremaCategories.concat([{ name: "", maxPoints: 0, subcategories: [{ name: "", points: 1, uuid: "" }] }]);
         // setValues({ baremaCategories: categories })
         setBaremaCategories(categories);
         // push({ name: "", maxPoints: 0, subcategories: [{ name: "", points: 1 }] });
@@ -153,7 +160,7 @@ export default function SelectiveProcessBarema(props: Props) {
     const handleAddNewSubCategory = idx => () => {
         const categories = baremaCategories.map((category, i) => {
             if (idx !== i) return category;
-            return { ...category, subcategories: category.subcategories.concat([{ name: "", points: 1 }]) };
+            return { ...category, subcategories: category.subcategories.concat([{ name: "", points: 1, uuid: "" }]) };
         });
 
         setBaremaCategories(categories);
@@ -203,109 +210,109 @@ export default function SelectiveProcessBarema(props: Props) {
             }) => (
                 <form onSubmit={handleSubmit}>
 
-                        <div>
-                            <div className="mb-3 ">
-                                <label className="form-label mb-3">Categorias do Barema</label>
+                    <div>
+                        <div className="mb-3 ">
+                            <label className="form-label mb-3">Categorias do Barema</label>
 
-                                {values.baremaCategories.map((categorie, i) => {
+                            {values.baremaCategories.map((categorie, i) => {
 
-                                    return (
-                                        <div key={i} className={style.baremaCard}>
-                                            <div className="row">
-                                                <div className="col-6">
-                                                    <label className="form-label">Nome da categoria</label>
-                                                    <input type="text" className={"form-control form-control-sm "}
-                                                        name={`baremaCategories.${i}.name`}
-                                                        id={'name' + i}
-                                                        placeholder="Nome da categoria"
-                                                        value={categorie.name}
-                                                        onChange={(e) => { handleCategoryNameChange(i, e) }} />
-                                                </div>
-                                                <div className="col-4">
-                                                    <label className="form-label">Qtd máxima de pontos</label>
-                                                    <input type="number" className={"form-control form-control-sm " }
-                                                        name={`baremaCategories.${i}.maxPoints`}
-                                                        id={i + 'categorieMaxPoints'}
-                                                        placeholder="Qtd máxima de pontos"
-                                                        value={categorie.maxPoints}
-                                                        onChange={(e) => { handleCategoryMaxPointsChange(i, e) }} />
-                                                </div>
-                                                <div className="col-2 d-flex flex-column">
-                                                    <button type="button" className="btn text-danger btn-sm mt-auto" onClick={handleRemoveCategory(i)}>
-                                                        <FontAwesomeIcon icon={faTrash} className="sm-icon" />
-                                                    </button>
-                                                </div>
+                                return (
+                                    <div key={i} className={style.baremaCard}>
+                                        <div className="row">
+                                            <div className="col-6">
+                                                <label className="form-label">Nome da categoria</label>
+                                                <input type="text" className={"form-control form-control-sm "}
+                                                    name={`baremaCategories.${i}.name`}
+                                                    id={'name' + i}
+                                                    placeholder="Nome da categoria"
+                                                    value={categorie.name}
+                                                    onChange={(e) => { handleCategoryNameChange(i, e) }} />
                                             </div>
-                                            <div className="table-responsive mt-4">
-                                                <label htmlFor="">Itens da categoria</label>
-                                                <table className="table table-striped mb-3 table-sm">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Nome</th>
-                                                            <th>Pontos</th>
-                                                            <th>Excluir</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {categorie.subcategories.map((subcategorie, subIndex) => {
-                                                                                                             return (
-                                                                <tr key={subIndex}>
-                                                                    <td>
-                                                                        <input
-                                                                            type="text"
-                                                                            className={"form-control form-control-sm "}
-                                                                            name={`baremaCategories.${i}.subcategories.${subIndex}.name`}
-                                                                            id={i + 'subName'}
-                                                                            placeholder="Nome do item"
-                                                                            value={subcategorie.name}
-                                                                            onChange={(e) => { handleSubCategoryNameChange(i, subIndex, e) }}
-                                                                        />
-                                                                    </td>
-                                                                    <td>
-                                                                        <input
-                                                                            type="number"
-                                                                            className={"form-control form-control-sm "}
-                                                                            name={`baremaCategories.${i}.subcategories.${subIndex}.points`}
-                                                                            id={i + 'points'}
-                                                                            placeholder="Pontos por item"
-                                                                            value={subcategorie.points}
-                                                                            onChange={(e) => { handleSubCategoryPointsChange(i, subIndex, e) }}
-                                                                        />
-                                                                    </td>
-                                                                    <td>
-                                                                        <button type="button" className="btn btn-sm text-danger" onClick={(e) => { handleRemoveSubCategory(i, subIndex) }}>
-                                                                            <FontAwesomeIcon icon={faTrash} className="sm-icon" />
-                                                                        </button></td>
-                                                                </tr>
-                                                            )
-                                                        })}
-
-                                                        <tr>
-                                                            <td colSpan={3} className="text-center">
-                                                                <button type="button" className="btn btn-sm btn-secondary" onClick={handleAddNewSubCategory(i)}>
-                                                                    <FontAwesomeIcon icon={faPlus} className="sm-icon me-2" />
-                                                                    Adicionar novo item na categoria
-                                                                </button>
-                                                            </td>
-                                                        </tr>
-                                                    </tbody>
-                                                </table>
+                                            <div className="col-4">
+                                                <label className="form-label">Qtd máxima de pontos</label>
+                                                <input type="number" className={"form-control form-control-sm "}
+                                                    name={`baremaCategories.${i}.maxPoints`}
+                                                    id={i + 'categorieMaxPoints'}
+                                                    placeholder="Qtd máxima de pontos"
+                                                    value={categorie.maxPoints}
+                                                    onChange={(e) => { handleCategoryMaxPointsChange(i, e) }} />
                                             </div>
+                                            <div className="col-2 d-flex flex-column">
+                                                <button type="button" className="btn text-danger btn-sm mt-auto" onClick={handleRemoveCategory(i)}>
+                                                    <FontAwesomeIcon icon={faTrash} className="sm-icon" />
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="table-responsive mt-4">
+                                            <label htmlFor="">Itens da categoria</label>
+                                            <table className="table table-striped mb-3 table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Nome</th>
+                                                        <th>Pontos</th>
+                                                        <th>Excluir</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {categorie.subcategories.map((subcategorie, subIndex) => {
+                                                        return (
+                                                            <tr key={subIndex}>
+                                                                <td>
+                                                                    <input
+                                                                        type="text"
+                                                                        className={"form-control form-control-sm "}
+                                                                        name={`baremaCategories.${i}.subcategories.${subIndex}.name`}
+                                                                        id={i + 'subName'}
+                                                                        placeholder="Nome do item"
+                                                                        value={subcategorie.name}
+                                                                        onChange={(e) => { handleSubCategoryNameChange(i, subIndex, e) }}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <input
+                                                                        type="number"
+                                                                        className={"form-control form-control-sm "}
+                                                                        name={`baremaCategories.${i}.subcategories.${subIndex}.points`}
+                                                                        id={i + 'points'}
+                                                                        placeholder="Pontos por item"
+                                                                        value={subcategorie.points}
+                                                                        onChange={(e) => { handleSubCategoryPointsChange(i, subIndex, e) }}
+                                                                    />
+                                                                </td>
+                                                                <td>
+                                                                    <button type="button" className="btn btn-sm text-danger" onClick={(e) => { handleRemoveSubCategory(i, subIndex) }}>
+                                                                        <FontAwesomeIcon icon={faTrash} className="sm-icon" />
+                                                                    </button></td>
+                                                            </tr>
+                                                        )
+                                                    })}
 
-
+                                                    <tr>
+                                                        <td colSpan={3} className="text-center">
+                                                            <button type="button" className="btn btn-sm btn-secondary" onClick={handleAddNewSubCategory(i)}>
+                                                                <FontAwesomeIcon icon={faPlus} className="sm-icon me-2" />
+                                                                Adicionar novo item na categoria
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
 
-                                    )
-                                })}
-                            </div>
-                            <div className="mb-3 text-center">
-                                <button type="button" className="btn btn-sm btn-success" onClick={(e) => { handleAddNewCategory() }}>
-                                    <FontAwesomeIcon icon={faPlus} className="sm-icon me-2" />
-                                    Adicionar nova categoria
-                                </button>
-                            </div>
+
+                                    </div>
+
+                                )
+                            })}
                         </div>
-                    
+                        <div className="mb-3 text-center">
+                            <button type="button" className="btn btn-sm btn-success" onClick={(e) => { handleAddNewCategory() }}>
+                                <FontAwesomeIcon icon={faPlus} className="sm-icon me-2" />
+                                Adicionar nova categoria
+                            </button>
+                        </div>
+                    </div>
+
 
 
                     {/* <div className="mb-3">

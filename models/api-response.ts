@@ -1,7 +1,7 @@
 export interface APIResponse {
 
-    msg: string;
-    result: any;
+    msg?: string;
+    result?: any;
     error?: boolean;
 
 }

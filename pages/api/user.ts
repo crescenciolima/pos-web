@@ -1,15 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import UserService from '../../lib/user.service'
-import FileUploadService from '../../lib/upload.service';
-import { StoragePaths } from '../../lib/storage-path';
-import multer from 'multer';
-import initMiddleware from '../../lib/init-middleware'
+import { NextApiRequest, NextApiResponse } from 'next';
+import UserService from '../../lib/user.service';
+import initMiddleware from '../../utils/init-middleware';
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { User } from '../../models/user';
 import { APIResponse } from '../../models/api-response';
 import Cors from 'cors'
 import AuthService from '../../lib/auth.service';
-import FirebaseMessage from '../../utils/firebase-message-util';
 import TreatError from '../../lib/treat-error.service';
 
 const cors = initMiddleware(
@@ -49,7 +45,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         if (id) {
           user.id = id;
         } else {
-          const result: any = await authService.signUp(user);
+          const result: any = await authService.signUp(user, res);
           
           if(result.error){        
             return res.status(400).json(await treatError.firebase(result));

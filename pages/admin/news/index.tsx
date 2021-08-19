@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import AdminBase from '../../../components/admin/admin-base'
-import { APIRoutes } from '../../../lib/api.routes'
+import { APIRoutes } from '../../../utils/api.routes'
 import Link from 'next/link';
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';

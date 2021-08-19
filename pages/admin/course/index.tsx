@@ -7,7 +7,7 @@ import { css } from "@emotion/core";
 
 import AdminBase from '../../../components/admin/admin-base';
 import { Course } from "../../../models/course";
-import { APIRoutes } from '../../../lib/api.routes';
+import { APIRoutes } from '../../../utils/api.routes'
 import API from '../../../lib/api.service';
 import Cookies from '../../../lib/cookies.service';
 import { authAdmin } from '../../../utils/firebase-admin';

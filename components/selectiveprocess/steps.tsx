@@ -1,20 +1,15 @@
-import { ErrorMessage, Field, FieldArray, Form, Formik } from 'formik'
+import { ErrorMessage, FieldArray, Formik } from 'formik'
 import React, { useEffect, useState } from "react";
-import teacher from "../../pages/api/teacher";
 import * as Yup from 'yup'
-import { BaremaCategory, ProcessStep, ProcessStepsTypes, ReservedPlace, SelectiveProcess } from '../../models/selective-process';
+import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
-import { APIRoutes } from '../../lib/api.routes';
+import { APIRoutes } from '../../utils/api.routes';
 import { APIResponse } from '../../models/api-response';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
-import style from '../../styles/selectiveprocess.module.css'
-// import { toast } from 'react-nextjs-toast'
-// import DayPickerInput from 'react-day-picker/DayPickerInput';
-// import 'react-day-picker/lib/style.css';
 import DatePicker from "react-datepicker";
-import { registerLocale, setDefaultLocale } from "react-datepicker";
+import { registerLocale } from "react-datepicker";
 
 import ptBR from 'date-fns/locale/pt-BR';
 registerLocale('pt-BR', ptBR)
@@ -42,7 +37,7 @@ export default function SelectiveProcessSteps(props: Props) {
         for (let step of steps) {
 
             step['selectedStartDate'] = new Date(step.startDate);
-            step['selectedFinishDate'] =  new Date(step.finishDate);
+            step['selectedFinishDate'] = new Date(step.finishDate);
         }
 
         setSteps(steps);
@@ -68,10 +63,6 @@ export default function SelectiveProcessSteps(props: Props) {
             for (let step of steps) {
                 step.startDate = fire.firestore.Timestamp.fromDate(step['selectedStartDate']).toMillis();
                 step.finishDate = fire.firestore.Timestamp.fromDate(step['selectedFinishDate']).toMillis();
-                step.weight = 0;
-                step.order = steps.indexOf(step);
-                step.passingScore = 0;
-                console.log(step);
             }
 
             actions.setSubmitting(true);
@@ -100,8 +91,8 @@ export default function SelectiveProcessSteps(props: Props) {
                 // name: Yup.string().required('Preencha este campo.'),
                 // startDate: Yup.string().required('Preencha este campo.'),
                 // finishDate: Yup.string().required('Preencha este campo.'),
-                // weight: Yup.string().required('Preencha este campo.'),
-                // passingScore: Yup.string().required('Preencha este campo.'),
+                weight: Yup.number().max(100, "Entre 0 e 100").required('Preencha este campo.'),
+                passingScore: Yup.number().max(100, "Entre 0 e 100").required('Preencha este campo.'),
                 selectedStartDate: Yup.date().required('Preencha este campo.').nullable(),
                 selectedFinishDate: Yup.date().required('Preencha este campo.').nullable(),
                 type: Yup.string().required('Preencha este campo.'),
@@ -138,6 +129,8 @@ export default function SelectiveProcessSteps(props: Props) {
                                                 <th>Etapa </th>
                                                 <th>Data Início</th>
                                                 <th>Data Fim</th>
+                                                <th>Nota Corte (0-100)</th>
+                                                <th>Peso</th>
                                                 <th>Opções</th>
                                             </tr>
                                         </thead>
@@ -177,6 +170,28 @@ export default function SelectiveProcessSteps(props: Props) {
                                                         <ErrorMessage name={`steps.${index}.selectedFinishDate`} className="input-error" />
                                                     </td>
                                                     <td>
+                                                        <input type="number" className={"form-control form-control-sm "}
+                                                            name={`steps.${index}.passingScore`}
+                                                            id={'passingScore' + index}
+                                                            placeholder="De 0 a 100"
+                                                            value={step.passingScore}
+                                                            maxLength={3}
+                                                            onChange={handleChange} />
+                                                        <ErrorMessage name={`steps.${index}.passingScore`} className="input-error" />
+
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" className={"form-control form-control-sm "}
+                                                            name={`steps.${index}.weight`}
+                                                            id={'weight' + index}
+                                                            placeholder="Peso"
+                                                            value={step.weight}
+                                                            maxLength={3}
+                                                            onChange={handleChange} />
+                                                        <ErrorMessage name={`steps.${index}.weight`} className="input-error" />
+
+                                                    </td>
+                                                    <td>
                                                         {index > 0 ? <button className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index - 1)} >
                                                             <FontAwesomeIcon icon={faArrowUp} className="sm-icon" />
                                                         </button> : null}
@@ -192,7 +207,7 @@ export default function SelectiveProcessSteps(props: Props) {
                                             <tr>
                                                 <td colSpan={4} className="text-center">
                                                     <button
-                                                        type="button" className="btn btn-primary" onClick={() => arrayHelpers.push({ type: ProcessStepsTypes.INSCRICAO, selectedStartDate: new Date(), selectedFinishDate: new Date() })}                                                     >
+                                                        type="button" className="btn btn-primary" onClick={() => arrayHelpers.push({ type: ProcessStepsTypes.INSCRICAO, selectedStartDate: new Date(), selectedFinishDate: new Date(), weight: 0, passingScore: 0 })}                                                     >
                                                         Nova Etapa
                                                     </button>
                                                 </td>

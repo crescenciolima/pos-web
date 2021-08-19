@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors'
-import initMiddleware from '../../../lib/init-middleware'
+import initMiddleware from '../../../utils/init-middleware';
 import { APIResponse } from '../../../models/api-response';
 import AuthService from '../../../lib/auth.service';
 import { User } from '../../../models/user';
