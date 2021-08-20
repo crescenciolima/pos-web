@@ -50,7 +50,7 @@ export default function Permission() {
             let redirect =  '';
             
             if(user.type === UserType.STUDENT){
-              redirect = "/selective-process";
+              redirect = "/student";
             }else if ([UserType.MASTER, UserType.ADMIN].includes(user.type as UserType)){            
               redirect = "/admin";
             }

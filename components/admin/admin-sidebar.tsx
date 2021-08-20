@@ -1,11 +1,11 @@
 import Image from 'next/image'
-import adminStyle from '../styles/admin.module.css'
+import adminStyle from '../../styles/admin.module.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faChartLine, faBookReader, faChalkboardTeacher, faFile, faFileAlt, faFileInvoice, faFolder, faCopy, faUser } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import Permission from '../lib/permission.service'
-import { UserType } from '../enum/type-user.enum'
+import Permission from '../../lib/permission.service'
+import { UserType } from '../../enum/type-user.enum'
 
 export default function AdminSidebar() {
     //const { userType } = props; 

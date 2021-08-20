@@ -23,12 +23,13 @@ export class APIRoutes {
     static USER:string = APIRoutes.API_URL + "/api/user"
 
     static USER_PROFILE:string = APIRoutes.API_URL + "/api/user-profile"
+
     static NEWS:string = APIRoutes.API_URL + "/api/news"
 
     static SUBSCRIPTION:string = APIRoutes.API_URL + "/api/subscription"
 
     static SELECTIVE_PROCESS:string = APIRoutes.API_URL + "/api/selectiveprocess"
-    static SELECTIVE_PROCESS_FILES:string = APIRoutes.API_URL + "/api/selectiveprocessfiles"
 
+    static SELECTIVE_PROCESS_FILES:string = APIRoutes.API_URL + "/api/selectiveprocessfiles"
 
 }

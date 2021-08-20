@@ -1,0 +1,25 @@
+.radioGroup {
+  margin-top: 0.5em;
+  display: flex;
+}
+
+.radio {
+  margin-right: 0.5em;
+}
+
+.radio > input {
+  margin-right: 0.5em
+}
+
+.radioVacancyType {
+  margin-right: 0.5em;
+}
+
+.radioVacancyType > input {
+  margin-right: 0.5em;
+}
+
+.radioVacancyType > label {
+  font-weight: normal !important;
+}
+

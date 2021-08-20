@@ -1,4 +1,4 @@
-import adminStyle from '../styles/admin.module.css'
+import adminStyle from '../../styles/admin.module.css'
 
 export default function AdminContent(props: any) {
 

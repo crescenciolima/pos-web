@@ -1,7 +1,7 @@
 export interface SelectiveProcess {
     id?: string;
-    title: string;
-    state: ProcessStepsState;
+    title?: string;
+    state?: ProcessStepsState;
     creationDate?: number;
     numberPlaces?: number;
     description?: string;
