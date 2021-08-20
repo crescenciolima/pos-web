@@ -100,7 +100,7 @@ export default function Admin() {
           </div>
           <div className="row mt-5 justify-content-center">
             <div className="col-12 text-center">
-              <h5 className="text-primary-dark">Nenhum processo seletivo em construção no momento<br></br> Para abrir um novo processo acesse o menu de "Processo Seletivo"</h5>
+              <h5 className="text-primary-dark">Nenhum processo seletivo em andamento no momento<br></br> Para abrir um novo processo acesse o menu de "Processo Seletivo"</h5>
             </div>
           </div>
         </>

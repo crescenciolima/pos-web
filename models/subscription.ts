@@ -14,7 +14,12 @@ export interface Subscription {
     observation?: string;
     graduationProofFile: string;
     resources?: SubscriptionResource[];
+    //interviewGrade
+    //interviewGrade
     grades?: SubscriptionGrade[];
+
+
+
     //Only for UI
     currentResource?: SubscriptionResource;
     currentGrade?: SubscriptionGrade;

@@ -1,9 +1,10 @@
 import { ProcessStep, ProcessStepsState, SelectiveProcess } from "../models/selective-process";
+import { Subscription } from "../models/subscription";
 
 
 export default function SelectiveProcessUtil() {
 
-  
+
     function getCurrentStep(process: SelectiveProcess): ProcessStep {
 
         const currentDate = (new Date()).setHours(0, 0, 0, 0);
@@ -18,8 +19,40 @@ export default function SelectiveProcessUtil() {
         return null;
     }
 
+    function calculateFinalGrade(subscription: Subscription, process: SelectiveProcess): number {
+
+        let finalGrade = 0;
+
+        for (let grade of subscription.grades) {
+            for (let step of process.steps) {
+                if (grade.step == step.type) {
+
+                    if (grade.grade >= step.passingScore) {
+                        finalGrade += (grade.grade * step.weight);
+                    }
+
+                }
+            }
+
+        }
+        return finalGrade;
+    }
+
+    function orderSubscriptionList(subscriptionList: Subscription[], process:SelectiveProcess) :  Subscription[]{
+        //levar em consideração idade e anos de experiência e vagas reservadas
+        for(let sub of subscriptionList){
+            sub['finalGrade'] = calculateFinalGrade(sub, process);
+        }
+        
+        subscriptionList.sort((a, b) => b['finalGrade'] - a['finalGrade']);
+
+        return subscriptionList;
+    }
+
     return {
-        getCurrentStep
+        getCurrentStep,
+        calculateFinalGrade,
+        orderSubscriptionList
     }
 
 }

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
 import AdminBase from '../../../components/admin-base'
-import { APIRoutes } from '../../../lib/api.routes'
 import { User } from '../../../models/user';
 import Link from 'next/link';
 import API from '../../../lib/api.service';
@@ -13,6 +12,7 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
+import { APIRoutes } from '../../../utils/api.routes';
 
 
 export default function UserLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {

@@ -11,6 +11,7 @@ import { faTrash, faClock, faCheck, faTimes } from '@fortawesome/free-solid-svg-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 
 interface Props {
     process: SelectiveProcess;
@@ -23,12 +24,11 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
     const router = useRouter();
     const [subscriptionList, setSubscriptionList] = useState<Subscription[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
-    const [allChecked, setAllChecked] = useState<boolean>(false);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
     const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0, passingScore: 0, weight: 0 });
 
     const api = API(setLoading);
-
+    const processUtil = SelectiveProcessUtil();
 
     useEffect(() => {
         setSelectiveProcess(props.process);
@@ -36,15 +36,14 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
         const list: Subscription[] = props.subscriptionList;
         const finalList: Subscription[] = [];
 
-        let checked = true;
         for (let sub of list) {
-            sub['formatedDate'] = format(new Date(sub.subscriptionDate), 'dd/MM/yyyy')
+            sub['formatedDate'] = format(new Date(sub.subscriptionDate), 'dd/MM/yyyy');
             if (sub.status == SubscriptionStatus.DEFERIDA) {
                 finalList.push(sub)
             }
             if (sub.grades) {
                 for (let grade of sub.grades) {
-                    if (grade.step == currentStep.type) {
+                    if (grade.step == props.currentStep.type) {
                         sub.currentGrade = grade;
                     }
                 }
@@ -53,24 +52,28 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
             }
 
             if (!sub.currentGrade) {
-                sub.currentGrade = { grade: 0, step: currentStep.type };
+                sub.currentGrade = { grade: 0, step: props.currentStep.type };
                 sub.grades.push(sub.currentGrade);
             }
 
         }
-        setAllChecked(checked);
-        setSubscriptionList(finalList);
+        orderSubsList(finalList, props.process);
 
     }, []);
 
     const handleGradeChange = (index, evt) => {
         const newSubscriptionList = subscriptionList.map((sub, i) => {
             if (index !== i) return sub;
-            return { ...sub, currentGrade: { ...sub.currentGrade, grade: evt.target.value } };
+            sub.currentGrade.grade = +evt.target.value;
+            return sub;
         });
 
-        setSubscriptionList(newSubscriptionList);
+        orderSubsList(newSubscriptionList, selectiveProcess);
     };
+
+    const orderSubsList = (subList: Subscription[], process: SelectiveProcess) => {
+        setSubscriptionList(processUtil.orderSubscriptionList(subList, process));
+    }
 
 
     return (
@@ -83,7 +86,7 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
             </div>
             <div className="row mt-3">
                 <div className="col-12 table-responsive">
-                    <table className="table table-striped table-hover">
+                    <table className="table">
                         <caption>Quantidade de Inscritos: {subscriptionList.length}</caption>
                         <thead>
                             <tr>
@@ -99,7 +102,7 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
                             {subscriptionList.map((sub, i) => {
                                 return (
                                     <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} key={sub.id}>
-                                        <tr>
+                                        <tr className={sub.currentGrade.grade < currentStep.passingScore ? 'table-danger' : ''}>
                                             <td>{sub.name}</td>
                                             <td>{sub.age}</td>
                                             <td>{sub['formatedDate']}</td>
@@ -118,14 +121,11 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
                                                     id={i + 'grade'}
                                                     placeholder="Nota (0-100)"
                                                     value={sub.currentGrade.grade}
-                                                    onClick={(e) => {e.preventDefault()}}
+                                                    onClick={(e) => { e.preventDefault() }}
                                                     onChange={(e) => { handleGradeChange(i, e) }}>
                                                 </input>
 
                                             </td>
-                                            {/* <td><button className="btn btn-sm btn-danger" onClick={(e) => removeTeacher(e, newsItem)} >
-                                                <FontAwesomeIcon icon={faTrash} className="sm-icon" />
-                                            </button></td> */}
                                         </tr>
                                     </Link>
                                 )
@@ -142,35 +142,12 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
                 </div>
             </div>
 
-            {(currentStep.type == ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO)
-                &&
-                <div className="row mt-3">
-                    <div className="col-12">
-                        {allChecked &&
-                            <div className="alert alert-success text-center">
-                                Inscrições Homologadas com Sucesso.
-                            </div>
-                        }
-
-                        {!allChecked &&
-                            <div className="alert alert-warning text-center">
-                                <b>Atenção: </b>Finalize a análise das inscrições até a data limite.
-                            </div>
-                        }
-                    </div>
+            <div className="row mt-3">
+                <div className="col-12 text-center">
+                    <button className="btn btn-success">Salvar Dados</button>
                 </div>
-            }
+            </div>
 
-            {(currentStep.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO)
-                &&
-                <div className="row mt-3">
-                    <div className="col-12">
-                        <div className="alert alert-success text-center">
-                            Homologação Definitiva Realizada com Sucesso.
-                        </div>
-                    </div>
-                </div>
-            }
 
         </>
     );
