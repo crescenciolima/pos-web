@@ -7,7 +7,7 @@
 
 # testing
 /coverage
-/firebase
+firebase/credentials-firebase-adminsdk.json
 
 # next.js
 /.next/
