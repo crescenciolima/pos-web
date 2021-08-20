@@ -25,7 +25,7 @@ export default function SelectiveProcessResourceList(props: Props) {
     const [isLoading, setLoading] = useState<boolean>(true);
     const [allChecked, setAllChecked] = useState<boolean>(false);
     // const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
-    const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0,  passingScore: 0, weight: 0 });
+    const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0,  passingScore: 0, weight: 0, order: 0 });
 
     const api = API(setLoading);
 

@@ -60,9 +60,12 @@ export default function SelectiveProcessSteps(props: Props) {
         try {
 
             let steps: ProcessStep[] = values.steps;
+            let index = 0;
             for (let step of steps) {
                 step.startDate = fire.firestore.Timestamp.fromDate(step['selectedStartDate']).toMillis();
                 step.finishDate = fire.firestore.Timestamp.fromDate(step['selectedFinishDate']).toMillis();
+                step.order = index;
+                index++;
             }
 
             actions.setSubmitting(true);
@@ -88,9 +91,6 @@ export default function SelectiveProcessSteps(props: Props) {
     const validationSchema = Yup.object().shape({
         steps: Yup.array().of(
             Yup.object().shape({
-                // name: Yup.string().required('Preencha este campo.'),
-                // startDate: Yup.string().required('Preencha este campo.'),
-                // finishDate: Yup.string().required('Preencha este campo.'),
                 weight: Yup.number().max(100, "Entre 0 e 100").required('Preencha este campo.'),
                 passingScore: Yup.number().max(100, "Entre 0 e 100").required('Preencha este campo.'),
                 selectedStartDate: Yup.date().required('Preencha este campo.').nullable(),
@@ -137,17 +137,6 @@ export default function SelectiveProcessSteps(props: Props) {
                                         <tbody>
                                             {values.steps.map((step, index) => (
                                                 <tr key={index}>
-                                                    {/* <Field name={`steps.${index}`} /> */}
-                                                    {/* <td>
-                                                        <input type="text" className={"form-control form-control-sm "}
-                                                            name={`steps.${index}.name`}
-                                                            id={'name' + index}
-                                                            placeholder="Nome da etapa"
-                                                            value={step.name}
-                                                            onChange={handleChange} />
-                                                        <ErrorMessage name={`steps.${index}.name`} className="input-error" />
-
-                                                    </td> */}
                                                     <td>
                                                         <select
                                                             className="form-select form-select-sm"

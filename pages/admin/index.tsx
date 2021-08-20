@@ -21,7 +21,7 @@ export default function Admin() {
 
   const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0,  passingScore: 0, weight: 0 });
+  const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0,  passingScore: 0, weight: 0, order: 0 });
   const [startDate, setStartDate] = useState<string>();
   const [finishDate, setFinishDate] = useState<string>();
   const [open, setOpen] = useState<boolean>(false);

@@ -48,7 +48,7 @@ export default function SelectiveProcessLayout() {
   }, []);
 
   function handleNewProcessSubmit(event) {
-    event.stopPropagation();
+    event.stopPropagation();      
     const process: SelectiveProcess = {
       title: newProcessTitle,
       state: ProcessStepsState.IN_CONSTRUCTION,
@@ -74,9 +74,12 @@ export default function SelectiveProcessLayout() {
 
   async function confirmOpenProcess() {
 
+    let firstStep = selectiveProcess.steps.find(step => step.order == 0);
+
     let body = {
       id: selectiveProcess.id,
       state: ProcessStepsState.OPEN,
+      currentStep: firstStep
     }
 
     const result = await api.post(APIRoutes.SELECTIVE_PROCESS, body);
