@@ -1,7 +1,7 @@
-import Head from 'next/head'
-import { GetStaticProps, GetServerSidePropsContext,  InferGetServerSidePropsType } from 'next'
+import { GetServerSidePropsContext,  InferGetServerSidePropsType } from 'next'
 import React, { useEffect, useState } from 'react'
-import AdminBase from '../../components/admin-base'
+import AdminBase from '../../components/admin/admin-base'
+import Head from 'next/head'
 import API from '../../lib/api.service';
 import { APIRoutes } from '../../utils/api.routes';
 import { APIResponse } from '../../models/api-response';

@@ -69,6 +69,11 @@ a {
     border-color:  var(--primary-dark)!important;
 }
 
+.btn-secondary {
+    background-color: rgb(202, 202, 202) !important;
+    border-color: rgb(202, 202, 202) !important;
+}
+
 .btn-round{
     border-radius: 30px;
 }
@@ -169,7 +174,11 @@ a {
 }
 
 .text-right{
-    text-align: right;;
+    text-align: right;
+}
+
+.text-center{
+    text-align: center;
 }
 
 .input-error{

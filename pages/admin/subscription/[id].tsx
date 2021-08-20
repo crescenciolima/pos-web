@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-import AdminBase from '../../../components/admin-base'
+import AdminBase from '../../../components/admin/admin-base'
 import { APIRoutes } from '../../../utils/api.routes'
 import { News } from '../../../models/news';
 import { useRouter } from 'next/router'

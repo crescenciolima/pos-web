@@ -53,7 +53,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
 
     const redirectAfterLogin = (type: string) => {
         if(type === UserType.STUDENT){
-            router.push("/selective-process");
+            router.push("/student");
         }else{            
             router.push("/admin");
         }

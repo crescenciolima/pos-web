@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next'
 import TeacherService from '../../lib/teacher.service'
 import FileUploadService from '../../lib/upload.service';
-import { StoragePaths } from '../../lib/storage-path';
+import { StoragePaths } from '../../utils/storage-path';
 import multer from 'multer';
 import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
