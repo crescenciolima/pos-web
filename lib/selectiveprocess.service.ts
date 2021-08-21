@@ -22,6 +22,7 @@ export default function SelectiveProcessService() {
                 processForms: data['processForms'],
                 processNotices: data['processNotices'],
                 steps: data['steps'],
+                currentStep: data['currentStep']
 
             }
 
@@ -47,6 +48,7 @@ export default function SelectiveProcessService() {
                 processForms: data['processForms'],
                 processNotices: data['processNotices'],
                 steps: data['steps'],
+                currentStep: data['currentStep']
 
             }
 
@@ -82,6 +84,8 @@ export default function SelectiveProcessService() {
             processForms: doc['processForms'],
             processNotices: doc['processNotices'],
             steps: doc['steps'],
+            currentStep: doc['currentStep']
+
         }
         return process;
     }

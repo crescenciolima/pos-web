@@ -7,16 +7,17 @@ export default function SelectiveProcessUtil() {
 
     function getCurrentStep(process: SelectiveProcess): ProcessStep {
 
-        const currentDate = (new Date()).setHours(0, 0, 0, 0);
-        for (let step of process.steps) {
-            const startDate = new Date(step.startDate);
-            const finishDate = new Date(step.finishDate);
-            if (startDate.setHours(0, 0, 0, 0) <= currentDate && finishDate.setHours(23, 59, 59, 999) > currentDate) {
-                return step;
-            }
-        }
+        // const currentDate = (new Date()).setHours(0, 0, 0, 0);
+        // for (let step of process.steps) {
+        //     const startDate = new Date(step.startDate);
+        //     const finishDate = new Date(step.finishDate);
+        //     if (startDate.setHours(0, 0, 0, 0) <= currentDate && finishDate.setHours(23, 59, 59, 999) > currentDate) {
+        //         return step;
+        //     }
+        // }
 
-        return null;
+        const currentStep = process.steps.find(step => step.order == process.currentStep);
+        return currentStep;
     }
 
     function calculateFinalGrade(subscription: Subscription, process: SelectiveProcess): number {
