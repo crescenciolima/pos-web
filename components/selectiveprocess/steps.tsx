@@ -181,20 +181,20 @@ export default function SelectiveProcessSteps(props: Props) {
 
                                                     </td>
                                                     <td>
-                                                        {index > 0 ? <button className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index - 1)} >
+                                                        {index > 0 ? <button type="button"  className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index - 1)} >
                                                             <FontAwesomeIcon icon={faArrowUp} className="sm-icon" />
                                                         </button> : null}
-                                                        {index < (values.steps.length - 1) ? <button className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index + 1)} >
+                                                        {index < (values.steps.length - 1) ? <button type="button"  className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index + 1)} >
                                                             <FontAwesomeIcon icon={faArrowDown} className="sm-icon" />
                                                         </button> : null}
-                                                        <button className="btn btn-sm btn-link text-danger" onClick={(e) => arrayHelpers.remove(index)} >
+                                                        <button type="button" className="btn btn-sm btn-link text-danger" onClick={(e) => arrayHelpers.remove(index)} >
                                                             <FontAwesomeIcon icon={faTrash} className="sm-icon" />
                                                         </button>
                                                     </td>
                                                 </tr>
                                             ))}
                                             <tr>
-                                                <td colSpan={4} className="text-center">
+                                                <td colSpan={6} className="text-center">
                                                     <button
                                                         type="button" className="btn btn-primary" onClick={() => arrayHelpers.push({ type: ProcessStepsTypes.INSCRICAO, selectedStartDate: new Date(), selectedFinishDate: new Date(), weight: 0, passingScore: 0 })}                                                     >
                                                         Nova Etapa

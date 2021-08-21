@@ -6,7 +6,6 @@ export interface Subscription {
     uid?: string,
 
     user?: User
-    selectiveProcess?: SelectiveProcess
 
     name?: string,
     document?: string,
@@ -51,7 +50,7 @@ export interface Subscription {
     status?: SubscriptionStatus,
 
     age?: number;
-    subscriptionDate?: number;
+    subscriptionDate: number;
     selectiveProcessID?: string;
     statusObservation?: string;
     reservedPlace?: string;

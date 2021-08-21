@@ -283,7 +283,7 @@ export default function SelectiveProcessBarema(props: Props) {
 
                                                     <tr>
                                                         <td colSpan={3} className="text-center">
-                                                            <button type="button" className="btn btn-sm btn-secondary" onClick={handleAddNewSubCategory(i)}>
+                                                            <button type="button" className="btn btn-sm btn-primary" onClick={handleAddNewSubCategory(i)}>
                                                                 <FontAwesomeIcon icon={faPlus} className="sm-icon me-2" />
                                                                 Adicionar novo item na categoria
                                                             </button>

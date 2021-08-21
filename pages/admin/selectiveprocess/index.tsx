@@ -24,7 +24,7 @@ export default function SelectiveProcessLayout() {
   const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
   const [isLoading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const [inConstruction, setInConstruction] = useState<boolean>(false);
+  const [hasProcess, setHasProcess] = useState<boolean>(false);
   const [newProcessTitle, setNewProcessTitle] = useState('');
   const [menuSelection, setMenuSelection] = useState<string>("dadosbasicos");
 
@@ -36,10 +36,10 @@ export default function SelectiveProcessLayout() {
     api.get(APIRoutes.SELECTIVE_PROCESS, { 'inconstruction': "true" }).then(
       (result: APIResponse) => {
         if (result.result) {
-          setInConstruction(true);
+          setHasProcess(true);
           setSelectiveProcess(result.result);
         } else {
-          setInConstruction(false);
+          setHasProcess(false);
         }
         console.log(result)
       }
@@ -58,10 +58,10 @@ export default function SelectiveProcessLayout() {
     api.post(APIRoutes.SELECTIVE_PROCESS, process).then(
       (result: APIResponse) => {
         if (result.result) {
-          setInConstruction(true);
+          setHasProcess(true);
           setSelectiveProcess(result.result);
         } else {
-          setInConstruction(false);
+          setHasProcess(false);
         }
       }
     );
@@ -74,12 +74,10 @@ export default function SelectiveProcessLayout() {
 
   async function confirmOpenProcess() {
 
-    let firstStep = selectiveProcess.steps.find(step => step.order == 0);
-
     let body = {
       id: selectiveProcess.id,
       state: ProcessStepsState.OPEN,
-      currentStep: firstStep
+      currentStep: 0
     }
 
     const result = await api.post(APIRoutes.SELECTIVE_PROCESS, body);
@@ -105,7 +103,7 @@ export default function SelectiveProcessLayout() {
           <h3 className="text-primary-dark">Processo Seletivo</h3>
         </div>
         <div className="col-6 text-right">
-          {selectiveProcess.state == ProcessStepsState.IN_CONSTRUCTION ?
+          {selectiveProcess.state == ProcessStepsState.IN_CONSTRUCTION && hasProcess ?
             <button type="button" className="btn btn-success mt-3 me-auto" onClick={openProcess}>
               <FontAwesomeIcon icon={faRocket} className="sm-icon" /> Abrir Processo Seletivo
             </button>
@@ -119,7 +117,7 @@ export default function SelectiveProcessLayout() {
           }
         </div>
       </div>
-      {(!inConstruction && !isLoading) &&
+      {(!hasProcess && !isLoading) &&
         <>
           <div className="row mt-5 justify-content-center">
             <div className="col-10 col-md-4 col-lg-3">
@@ -148,7 +146,7 @@ export default function SelectiveProcessLayout() {
           </div>
         </>
       }
-      {(inConstruction && !isLoading) &&
+      {(hasProcess && !isLoading) &&
         <>
           <div className="row mt-5 justify-content-center">
             <div className="col-12">

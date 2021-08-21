@@ -10,7 +10,7 @@ export interface SelectiveProcess {
     processForms?: ProcessDocument[];
     processNotices?: ProcessDocument[];
     steps?: ProcessStep[];
-    currentStep?:ProcessStep;
+    currentStep?:number;
 }
 
 

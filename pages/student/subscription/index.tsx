@@ -108,9 +108,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             disabilityType: stageFourValues.disabilityType,
             specialTreatmentTypes: stageFourValues.specialTreatmentTypes,
             vacancyType: stageFourValues.vacancyType,  
-            selectiveProcess: {
-                id: selectiveProcess.id
-            }
+            selectiveProcessID: selectiveProcess.id,
+
+            subscriptionDate: Date.now()
         }
 
         return subscription;

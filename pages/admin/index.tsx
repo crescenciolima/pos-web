@@ -40,7 +40,7 @@ export default function Admin() {
           const process: SelectiveProcess = result.result;
 
           let subsResult: APIResponse = await api.get(APIRoutes.SUBSCRIPTION, { 'processID': process.id });
-          let subsList: Subscription[] = subsResult.result;
+          let subsList: Subscription[] = subsResult.result || [];
 
           setSubscriptionList(subsList);
 
