@@ -1,7 +1,7 @@
 import { GetServerSidePropsContext, GetStaticProps, InferGetServerSidePropsType } from 'next'
 import React, {useEffect, useState, useRef} from 'react'
 import * as Yup from 'yup'
-import {ErrorMessage, Field, Form, Formik} from 'formik'
+import {ErrorMessage, Field, FieldArray, Form, Formik} from 'formik'
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import MaskedInput from 'react-input-mask';
@@ -17,7 +17,7 @@ import Permission from '../../../lib/permission.service';
 import { UserType } from '../../../enum/type-user.enum';
 import StudentBase from '../../../components/student/student-base';
 import { APIResponse } from '../../../models/api-response';
-import { SelectiveProcess } from '../../../models/selective-process';
+import { BaremaCategory, BaremaSubCategory, SelectiveProcess } from '../../../models/selective-process';
 import { MaskHelper } from '../../../helpers/mask-helper';
 registerLocale('pt-BR', ptBR);
 
@@ -26,7 +26,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [reload, setReload] = useState(true);
     const api = API(setLoading);
     const [subscription, setSubscription] = useState<Subscription>();
-    const [currentStage, setCurrentStage] = useState(1);
+    const [currentStage, setCurrentStage] = useState(5);
     const [stageOneValues, setStageOneValues] = useState(null);
     const [stageTwoValues, setStageTwoValues] = useState(null);
     const [stageThreeValues, setStageThreeValues] = useState(null);
@@ -35,15 +35,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [stageSixValues, setStageSixValues] = useState(null);
     const [inConstruction, setInConstruction] = useState<boolean>(null);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
+    const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>(null);
+    const [baremaCategories, setBaremaCategories] = useState<any>(null);
     const [files, setFiles] = useState<FileList>();
-    const vacancyTypes = [
-        { name: "Servidores do IFBA", value: 'servidores' },
-        { name: "Pessoas com Deficiência", value: 'pessoas_deficiencia' },
-        { name: "Negros (Pretos e Pardos) ", value: 'negros' },
-        { name: "Indígenas", value: 'indigenas' },
-        { name: "Quilombolas", value: 'quilombolas' },
-        { name: "Pessoas Trans (Transexuais, Transgêneros e Travestis)", value : 'trans' },
-    ];
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
         { name: "Auxílio de Leitor/Ledor", value: 'auxilio_leitor' },
@@ -65,6 +59,34 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             console.error(error);
         }
     };
+
+    const handleFile = async (subcategoryUuid, position, file) => {
+        const subCategoriesFilesUpdated = baremaCategories.map((baremaCategory) => {
+            const subCategoriesUpdated = baremaCategory.subcategories.map((subcategory) => {
+                console.log(subcategory);
+                //subCategoriesFilesBuild.push({uuid: subcategory.uuid, files: [{position: 1, file: ''}]})
+                if(subcategory.uuid !== subcategoryUuid){
+                    return subcategory;
+                }
+                if(position && file){
+                    subcategory.files.forEach((element) => {
+                        if(element.position === position){
+                            element.file = file;
+                        }
+                    });
+                }else {
+                    const newPosition = subcategory.files[subcategory.files.length -1]?.position + 1;
+                    subcategory.files.push({uuid: subcategoryUuid, files: [{position: newPosition, file: ''}]})
+
+                }
+                return subcategory;
+            })
+            baremaCategory.subcategories = subCategoriesUpdated;
+            return baremaCategory;
+        })
+        setSubCategoriesFiles(subCategoriesFilesUpdated)
+        console.log(subCategoriesFilesUpdated)
+    }
 
     const buildForm = async () => {   
         const subscription: Subscription = {    
@@ -104,10 +126,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             workShift: stageThreeValues.workShift,
             workRegime: stageThreeValues.workRegime,
 
-            handicapped: stageFourValues.handicapped,
+            disability: stageFourValues.disability,
             disabilityType: stageFourValues.disabilityType,
             specialTreatmentTypes: stageFourValues.specialTreatmentTypes,
-            vacancyType: stageFourValues.vacancyType,  
+            reservedPlace: stageFourValues.reservedPlace,  
             selectiveProcessID: selectiveProcess.id,
 
             subscriptionDate: Date.now()
@@ -158,8 +180,16 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         api.get(APIRoutes.SELECTIVE_PROCESS, { 'inconstruction': "true" }).then(
           (result: APIResponse) => {
             if (result.result) {
-              setInConstruction(true);
-              setSelectiveProcess(result.result);
+                setInConstruction(true);
+                setSelectiveProcess(result.result);
+                const subCategoriesFilesBuild = []
+                let cloneCategories = JSON.parse(JSON.stringify(result.result.baremaCategories))
+                cloneCategories.map((baremaCategory) => (
+                    baremaCategory.subcategories.map((subcategory) => {
+                        subcategory.files = [{position: 1, file: ''}]
+                    })
+                ))
+                setBaremaCategories(cloneCategories);
             } else {
               setInConstruction(false);
             }
@@ -193,6 +223,17 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 </div>
             </StudentBase>
         );
+    }
+
+    const generateForm = () => {
+        const values = {};
+        baremaCategories?.forEach((baremaCategory, index) => {                                          
+            baremaCategory.subcategories.forEach((subcategory, index) => {
+                values[subcategory.uuid] = [''];
+            })
+        })
+        console.log(values);
+        return values;
     }
 
     return (    
@@ -781,38 +822,38 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     enableReinitialize
                     initialValues={
                         stageFourValues ? stageFourValues : {
-                            handicapped: '',
+                            disability: '',
                             disabilityType: '',
                             specialTreatmentTypes: '',
-                            vacancyType: '',
+                            reservedPlace: '',
                         }
                     }
                     validationSchema={Yup.object().shape({                        
-                        handicapped: Yup.string().required('Preencha este campo.'),
-                        vacancyType: Yup.string().required('Preencha este campo.'),
+                        disability: Yup.string().required('Preencha este campo.'),
+                        reservedPlace: Yup.string().required('Preencha este campo.'),
                     })}
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
                             <div className="col-3">
-                                <label htmlFor="handicapped" className="form-label">Portador de Deficiência</label>
+                                <label htmlFor="disability" className="form-label">Portador de Deficiência</label>
                                 <div role="group" aria-labelledby="my-radio-group"> 
                                     <div className={style.radioGroup}>
                                         <div className={style.radio}>
-                                            <input type="radio" name="handicapped" value="1" onChange={actions.handleChange} checked={actions.values.handicapped === "1"}/>
+                                            <input type="radio" name="disability" value="1" onChange={actions.handleChange} checked={actions.values.disability === "1"}/>
                                             <label>Sim</label>
                                         </div>  
                                         <div className={style.radio}>
-                                            <input type="radio" name="handicapped" value="0" onChange={actions.handleChange} checked={actions.values.handicapped === "0"} />
+                                            <input type="radio" name="disability" value="0" onChange={actions.handleChange} checked={actions.values.disability === "0"} />
                                             <label>Não</label>                                  
                                         </div>
                                     </div>
-                                    <p className="input-error"><ErrorMessage name="handicapped" className="input-error" /></p>
+                                    <p className="input-error"><ErrorMessage name="disability" className="input-error" /></p>
                                 </div>
                             </div>
                             <div className="col-5">
-                                {actions.values.handicapped === '1' && 
+                                {actions.values.disability === '1' && 
                                     <div className="mb-3">
                                         <label htmlFor="disabilityType" className="form-label">Tipo de Deficiência</label>
                                         <input 
@@ -827,7 +868,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 }
                             </div>
                             <div className="col-4">
-                                {actions.values.handicapped === '1' && 
+                                {actions.values.disability === '1' && 
                                     <div className="mb-3">
                                         <label htmlFor="type" className="form-label">Tipos de Atendimento Especial</label>
                                         <select 
@@ -848,18 +889,18 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 }
                             </div>
                             <div className="col-12">
-                                <label htmlFor="vacancyType" className="form-label">Concorrência às vagas destinadas para:</label>
+                                <label htmlFor="reservedPlace" className="form-label">Concorrência às vagas destinadas para:</label>
                                 <div role="group" aria-labelledby="my-radio-group"> 
-                                    {vacancyTypes.map((vacancyType, index) => (
+                                    {selectiveProcess.reservedPlaces.map((reservedPlace, index) => (
                                         <div className={style.radioGroup} key={index}>
-                                            <div className={style.radioVacancyType}>
-                                            <input type="radio" name="vacancyType" value={vacancyType.value} onChange={actions.handleChange} checked={actions.values.vacancyType === vacancyType.value}/>
-                                            <label>{vacancyType.name}</label>
+                                            <div className={style.radioReservedPlace}>
+                                            <input type="radio" name="reservedPlace" value={reservedPlace.uuid} onChange={actions.handleChange} checked={actions.values.reservedPlace === reservedPlace.uuid}/>
+                                            <label>{reservedPlace.name}</label>
                                             </div>  
                                         </div>
                                     ))}
                                 </div>
-                                <p className="input-error"><ErrorMessage name="vacancyType" className="input-error" /></p>
+                                <p className="input-error"><ErrorMessage name="reservedPlace" className="input-error" /></p>
                             </div>
                         </div>
                         <br />
@@ -874,11 +915,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             {currentStage === 5 && 
                 <Formik
                     enableReinitialize
-                    initialValues={
-                        {
-                            files: ''
-                        }
-                    }
+                    initialValues={generateForm()}
                     validationSchema={Yup.object().shape({                        
                         //files: Yup.string().required('Preencha este campo.'),
                     })}
@@ -888,20 +925,44 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         <div className="row mt-5 justify-content-center">
                             <div className="col-12">                                
                                 <div className="mb-3">
-                                    <label htmlFor="files" className="form-label">Arquivo</label>
-                                    <input
-                                        type="file"
-                                        className="form-control"
-                                        name="files"
-                                        id="files"
-                                        value={actions.values.files}
-                                        onChange={(event) => {
-                                            actions.handleChange(event);
-                                            setFiles(event.currentTarget.files);
-                                        }} 
-                                        multiple
-                                    />
-                                    <p className="input-error"><ErrorMessage name="files" className="input-error" /></p>
+                                    {baremaCategories?.map((baremaCategory, index) => (
+                                        <>
+                                            <label htmlFor="files" className="form-label" key={index}>{baremaCategory.name}</label>                                            
+                                            {baremaCategory.subcategories.map((subcategory, index) => (
+                                                <>
+                                                <FieldArray
+                                                    name={subcategory.uuid}
+                                                    render={arrayHelpers => (
+                                                        <>
+                                                            {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, index) => (    
+                                                                <> 
+                                                                    <label htmlFor="files" className="form-label"key={index}>{subcategory.name}</label>   
+                                                                    <Field 
+                                                                        type="file"
+                                                                        className="form-control"
+                                                                        name={`${subcategory.uuid}.${index}`}
+                                                                        id="files"
+                                                                        onChange={(event) => {
+                                                                            actions.handleChange(event);
+                                                                            console.log(event.currentTarget.files);
+                                                                            handleFile(subcategory.uuid, 0, event.currentTarget.files);
+                                                                        }}
+                                                                    />  
+                                                                    <p className="input-error"><ErrorMessage name="files" className="input-error" /></p>
+                                                                    {index !== 0 && <button className="delete-collection-button" type="button" onClick={() => arrayHelpers.remove(index)}>-</button>}
+                                                                    {index === 0 &&
+                                                                        <button onClick={() => arrayHelpers.push('')}>
+                                                                            NOVO
+                                                                        </button>}
+                                                                </>
+                                                            )))}
+                                                        </>
+                                                    )}
+                                                />   
+                                                </>                                             
+                                            ))}
+                                        </>
+                                    ))}
                                 </div>
                             </div>
                         </div>

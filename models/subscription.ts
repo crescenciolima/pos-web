@@ -43,10 +43,9 @@ export interface Subscription {
     workRegime?: string,
 
     protocol?: string,
-    handicapped?: boolean,
+    disability?: boolean,
     disabilityType?: string,
     specialTreatmentTypes?: string[],
-    vacancyType?: string,    
     status?: SubscriptionStatus,
 
     age?: number;
