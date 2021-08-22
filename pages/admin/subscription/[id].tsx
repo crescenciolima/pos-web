@@ -122,7 +122,16 @@ export default function ProcessSubscriprionLayout() {
                     </Link>
                 </div>
             </div>
-            <div className="row">
+            <fieldset>
+                <legend>
+                    Inscrição: 
+                    {subscription.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon mx-2" />}
+                    {subscription.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon mx-2" />}
+                    {subscription.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon mx-2" />}
+                    {subscription.status}
+                </legend>
+            </fieldset>
+            {/* <div className="row">
                 <div className="col-6">
                     <h5 className="text-primary-dark">
                         Inscrição
@@ -132,10 +141,11 @@ export default function ProcessSubscriprionLayout() {
                         {subscription.status}
                     </h5>
                 </div>
-            </div>
+            </div> */}
             <div className="row mt-3">
                 <div className="col-12 ">
                     <fieldset disabled>
+                        <legend>Dados básicos</legend>
                         <div className="mb-3">
                             <label className="form-label">Nome</label>
                             <input type="text" id="nome" className="form-control form-control-sm" value={subscription.name} readOnly></input>
@@ -190,8 +200,9 @@ export default function ProcessSubscriprionLayout() {
                 </>}
             {
                 (stepType == ProcessStepsTypes.INSCRICAO || stepType == ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO) &&
-                <div className="row justify-content-center">
-                    <div className="col-12 my-4 "><hr></hr></div>
+                <fieldset>
+                    <legend>Parecer Inscrição</legend>
+                    <div className="row justify-content-center">
                     <div className="col-12">
                         <div className="mb-3">
                             <label className="form-label">Infomações Adicionais da Análise (Parecer)</label>
@@ -205,6 +216,8 @@ export default function ProcessSubscriprionLayout() {
                         <button className="btn btn-danger" onClick={(e) => save(SubscriptionStatus.INDEFERIDA)}>Indeferir</button>
                     </div>
                 </div>
+                </fieldset>
+            
             }
 
         </AdminBase>

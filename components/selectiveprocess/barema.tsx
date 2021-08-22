@@ -68,12 +68,6 @@ export default function SelectiveProcessBarema(props: Props) {
             }
         }
 
-        for (let category of baremaCategories) {
-            for (let subCategory of category.subcategories) {
-                subCategory.uuid = uuidv4();
-            }
-        }
-
         try {
             actions.setSubmitting(true);
 
@@ -114,7 +108,7 @@ export default function SelectiveProcessBarema(props: Props) {
     };
 
     const handleAddNewCategory = () => {
-        const categories = baremaCategories.concat([{ name: "", maxPoints: 0, subcategories: [{ name: "", points: 1, uuid: "" }] }]);
+        const categories = baremaCategories.concat([{ name: "", maxPoints: 0, subcategories: [{ name: "", points: 1, uuid: uuidv4() }] }]);
         // setValues({ baremaCategories: categories })
         setBaremaCategories(categories);
         // push({ name: "", maxPoints: 0, subcategories: [{ name: "", points: 1 }] });
@@ -160,7 +154,7 @@ export default function SelectiveProcessBarema(props: Props) {
     const handleAddNewSubCategory = idx => () => {
         const categories = baremaCategories.map((category, i) => {
             if (idx !== i) return category;
-            return { ...category, subcategories: category.subcategories.concat([{ name: "", points: 1, uuid: "" }]) };
+            return { ...category, subcategories: category.subcategories.concat([{ name: "", points: 1, uuid: uuidv4() }]) };
         });
 
         setBaremaCategories(categories);
@@ -289,7 +283,7 @@ export default function SelectiveProcessBarema(props: Props) {
 
                                                     <tr>
                                                         <td colSpan={3} className="text-center">
-                                                            <button type="button" className="btn btn-sm btn-secondary" onClick={handleAddNewSubCategory(i)}>
+                                                            <button type="button" className="btn btn-sm btn-primary" onClick={handleAddNewSubCategory(i)}>
                                                                 <FontAwesomeIcon icon={faPlus} className="sm-icon me-2" />
                                                                 Adicionar novo item na categoria
                                                             </button>

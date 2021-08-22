@@ -228,3 +228,19 @@ tr{
 .nav-fill .nav-item .sm-icon{
     height: 20px;
 }
+
+fieldset {
+    padding: .75rem !important;
+    margin-top: .75rem !important;
+    margin-bottom: .75rem !important;
+    border: 1px solid #eee !important;
+    border-left-width: .25rem !important;
+    border-radius: .30rem !important;
+    border-left-color: var(--color-primary-dark) !important;
+  }
+  
+  legend {
+    font-size: 1.15rem !important;
+    font-weight: bold !important;
+    color: var(--color-primary-dark)
+  }

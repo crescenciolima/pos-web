@@ -10,6 +10,7 @@ export interface SelectiveProcess {
     processForms?: ProcessDocument[];
     processNotices?: ProcessDocument[];
     steps?: ProcessStep[];
+    currentStep?:number;
 }
 
 
@@ -17,6 +18,7 @@ export interface ReservedPlace {
 
     name: string;
     numberPlaces: number;
+    uuid: string;
 
 }
 
@@ -47,6 +49,7 @@ export interface ProcessDocument {
 
 export interface ProcessStep {
 
+    order:number;
     startDate: number;
     finishDate: number;
     weight: number;

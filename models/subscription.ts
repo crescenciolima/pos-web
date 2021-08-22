@@ -6,7 +6,6 @@ export interface Subscription {
     uid?: string,
 
     user?: User
-    selectiveProcess?: SelectiveProcess
 
     name?: string,
     document?: string,
@@ -51,14 +50,19 @@ export interface Subscription {
     status?: SubscriptionStatus,
 
     age?: number;
-    subscriptionDate?: number;
+    subscriptionDate: number;
     selectiveProcessID?: string;
     statusObservation?: string;
     reservedPlace?: string;
     observation?: string;
     graduationProofFile?: string;
     resources?: SubscriptionResource[];
+    //interviewGrade
+    //interviewGrade
     grades?: SubscriptionGrade[];
+
+
+
     //Only for UI
     currentResource?: SubscriptionResource;
     currentGrade?: SubscriptionGrade;
@@ -80,7 +84,8 @@ export interface SubscriptionResource {
     step: ProcessStepsTypes;
     status: SubscriptionStatus;
     statusObservation?: string;
-
+    files: string[];
+    
     //Only for UI
     formatedDate?: string;
 }

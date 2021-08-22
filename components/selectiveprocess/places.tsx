@@ -9,6 +9,7 @@ import { APIRoutes } from '../../utils/api.routes';
 import { APIResponse } from '../../models/api-response';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Props {
     process: SelectiveProcess;
@@ -74,7 +75,7 @@ export default function SelectiveProcessPlaces(props: Props) {
     };
 
     const handleAddNewReservedPlace = () => {
-        setReservedPlaces(reservedPlaces.concat([{ name: "", numberPlaces: 1 }]));
+        setReservedPlaces(reservedPlaces.concat([{ name: "", numberPlaces: 1 , uuid: uuidv4()}]));
     };
 
     const handleRemoveReservedPlace = idx => () => {

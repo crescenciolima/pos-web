@@ -3,6 +3,7 @@ import FileUploadService from '../../lib/upload.service';
 import { APIResponse } from '../../models/api-response';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
 import { SelectiveProcess } from '../../models/selective-process';
+import { v4 as uuidv4 } from 'uuid';
 
 
 async function endpoint(req: NextApiRequest, res: NextApiResponse) {
@@ -32,12 +33,12 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
             state: state,
             numberPlaces: 0,
             reservedPlaces: [
-              { name: "Servidores do IFBA", numberPlaces: 0 },
-              { name: "Pessoas com Deficiência", numberPlaces: 0 },
-              { name: "Negros (Pretos e Pardos) ", numberPlaces: 0 },
-              { name: "Indígenas", numberPlaces: 0 },
-              { name: "Quilombolas", numberPlaces: 0 },
-              { name: "Pessoas Trans (Transexuais, Transgêneros e Travestis)", numberPlaces: 0 },
+              { name: "Servidores do IFBA", numberPlaces: 0, uuid: uuidv4() },
+              { name: "Pessoas com Deficiência", numberPlaces: 0 , uuid: uuidv4()},
+              { name: "Negros (Pretos e Pardos) ", numberPlaces: 0 , uuid: uuidv4()},
+              { name: "Indígenas", numberPlaces: 0 , uuid: uuidv4()},
+              { name: "Quilombolas", numberPlaces: 0 , uuid: uuidv4()},
+              { name: "Pessoas Trans (Transexuais, Transgêneros e Travestis)", numberPlaces: 0 , uuid: uuidv4()},
             ]
           }
 

@@ -1,4 +1,4 @@
-import { GetServerSidePropsContext,  InferGetServerSidePropsType } from 'next'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import React, { useEffect, useState } from 'react'
 import AdminBase from '../../components/admin/admin-base'
 import Head from 'next/head'
@@ -7,7 +7,7 @@ import { APIRoutes } from '../../utils/api.routes';
 import { APIResponse } from '../../models/api-response';
 import { SelectiveProcess, ProcessStepsState, ProcessStep, ProcessStepsTypes } from '../../models/selective-process';
 import Loading from '../../components/loading';
-import { format } from 'date-fns';
+import { format, sub } from 'date-fns';
 import SelectiveProcessSubscriptionList from '../../components/selectiveprocess/dashboard/subscription-list';
 import { Subscription, SubscriptionStatus } from '../../models/subscription';
 import SelectiveProcessResourceList from '../../components/selectiveprocess/dashboard/resource-list';
@@ -21,7 +21,7 @@ export default function Admin() {
 
   const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0,  passingScore: 0, weight: 0 });
+  const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0, passingScore: 0, weight: 0, order: 0 });
   const [startDate, setStartDate] = useState<string>();
   const [finishDate, setFinishDate] = useState<string>();
   const [open, setOpen] = useState<boolean>(false);
@@ -40,43 +40,18 @@ export default function Admin() {
           const process: SelectiveProcess = result.result;
 
           let subsResult: APIResponse = await api.get(APIRoutes.SUBSCRIPTION, { 'processID': process.id });
-          let subsList: Subscription[] = subsResult.result;
+          let subsList: Subscription[] = subsResult.result || [];
 
           setSubscriptionList(subsList);
 
           setSelectiveProcess(process);
-          const step = processUtil.getCurrentStep(process);
-          if(step){
-            const startDate = new Date(step.startDate);
-            const finishDate = new Date(step.finishDate);
-            setCurrentStep(step);
-            setStartDate(format(startDate, 'dd/MM/yyyy'))
-            setFinishDate(format(finishDate, 'dd/MM/yyyy'))
-  
-            //Verificando se todos os recursos foram julgados para homologação definitiva
-            //Se algum recurso de inscrição ainda não foi julgado a homologação definitiva ainda não está completa
-            if (step.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
-              for (let subscription of subsList) {
-                if (subscription.resources) {
-                  for (let resource of subscription.resources) {
-                    if (resource.step == ProcessStepsTypes.RECURSO_INSCRICAO && resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
-                      setAllResourcesChecked(false);
-                      break;
-                    }
-                  }
-                }
-  
-              }
-            }
-  
-  
-            setOpen(true);
-  
-          }else{
-            //Final do processo seletivo
-            setOpen(true);
-          }
-         
+
+          getCurrentStep(process, subsList);
+
+          setOpen(true);
+
+
+
         } else {
           setOpen(false);
         }
@@ -85,6 +60,40 @@ export default function Admin() {
     )
 
   }, []);
+
+  const getCurrentStep = (process: SelectiveProcess, subsList: Subscription[]) => {
+    const step = processUtil.getCurrentStep(process);
+
+    const startDate = new Date(step.startDate);
+    const finishDate = new Date(step.finishDate);
+    setCurrentStep(step);
+    setStartDate(format(startDate, 'dd/MM/yyyy'))
+    setFinishDate(format(finishDate, 'dd/MM/yyyy'))
+
+    //Verificando se todos os recursos foram julgados para homologação definitiva
+    //Se algum recurso de inscrição ainda não foi julgado a homologação definitiva ainda não está completa
+    if (step.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
+      for (let subscription of subsList) {
+        if (subscription.resources) {
+          for (let resource of subscription.resources) {
+            if (resource.step == ProcessStepsTypes.RECURSO_INSCRICAO && resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
+              setAllResourcesChecked(false);
+              break;
+            }
+          }
+        }
+
+      }
+    }
+  };
+  const advanceStep = async () => {
+    selectiveProcess.currentStep++;
+    let response = await api.post(APIRoutes.SELECTIVE_PROCESS, selectiveProcess);
+    if (!response.error) {
+      setSelectiveProcess(response.result);
+      getCurrentStep(response.result, subscriptionList);
+    }
+  };
 
 
 
@@ -100,7 +109,7 @@ export default function Admin() {
           </div>
           <div className="row mt-5 justify-content-center">
             <div className="col-12 text-center">
-              <h5 className="text-primary-dark">Nenhum processo seletivo em construção no momento<br></br> Para abrir um novo processo acesse o menu de "Processo Seletivo"</h5>
+              <h5 className="text-primary-dark">Nenhum processo seletivo em andamento no momento<br></br> Para abrir um novo processo acesse o menu de "Processo Seletivo"</h5>
             </div>
           </div>
         </>
@@ -133,6 +142,12 @@ export default function Admin() {
               {(currentStep.type == ProcessStepsTypes.ENTREVISTA || currentStep.type == ProcessStepsTypes.PROVA)
                 && <SelectiveProcessSubscriptionGrading process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList}></SelectiveProcessSubscriptionGrading>}
 
+            </div>
+          </div>
+
+          <div className="row mt-5">
+            <div className="col-12 text-center">
+              <button className="btn btn-primary" onClick={advanceStep}>Avançar para próxima etapa</button>
             </div>
           </div>
         </>
