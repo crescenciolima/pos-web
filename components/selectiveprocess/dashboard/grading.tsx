@@ -23,7 +23,8 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
 
     const router = useRouter();
     const [subscriptionList, setSubscriptionList] = useState<Subscription[]>([]);
-    const [isLoading, setLoading] = useState<boolean>(true);
+    const [isLoading, setLoading] = useState<boolean>(false);
+    const [canEdit, setCanEdit] = useState<boolean>(false);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
     const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0, passingScore: 0, weight: 0, order: 0 });
 
@@ -32,39 +33,45 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
 
     useEffect(() => {
         setSelectiveProcess(props.process);
-        setCurrentStep(props.currentStep);
+
+        let propsCurrentStep = props.currentStep;
+        if (propsCurrentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA) {
+            let interviewStep = props.process.steps.find(step => step.type == ProcessStepsTypes.ENTREVISTA);
+            propsCurrentStep.passingScore = interviewStep.passingScore;
+        } else if (propsCurrentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA) {
+            let testStep = props.process.steps.find(step => step.type == ProcessStepsTypes.PROVA);
+            propsCurrentStep.passingScore = testStep.passingScore;
+        }
+
+        setCurrentStep(propsCurrentStep);
         const list: Subscription[] = props.subscriptionList;
         const finalList: Subscription[] = [];
 
         for (let sub of list) {
             sub['formatedDate'] = format(new Date(sub.subscriptionDate), 'dd/MM/yyyy');
             if (sub.status == SubscriptionStatus.DEFERIDA) {
-                finalList.push(sub)
-            }
-            if (sub.grades) {
-                for (let grade of sub.grades) {
-                    if (grade.step == props.currentStep.type) {
-                        sub.currentGrade = grade;
-                    }
-                }
-            } else {
-                sub.grades = [];
-            }
 
-            if (!sub.currentGrade) {
-                sub.currentGrade = { grade: 0, step: props.currentStep.type };
-                sub.grades.push(sub.currentGrade);
+                sub.interviewGrade = sub.interviewGrade | 0;
+                sub.testGrade = sub.testGrade | 0;
+                finalList.push(sub)
             }
 
         }
         orderSubsList(finalList, props.process);
+
+        setCanEdit(props.currentStep.type == ProcessStepsTypes.PROVA || props.currentStep.type == ProcessStepsTypes.ENTREVISTA
+            || props.currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA || props.currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA);
 
     }, []);
 
     const handleGradeChange = (index, evt) => {
         const newSubscriptionList = subscriptionList.map((sub, i) => {
             if (index !== i) return sub;
-            sub.currentGrade.grade = +evt.target.value;
+            if (currentStep.type == ProcessStepsTypes.PROVA || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA) {
+                sub.testGrade = +evt.target.value;
+            } else if (currentStep.type == ProcessStepsTypes.ENTREVISTA || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA) {
+                sub.interviewGrade = +evt.target.value;
+            }
             return sub;
         });
 
@@ -75,6 +82,11 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
         setSubscriptionList(processUtil.orderSubscriptionList(subList, process));
     }
 
+    const saveGradings = () => {
+        if (!isLoading) {
+            api.post(APIRoutes.SELECTIVE_PROCESS_SUBSCRIPTION_GRADING, { subscriptionList: subscriptionList });
+        }
+    }
 
     return (
         <>
@@ -102,7 +114,10 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
                             {subscriptionList.map((sub, i) => {
                                 return (
                                     <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} key={sub.id}>
-                                        <tr className={sub.currentGrade.grade < currentStep.passingScore ? 'table-danger' : ''}>
+                                        <tr className={
+                                            (currentStep.type == ProcessStepsTypes.PROVA || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA && sub.testGrade < currentStep.passingScore)
+                                                || (currentStep.type == ProcessStepsTypes.ENTREVISTA || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA && sub.interviewGrade < currentStep.passingScore)
+                                                ? 'table-danger' : ''}>
                                             <td>{sub.name}</td>
                                             <td>{sub.age}</td>
                                             <td>{sub['formatedDate']}</td>
@@ -115,15 +130,17 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
                                             </td>
                                             <td>
                                                 <input
+                                                    disabled={!canEdit}
                                                     type="number"
                                                     className="form-control"
                                                     name={i + 'grade'}
                                                     id={i + 'grade'}
                                                     placeholder="Nota (0-100)"
-                                                    value={sub.currentGrade.grade}
+                                                    value={currentStep.type == ProcessStepsTypes.PROVA || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA ? sub.testGrade : sub.interviewGrade}
                                                     onClick={(e) => { e.preventDefault() }}
                                                     onChange={(e) => { handleGradeChange(i, e) }}>
                                                 </input>
+
 
                                             </td>
                                         </tr>
@@ -141,12 +158,14 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
 
                 </div>
             </div>
-
-            <div className="row mt-3">
-                <div className="col-12 text-center">
-                    <button className="btn btn-success">Salvar Dados</button>
+            {canEdit &&
+                <div className="row mt-3">
+                    <div className="col-12 text-center">
+                        <button className="btn btn-success" onClick={saveGradings}>Salvar Dados</button>
+                    </div>
                 </div>
-            </div>
+            }
+
 
 
         </>

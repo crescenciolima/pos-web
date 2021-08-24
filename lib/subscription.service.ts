@@ -26,7 +26,9 @@ export default function SubscriptionService() {
                         reservedPlace: doc['reservedPlace'],
                         graduationProofFile: doc['graduationProofFile'],
                         subscriptionDate : doc['subscriptionDate'],
-                        resources: doc['resources']
+                        resources: doc['resources'],
+                        testGrade: doc['testGrade'],
+                        interviewGrade: doc['interviewGrade'],
                     }
                     subs.push(sub);
                 });
@@ -51,8 +53,9 @@ export default function SubscriptionService() {
             graduationProofFile: doc['graduationProofFile'],
             observation: doc['observation'],
             subscriptionDate : doc['subscriptionDate'],
-            resources: doc['resources']
-
+            resources: doc['resources'],
+            testGrade: doc['testGrade'],
+            interviewGrade: doc['interviewGrade'],
         }
 
         return sub;
