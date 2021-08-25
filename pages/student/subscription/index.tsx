@@ -10,7 +10,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 import "react-datepicker/dist/react-datepicker.css";
 import fire from '../../../utils/firebase-util';
 import style from '../../../styles/subscription.module.css';
-import { Subscription } from "../../../models/subscription";
+import { Subscription, SubscriptionFile } from "../../../models/subscription";
 import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
@@ -26,7 +26,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [reload, setReload] = useState(true);
     const api = API(setLoading);
     const [subscription, setSubscription] = useState<Subscription>();
-    const [currentStage, setCurrentStage] = useState(5);
+    const [currentStage, setCurrentStage] = useState(1);
     const [stageOneValues, setStageOneValues] = useState(null);
     const [stageTwoValues, setStageTwoValues] = useState(null);
     const [stageThreeValues, setStageThreeValues] = useState(null);
@@ -53,8 +53,25 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 values = {...values, id: subscription.id};
             }
             const result = await api.post(APIRoutes.SUBSCRIPTION, values);
+            console.log(result);
+            if(result){
+                setSubscription(result.result)
+            }
 
-            setReload(!reload);
+            //setReload(!reload);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const saveFileSubscription = async (values: SubscriptionFile) => {
+        console.log(values);
+        try {
+            const _values = {subcategoryID: values.subcategoryID, subscriptionID: subscription.id};
+            const result = await api.postFile(APIRoutes.FILE_SUBSCRIPTION, _values, values.files);
+            console.log(result);
+
+            //setReload(!reload);
         } catch (error) {
             console.error(error);
         }
@@ -88,7 +105,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         console.log(subCategoriesFilesUpdated)
     }
 
-    const buildForm = async () => {   
+    const buildForm = async (_stageFiveValues) => {   
         const subscription: Subscription = {    
             name: stageOneValues.name,
             document: stageOneValues.document,
@@ -138,6 +155,21 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         return subscription;
     }
 
+    const buildFiles = async (_stageFiveValues) => {
+        console.log(subscription);
+        const categoryFiles = [];
+        await baremaCategories.forEach((baremaCategory: BaremaCategory) => {
+            baremaCategory.subcategories.forEach((subcategory: BaremaSubCategory) => {
+                categoryFiles.push({
+                    subscription: subscription.uuid,
+                    subcategory: subcategory.uuid,
+                    files: _stageFiveValues[subcategory.uuid]
+                })
+                saveFileSubscription({subcategoryID: subcategory.uuid, files: _stageFiveValues[subcategory.uuid]})
+            });
+        })
+    }
+    
     const handleSubmit = async (values:any) => {
         if(currentStage === 1){
             setStageOneValues(values);
@@ -151,11 +183,13 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }else if(currentStage === 4){
             setStageFourValues(values);
             setCurrentStage(currentStage + 1);
-        }else if(currentStage === 5){
-            setStageFourValues(values);
-            const subscription: Subscription = await buildForm();
-            await saveSubscription(subscription);
-            setCurrentStage(currentStage + 1);
+        }else if(currentStage === 5){            
+            console.log(values);
+            setStageFiveValues(values);
+            const subscription: Subscription = await buildForm(values);
+            const result = await saveSubscription(subscription);
+            buildFiles(values);
+            //setCurrentStage(currentStage + 1);*/
         }
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
@@ -925,35 +959,41 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         <div className="row mt-5 justify-content-center">
                             <div className="col-12">                                
                                 <div className="mb-3">
+                                    <br />
                                     {baremaCategories?.map((baremaCategory, index) => (
                                         <>
-                                            <label htmlFor="files" className="form-label" key={index}>{baremaCategory.name}</label>                                            
+                                            <label htmlFor="files" className="form-label" key={index}>
+                                                {baremaCategory.name}
+                                            </label>                                            
                                             {baremaCategory.subcategories.map((subcategory, index) => (
                                                 <>
+                                                <br />
+                                                <label htmlFor="files" className="form-label" key={index}>{subcategory.name}</label>  
                                                 <FieldArray
                                                     name={subcategory.uuid}
                                                     render={arrayHelpers => (
                                                         <>
                                                             {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, index) => (    
-                                                                <> 
-                                                                    <label htmlFor="files" className="form-label"key={index}>{subcategory.name}</label>   
+                                                                <>  
                                                                     <Field 
                                                                         type="file"
                                                                         className="form-control"
                                                                         name={`${subcategory.uuid}.${index}`}
-                                                                        id="files"
                                                                         onChange={(event) => {
                                                                             actions.handleChange(event);
                                                                             console.log(event.currentTarget.files);
-                                                                            handleFile(subcategory.uuid, 0, event.currentTarget.files);
+                                                                            //handleFile(subcategory.uuid, 0, event.currentTarget.files);
                                                                         }}
                                                                     />  
                                                                     <p className="input-error"><ErrorMessage name="files" className="input-error" /></p>
                                                                     {index !== 0 && <button className="delete-collection-button" type="button" onClick={() => arrayHelpers.remove(index)}>-</button>}
                                                                     {index === 0 &&
-                                                                        <button onClick={() => arrayHelpers.push('')}>
-                                                                            NOVO
-                                                                        </button>}
+                                                                        <>
+                                                                            <button type="button" onClick={() => arrayHelpers.push('')}>
+                                                                                NOVO
+                                                                            </button>
+                                                                        </>
+                                                                    }
                                                                 </>
                                                             )))}
                                                         </>

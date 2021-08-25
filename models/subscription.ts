@@ -3,7 +3,7 @@ import { User } from "./user";
 
 export interface Subscription {
     id?: string,
-    uid?: string,
+    uuid?: string,
 
     user?: User
 
@@ -47,6 +47,7 @@ export interface Subscription {
     disabilityType?: string,
     specialTreatmentTypes?: string[],
     status?: SubscriptionStatus,
+    files?: SubscriptionFile[];
 
     age?: number;
     subscriptionDate: number;
@@ -92,4 +93,9 @@ export interface SubscriptionResource {
 export interface SubscriptionGrade{
     grade: number;
     step: ProcessStepsTypes;
+}
+
+export interface SubscriptionFile{
+    subcategoryID: string;
+    files: string[];
 }

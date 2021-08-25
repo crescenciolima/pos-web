@@ -59,7 +59,7 @@ export default function SubscriptionService() {
     }
 
     async function save(sub: Subscription) {
-        subscriptionRef.add(sub);
+        return subscriptionRef.add(sub);
     }
 
     async function update(sub: Subscription) {
