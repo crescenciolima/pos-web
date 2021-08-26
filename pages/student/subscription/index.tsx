@@ -35,7 +35,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [stageSixValues, setStageSixValues] = useState(null);
     const [inConstruction, setInConstruction] = useState<boolean>(null);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
-    const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>(null);
+    const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>([]);
     const [baremaCategories, setBaremaCategories] = useState<any>(null);
     const [files, setFiles] = useState<FileList>();
     const specialTreatmentTypes = [
@@ -56,6 +56,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             console.log(result);
             if(result){
                 setSubscription(result.result)
+                return result.result;
             }
 
             //setReload(!reload);
@@ -64,13 +65,13 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }
     };
 
-    const saveFileSubscription = async (values: SubscriptionFile) => {
+    const saveFileSubscription = async (values) => {
         console.log(values);
         try {
-            const _values = {subcategoryID: values.subcategoryID, subscriptionID: subscription.id};
-            const result = await api.postFile(APIRoutes.FILE_SUBSCRIPTION, _values, values.files);
+            const _values = {subcategoryID: values.subcategoryID, subscriptionID: values.subscriptionID};
+            const result = await api.postFile(APIRoutes.FILE_SUBSCRIPTION, _values, values.file);
             console.log(result);
-
+            setSubscription(result.result);
             //setReload(!reload);
         } catch (error) {
             console.error(error);
@@ -78,33 +79,62 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     };
 
     const handleFile = async (subcategoryUuid, position, file) => {
-        const subCategoriesFilesUpdated = baremaCategories.map((baremaCategory) => {
-            const subCategoriesUpdated = baremaCategory.subcategories.map((subcategory) => {
-                console.log(subcategory);
-                //subCategoriesFilesBuild.push({uuid: subcategory.uuid, files: [{position: 1, file: ''}]})
-                if(subcategory.uuid !== subcategoryUuid){
-                    return subcategory;
-                }
-                if(position && file){
-                    subcategory.files.forEach((element) => {
-                        if(element.position === position){
-                            element.file = file;
-                        }
-                    });
-                }else {
-                    const newPosition = subcategory.files[subcategory.files.length -1]?.position + 1;
-                    subcategory.files.push({uuid: subcategoryUuid, files: [{position: newPosition, file: ''}]})
+        if(subCategoriesFiles.length === 0){
+            subCategoriesFiles.push({uuid: subcategoryUuid, files: [{position: position, file: file}]});
+            setSubCategoriesFiles(subCategoriesFiles)
+            return;
+        }
 
-                }
+        let newPosition = true;
+        const subCategoriesFilesUpdated = subCategoriesFiles.map((subcategory) => {
+            if(subcategory.uuid !== subcategoryUuid){
                 return subcategory;
-            })
-            baremaCategory.subcategories = subCategoriesUpdated;
-            return baremaCategory;
-        })
+            }
+
+            subcategory.files.forEach((element) => {
+                if(element.position === position){
+                    element.file = file;
+                    newPosition = false;
+                }
+            });
+
+            if(newPosition){
+                subcategory.files.push({position: position, file: file})
+            }
+            
+            return subcategory;
+        });
         setSubCategoriesFiles(subCategoriesFilesUpdated)
         console.log(subCategoriesFilesUpdated)
     }
 
+    const getFileName = (subcategoryUuid, position) => {
+        const subCategoriesFile = subCategoriesFiles.find((subcategory) => subcategory.uuid == subcategoryUuid);
+        if(subCategoriesFile){
+            const file = subCategoriesFile.files.find((file) => file.position === position);
+            return file ? file.file[0]?.name : <></>;
+        }
+
+        return <></>;
+    }
+
+    const removeFile = async (subcategoryUuid, position) => {
+        const subCategoriesFilesUpdated = subCategoriesFiles.map((subcategory) => {
+            if(subcategory.uuid !== subcategoryUuid){
+                return subcategory;
+            }
+
+            subcategory.files = subcategory.files.filter(file => file.position !== position)
+
+            subcategory.files.forEach((element, index) => {
+                element.position = index;
+            });
+            return subcategory;
+        });
+        setSubCategoriesFiles(subCategoriesFilesUpdated)
+        console.log(subCategoriesFilesUpdated)
+    }
+    
     const buildForm = async (_stageFiveValues) => {   
         const subscription: Subscription = {    
             name: stageOneValues.name,
@@ -155,18 +185,14 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         return subscription;
     }
 
-    const buildFiles = async (_stageFiveValues) => {
+    const buildFiles = async (subscriptionId) => {
         console.log(subscription);
-        const categoryFiles = [];
-        await baremaCategories.forEach((baremaCategory: BaremaCategory) => {
-            baremaCategory.subcategories.forEach((subcategory: BaremaSubCategory) => {
-                categoryFiles.push({
-                    subscription: subscription.uuid,
-                    subcategory: subcategory.uuid,
-                    files: _stageFiveValues[subcategory.uuid]
-                })
-                saveFileSubscription({subcategoryID: subcategory.uuid, files: _stageFiveValues[subcategory.uuid]})
-            });
+        await subCategoriesFiles.forEach((subcategoryFile: any) => {
+            subcategoryFile.files.forEach(async (file) => {
+                if(file.file[0]){
+                    await saveFileSubscription({subcategoryID: subcategoryFile.uuid, subscriptionID: subscriptionId, file: file.file[0]});
+                }
+            })
         })
     }
     
@@ -188,7 +214,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             setStageFiveValues(values);
             const subscription: Subscription = await buildForm(values);
             const result = await saveSubscription(subscription);
-            buildFiles(values);
+            buildFiles(result.id);
             //setCurrentStage(currentStage + 1);*/
         }
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -974,7 +1000,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                     render={arrayHelpers => (
                                                         <>
                                                             {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, index) => (    
-                                                                <>  
+                                                                <div key={`${subcategory.uuid}.${index}`}>  
                                                                     <Field 
                                                                         type="file"
                                                                         className="form-control"
@@ -982,11 +1008,21 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                                         onChange={(event) => {
                                                                             actions.handleChange(event);
                                                                             console.log(event.currentTarget.files);
-                                                                            //handleFile(subcategory.uuid, 0, event.currentTarget.files);
+                                                                            handleFile(subcategory.uuid, index, event.currentTarget.files);
                                                                         }}
-                                                                    />  
+                                                                        value={undefined}
+                                                                    />
+                                                                    {getFileName(subcategory.uuid, index)}
                                                                     <p className="input-error"><ErrorMessage name="files" className="input-error" /></p>
-                                                                    {index !== 0 && <button className="delete-collection-button" type="button" onClick={() => arrayHelpers.remove(index)}>-</button>}
+                                                                    {index !== 0 && 
+                                                                        <button 
+                                                                            className="delete-collection-button" 
+                                                                            type="button" 
+                                                                            onClick={async () => {
+                                                                                await removeFile(subcategory.uuid, index);
+                                                                                arrayHelpers.remove(index); 
+                                                                            }}
+                                                                        >-</button>}
                                                                     {index === 0 &&
                                                                         <>
                                                                             <button type="button" onClick={() => arrayHelpers.push('')}>
@@ -994,7 +1030,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                                             </button>
                                                                         </>
                                                                     }
-                                                                </>
+                                                                </div>
                                                             )))}
                                                         </>
                                                     )}
