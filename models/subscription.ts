@@ -5,7 +5,7 @@ export interface Subscription {
     id?: string,
     uuid?: string,
 
-    user?: User
+    userID?: string,
 
     name?: string,
     document?: string,
@@ -48,20 +48,16 @@ export interface Subscription {
     specialTreatmentTypes?: string[],
     status?: SubscriptionStatus,
     files?: SubscriptionFile[];
+    selectiveProcessID?: string;
+    reservedPlace?: string;
 
     age?: number;
     subscriptionDate: number;
-    selectiveProcessID?: string;
     statusObservation?: string;
-    reservedPlace?: string;
     observation?: string;
     graduationProofFile?: string;
     resources?: SubscriptionResource[];
-    //interviewGrade
-    //interviewGrade
     grades?: SubscriptionGrade[];
-
-
 
     //Only for UI
     currentResource?: SubscriptionResource;

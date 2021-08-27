@@ -46,29 +46,45 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           console.log('ARQUIVOS',req.files);    
 
           if(!req.files?.length){                
-            return res.status(400).json(treatError.general("Erro ao salvar arquivo"));
+            return res.status(400).json(await treatError.general("Arquivo não encontrado."));
           }
           
           const uploadService = FileUploadService();
-          const { subcategoryID, subscriptionID } = req.body;        
-          const urls = [];
+          const { subcategoryID, subscriptionID } = req.body;  
+          const urls = [];      
 
-          req.files.forEach(async (file) => {
-            const blob: BlobCorrected = file;
-            const path = StoragePaths.SUBSCRIPTION+'/'+subscriptionID+'/'+subcategoryID;
+          for (let i = 0; i < req.files.length; i++){
+            const blob: BlobCorrected = req.files[i];
+            const path = StoragePaths.SUBSCRIPTION+'/'+subscriptionID+'/'+subcategoryID+'/';
             const url = await uploadService.upload(path, blob, uuidv4());
             urls.push(url);
-          })
+          }
 
+          console.log(urls);
+          
           let subscription = await subscriptionService.getById(subscriptionID);
+          console.log(subscription);
+
+          let subscriptionFiles = [];
+          if(subscription.files && subscription.files.length){
+            subscriptionFiles = subscription.files.map(subscriptionFile => {
+              if(subscriptionFile.subcategoryID === subcategoryID){
+                subscriptionFile.files = {...subscriptionFile.files, ...urls}
+              }
+              return subscriptionFile;
+            })
+          }else{
+            subscriptionFiles = [{ subcategoryID: subcategoryID, files: urls }] 
+          }
+
           subscription = {
             ...subscription,     
-            files: subscription.files && subscription.files.length ? 
-            [...subscription.files, { subcategoryID: subcategoryID, files: [...urls] }] : 
-            [{ subcategoryID: subcategoryID, files: [...urls] }]        
+            files: subscriptionFiles        
           };
 
-          await subscriptionService.save(subscription);
+          console.log(subscription);
+
+          await subscriptionService.update(subscription);
     
           let response: APIResponse = {
             msg: "Arquivo salvo com sucesso!",

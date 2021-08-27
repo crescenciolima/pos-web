@@ -69,7 +69,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         console.log(values);
         try {
             const _values = {subcategoryID: values.subcategoryID, subscriptionID: values.subscriptionID};
-            const result = await api.postFile(APIRoutes.FILE_SUBSCRIPTION, _values, values.file);
+            const result = await api.postFile(APIRoutes.FILE_SUBSCRIPTION, _values, values.files);
             console.log(result);
             setSubscription(result.result);
             //setReload(!reload);
@@ -187,13 +187,24 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
 
     const buildFiles = async (subscriptionId) => {
         console.log(subscription);
-        await subCategoriesFiles.forEach((subcategoryFile: any) => {
-            subcategoryFile.files.forEach(async (file) => {
-                if(file.file[0]){
-                    await saveFileSubscription({subcategoryID: subcategoryFile.uuid, subscriptionID: subscriptionId, file: file.file[0]});
-                }
-            })
-        })
+        const arraySubcategories = []
+
+        for (let i = 0; i < subCategoriesFiles.length; i++){
+            const subcategoryFile = subCategoriesFiles[i];
+            const files = subcategoryFile.files;
+            const arrayFiles = [];
+            for (let j = 0; j < files.length; j++){
+                const file = files[j];
+                arrayFiles.push(file.file[0])
+            }
+            arraySubcategories.push({subcategoryID: subcategoryFile.uuid, subscriptionID: subscriptionId, files: arrayFiles})
+        }
+
+        console.log(arraySubcategories);
+
+        for (let i = 0; i < arraySubcategories.length; i++){
+            await saveFileSubscription(arraySubcategories[i]);
+        }
     }
     
     const handleSubmit = async (values:any) => {
