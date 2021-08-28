@@ -24,7 +24,7 @@ registerLocale('pt-BR', ptBR);
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [loading, setLoading] = useState(true);
     const [reload, setReload] = useState(true);
-    const api = API(setLoading);
+    const api = API();
     const [subscription, setSubscription] = useState<Subscription>();
     const [currentStage, setCurrentStage] = useState(1);
     const [stageOneValues, setStageOneValues] = useState(null);
@@ -71,26 +71,27 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             const _values = {subcategoryID: values.subcategoryID, subscriptionID: values.subscriptionID};
             const result = await api.postFile(APIRoutes.FILE_SUBSCRIPTION, _values, values.files);
             console.log(result);
-            setSubscription(result.result);
-            //setReload(!reload);
         } catch (error) {
             console.error(error);
         }
     };
 
     const handleFile = async (subcategoryUuid, position, file) => {
-        if(subCategoriesFiles.length === 0){
+        console.log(subCategoriesFiles, subcategoryUuid, position);
+        const subcategoryFound = subCategoriesFiles.find((subcategory) => subcategory.uuid === subcategoryUuid);
+
+        if(!subcategoryFound){
             subCategoriesFiles.push({uuid: subcategoryUuid, files: [{position: position, file: file}]});
             setSubCategoriesFiles(subCategoriesFiles)
             return;
         }
 
         let newPosition = true;
-        const subCategoriesFilesUpdated = subCategoriesFiles.map((subcategory) => {
+        const subCategoriesFilesUpdated = await subCategoriesFiles.map((subcategory) => {
+            console.log(subcategory);
             if(subcategory.uuid !== subcategoryUuid){
                 return subcategory;
             }
-
             subcategory.files.forEach((element) => {
                 if(element.position === position){
                     element.file = file;
@@ -104,8 +105,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             
             return subcategory;
         });
-        setSubCategoriesFiles(subCategoriesFilesUpdated)
+
         console.log(subCategoriesFilesUpdated)
+        setSubCategoriesFiles(subCategoriesFilesUpdated)
     }
 
     const getFileName = (subcategoryUuid, position) => {
@@ -176,7 +178,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             disability: stageFourValues.disability,
             disabilityType: stageFourValues.disabilityType,
             specialTreatmentTypes: stageFourValues.specialTreatmentTypes,
-            reservedPlace: stageFourValues.reservedPlace,  
+            reservedPlace: stageFourValues.reservedPlace !== 'ampla_concorrencia' ? stageFourValues.reservedPlace : null,  
             selectiveProcessID: selectiveProcess.id,
 
             subscriptionDate: Date.now()
@@ -186,7 +188,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     }
 
     const buildFiles = async (subscriptionId) => {
-        console.log(subscription);
+        console.log(subCategoriesFiles);
         const arraySubcategories = []
 
         for (let i = 0; i < subCategoriesFiles.length; i++){
@@ -225,7 +227,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             setStageFiveValues(values);
             const subscription: Subscription = await buildForm(values);
             const result = await saveSubscription(subscription);
-            buildFiles(result.id);
+            await buildFiles(result.id);
             //setCurrentStage(currentStage + 1);*/
         }
         window.scrollTo({top: 0, behavior: 'smooth'});
@@ -253,7 +255,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             if (result.result) {
                 setInConstruction(true);
                 setSelectiveProcess(result.result);
-                const subCategoriesFilesBuild = []
                 let cloneCategories = JSON.parse(JSON.stringify(result.result.baremaCategories))
                 cloneCategories.map((baremaCategory) => (
                     baremaCategory.subcategories.map((subcategory) => {
@@ -315,7 +316,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     initialValues={
                         stageOneValues ? stageOneValues : {
                             name: '',
-                            birthdate: fire.firestore.Timestamp.fromDate(new Date()).toMillis(),
+                            birthdate: new Date(),
                             postalCode: '',
                             street: '',
                             houseNumber: '',
@@ -328,7 +329,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             document: '',
                             identityDocument: '',
                             issuingAgency: '',
-                            issuanceDate: fire.firestore.Timestamp.fromDate(new Date()).toMillis(),
+                            issuanceDate: new Date(),
                         }
                     }
                     validationSchema={Yup.object().shape({
@@ -340,7 +341,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         district: Yup.string().required('Preencha este campo.'),
                         city: Yup.string().required('Preencha este campo.'),
                         state: Yup.string().required('Preencha este campo.'),
-                        alternativePhoneNumber: Yup.string().required('Preencha este campo.'),
                         phoneNumber: Yup.string().required('Preencha este campo.'),
                         document: Yup.string().required('Preencha este campo.'),
                         identityDocument: Yup.string().required('Preencha este campo.'),
@@ -962,6 +962,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             <div className="col-12">
                                 <label htmlFor="reservedPlace" className="form-label">Concorrência às vagas destinadas para:</label>
                                 <div role="group" aria-labelledby="my-radio-group"> 
+                                    <div className={style.radioGroup}>
+                                        <div className={style.radioReservedPlace}>
+                                        <input type="radio" name="reservedPlace" value="ampla_concorrencia" onChange={actions.handleChange} checked={actions.values.reservedPlace === 'ampla_concorrencia'}/>
+                                        <label>Ampla concorrência</label>
+                                        </div>  
+                                    </div>
                                     {selectiveProcess.reservedPlaces.map((reservedPlace, index) => (
                                         <div className={style.radioGroup} key={index}>
                                             <div className={style.radioReservedPlace}>
@@ -996,51 +1002,51 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         <div className="row mt-5 justify-content-center">
                             <div className="col-12">                                
                                 <div className="mb-3">
-                                    <br />
                                     {baremaCategories?.map((baremaCategory, index) => (
                                         <>
-                                            <label htmlFor="files" className="form-label" key={index}>
+                                            <label htmlFor="files" className="form-label mt-5 text-bold" key={index}>
                                                 {baremaCategory.name}
                                             </label>                                            
-                                            {baremaCategory.subcategories.map((subcategory, index) => (
+                                            {baremaCategory.subcategories.map((subcategory, idx) => (
                                                 <>
-                                                <br />
-                                                <label htmlFor="files" className="form-label" key={index}>{subcategory.name}</label>  
+                                                <label htmlFor="files" className="form-label mt-2" key={idx}>{subcategory.name}</label>  
                                                 <FieldArray
                                                     name={subcategory.uuid}
                                                     render={arrayHelpers => (
                                                         <>
-                                                            {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, index) => (    
-                                                                <div key={`${subcategory.uuid}.${index}`}>  
-                                                                    <Field 
-                                                                        type="file"
-                                                                        className="form-control"
-                                                                        name={`${subcategory.uuid}.${index}`}
-                                                                        onChange={(event) => {
-                                                                            actions.handleChange(event);
-                                                                            console.log(event.currentTarget.files);
-                                                                            handleFile(subcategory.uuid, index, event.currentTarget.files);
-                                                                        }}
-                                                                        value={undefined}
-                                                                    />
-                                                                    {getFileName(subcategory.uuid, index)}
-                                                                    <p className="input-error"><ErrorMessage name="files" className="input-error" /></p>
-                                                                    {index !== 0 && 
-                                                                        <button 
-                                                                            className="delete-collection-button" 
-                                                                            type="button" 
-                                                                            onClick={async () => {
-                                                                                await removeFile(subcategory.uuid, index);
-                                                                                arrayHelpers.remove(index); 
+                                                            {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, _idx) => (    
+                                                                <div key={`${subcategory.uuid}.${_idx}`} className="row">  
+                                                                    <div className="col-11">
+                                                                        <Field 
+                                                                            type="file"
+                                                                            className="form-control"
+                                                                            name={`${subcategory.uuid}.${_idx}`}
+                                                                            onChange={(event) => {
+                                                                                actions.handleChange(event);
+                                                                                console.log(event.currentTarget.files);
+                                                                                handleFile(subcategory.uuid, _idx, event.currentTarget.files);
                                                                             }}
-                                                                        >-</button>}
-                                                                    {index === 0 &&
-                                                                        <>
-                                                                            <button type="button" onClick={() => arrayHelpers.push('')}>
-                                                                                NOVO
+                                                                            value={undefined}
+                                                                        />
+                                                                        {/*getFileName(subcategory.uuid, index)*/}
+                                                                        <p className="input-error"><ErrorMessage name="files" className="input-error" /></p>
+                                                                    </div>
+                                                                    <div className="col-1">
+                                                                        {_idx !== 0 && 
+                                                                            <button 
+                                                                                className="btn btn-secondary"
+                                                                                type="button" 
+                                                                                onClick={async () => {
+                                                                                    await removeFile(subcategory.uuid, _idx);
+                                                                                    arrayHelpers.remove(_idx); 
+                                                                                }}
+                                                                            >-</button>}
+                                                                        {_idx === 0 &&
+                                                                            <button type="button" onClick={() => arrayHelpers.push('')} className="btn btn-primary">
+                                                                                +
                                                                             </button>
-                                                                        </>
-                                                                    }
+                                                                        }
+                                                                    </div>
                                                                 </div>
                                                             )))}
                                                         </>

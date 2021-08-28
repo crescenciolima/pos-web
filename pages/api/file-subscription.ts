@@ -67,12 +67,19 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
           let subscriptionFiles = [];
           if(subscription.files && subscription.files.length){
-            subscriptionFiles = subscription.files.map(subscriptionFile => {
-              if(subscriptionFile.subcategoryID === subcategoryID){
-                subscriptionFile.files = {...subscriptionFile.files, ...urls}
-              }
-              return subscriptionFile;
-            })
+            const subcategoryFound = subscription.files.find((subcategory) => subcategory.subcategoryID === subcategoryID);
+
+            if(subcategoryFound){
+              subscriptionFiles = subscription.files.map(subscriptionFile => {
+                if(subscriptionFile.subcategoryID === subcategoryID){
+                  subscriptionFile.files = {...subscriptionFile.files, ...urls}
+                }
+                return subscriptionFile;
+              })
+            }else{
+              subscriptionFiles = [...subscription.files, { subcategoryID: subcategoryID, files: urls }] 
+            }
+
           }else{
             subscriptionFiles = [{ subcategoryID: subcategoryID, files: urls }] 
           }
