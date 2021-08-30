@@ -1,5 +1,5 @@
 import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from "../models/selective-process";
-import { Subscription } from "../models/subscription";
+import { Subscription, SubscriptionStatus } from "../models/subscription";
 
 
 export default function SelectiveProcessUtil() {
@@ -23,8 +23,6 @@ export default function SelectiveProcessUtil() {
     function calculateFinalGrade(subscription: Subscription, process: SelectiveProcess): number {
 
         let finalGrade = 0;
-
-
 
             for (let step of process.steps) {
                 if (step.type == ProcessStepsTypes.ENTREVISTA) {

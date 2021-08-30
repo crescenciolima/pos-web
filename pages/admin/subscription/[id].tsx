@@ -70,7 +70,7 @@ export default function ProcessSubscriprionLayout() {
 
             subscription.status = status;
 
-            const response: APIResponse = await api.post(APIRoutes.SUBSCRIPTION, subscription);
+            const response: APIResponse = await api.post(APIRoutes.SELECTIVE_PROCESS_SUBSCRIPTION, subscription);
             const sub: Subscription = response.result;
             setSubscription(sub);
 
@@ -94,7 +94,7 @@ export default function ProcessSubscriprionLayout() {
                 }
             }
             subscription.currentResource = undefined;
-            const response: APIResponse = await api.post(APIRoutes.SUBSCRIPTION, subscription);
+            const response: APIResponse = await api.post(APIRoutes.SELECTIVE_PROCESS_SUBSCRIPTION, subscription);
             const sub: Subscription = response.result;
             setSubscription(sub);
 
