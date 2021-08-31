@@ -19,6 +19,7 @@ import StudentBase from '../../../components/student/student-base';
 import { APIResponse } from '../../../models/api-response';
 import { BaremaCategory, BaremaSubCategory, SelectiveProcess } from '../../../models/selective-process';
 import { MaskHelper } from '../../../helpers/mask-helper';
+import { useRouter } from 'next/router';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -38,6 +39,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>([]);
     const [baremaCategories, setBaremaCategories] = useState<any>(null);
     const [files, setFiles] = useState<FileList>();
+    const router = useRouter();
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
         { name: "Auxílio de Leitor/Ledor", value: 'auxilio_leitor' },
@@ -228,7 +230,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             const subscription: Subscription = await buildForm(values);
             const result = await saveSubscription(subscription);
             await buildFiles(result.id);
-            //setCurrentStage(currentStage + 1);*/
+            //setCurrentStage(currentStage + 1);*/            
+            router.push("/student");
         }
         window.scrollTo({top: 0, behavior: 'smooth'});
     }

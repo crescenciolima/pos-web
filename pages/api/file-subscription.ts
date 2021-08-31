@@ -3,7 +3,7 @@ import Cors from 'cors'
 import multer from 'multer';
 import { APIResponse } from '../../models/api-response';
 import SubscriptionService from '../../lib/subscription.service';
-import { Subscription } from '../../models/subscription';
+import { Subscription, SubscriptionStatus } from '../../models/subscription';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import initMiddleware from '../../utils/init-middleware';
@@ -57,7 +57,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
             const blob: BlobCorrected = req.files[i];
             const path = StoragePaths.SUBSCRIPTION+'/'+subscriptionID+'/'+subcategoryID+'/';
             const url = await uploadService.upload(path, blob, uuidv4());
-            urls.push(url);
+            urls.push({uuid: uuidv4(), url: url, status: SubscriptionStatus.AGUARDANDO_ANALISE, observation: ''});
           }
 
           console.log(urls);

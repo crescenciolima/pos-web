@@ -47,7 +47,7 @@ export interface Subscription {
     disabilityType?: string,
     specialTreatmentTypes?: string[],
     status?: SubscriptionStatus,
-    files?: SubscriptionFile[];
+    files?: SubscriptionFileCategory[];
     selectiveProcessID?: string;
     reservedPlace?: string;
 
@@ -91,7 +91,13 @@ export interface SubscriptionGrade{
     step: ProcessStepsTypes;
 }
 
-export interface SubscriptionFile{
+export interface SubscriptionFileCategory{
     subcategoryID: string;
-    files: string[];
+    files: SubscriptionFile[];
+}
+
+export interface SubscriptionFile{
+    url: string;
+    status: SubscriptionStatus;
+    observation?: string;
 }
