@@ -52,7 +52,7 @@ export default function ProcessSubscriprionLayout() {
         if (sub.resources?.length > 0) {
             for (let resource of sub.resources) {
                 if (resource.step == type
-                    || resource.step == ProcessStepsTypes.RECURSO_INSCRICAO && type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
+                    || resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO && type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
 
                     resource.formatedDate = format(new Date(resource.date), 'dd/MM/yyyy');
                     sub.currentResource = resource;
@@ -83,12 +83,12 @@ export default function ProcessSubscriprionLayout() {
         try {
             for (let resource of subscription.resources) {
                 if (resource.step == stepType
-                    || resource.step == ProcessStepsTypes.RECURSO_INSCRICAO && stepType == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
+                    || resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO && stepType == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
 
                     resource.status = status;
                     resource.statusObservation = subscription.currentResource.statusObservation;
 
-                    if (subscription.status == SubscriptionStatus.INDEFERIDA && resource.status == SubscriptionStatus.DEFERIDA && resource.step == ProcessStepsTypes.RECURSO_INSCRICAO) {
+                    if (subscription.status == SubscriptionStatus.INDEFERIDA && resource.status == SubscriptionStatus.DEFERIDA && resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO) {
                         subscription.status = status;
                     }
                 }

@@ -41,7 +41,7 @@ export default function SelectiveProcessResourceList(props: Props) {
             if (sub.resources?.length > 0) {
                 for (let resource of sub.resources) {
                     if (resource.step == props.currentStep.type || 
-                        resource.step == ProcessStepsTypes.RECURSO_INSCRICAO && props.currentStep.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
+                        resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO && props.currentStep.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
                         sub.formatedDate = format(new Date(sub.subscriptionDate), 'dd/MM/yyyy');
                         sub.currentResource = resource;
                         if (resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {

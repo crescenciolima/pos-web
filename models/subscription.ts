@@ -61,7 +61,6 @@ export interface Subscription {
 
     //Only for UI
     currentResource?: SubscriptionResource;
-    currentGrade?: SubscriptionGrade;
     formatedDate?: string;
 }
 

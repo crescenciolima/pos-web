@@ -34,4 +34,6 @@ export class APIRoutes {
 
     static SELECTIVE_PROCESS_FILES:string = APIRoutes.API_URL + "/api/selectiveprocessfiles"
 
+    static SELECTIVE_PROCESS_SUBSCRIPTION_GRADING:string = APIRoutes.API_URL + "/api/subscriptiongrading"
+
 }

@@ -1,4 +1,4 @@
-import { ProcessStep, ProcessStepsState, SelectiveProcess } from "../models/selective-process";
+import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from "../models/selective-process";
 import { Subscription } from "../models/subscription";
 
 
@@ -24,17 +24,19 @@ export default function SelectiveProcessUtil() {
 
         let finalGrade = 0;
 
-        for (let grade of subscription.grades) {
+
+
             for (let step of process.steps) {
-                if (grade.step == step.type) {
-
-                    if (grade.grade >= step.passingScore) {
-                        finalGrade += (grade.grade * step.weight);
+                if (step.type == ProcessStepsTypes.ENTREVISTA) {
+                    if (subscription.interviewGrade >= step.passingScore) {
+                        finalGrade += (subscription.interviewGrade * step.weight);
                     }
-
                 }
-            }
-
+                if (step.type == ProcessStepsTypes.PROVA) {
+                    if (subscription.testGrade >= step.passingScore) {
+                        finalGrade += (subscription.testGrade * step.weight);
+                    }
+                }
         }
         return finalGrade;
     }
