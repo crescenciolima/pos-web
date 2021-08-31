@@ -97,6 +97,7 @@ export interface SubscriptionFileCategory{
 }
 
 export interface SubscriptionFile{
+    uuid: string;
     url: string;
     status: SubscriptionStatus;
     observation?: string;
