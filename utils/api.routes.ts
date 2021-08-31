@@ -27,6 +27,8 @@ export class APIRoutes {
     static NEWS:string = APIRoutes.API_URL + "/api/news"
 
     static SUBSCRIPTION:string = APIRoutes.API_URL + "/api/subscription"
+    
+    static FILE_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-subscription"
 
     static SELECTIVE_PROCESS:string = APIRoutes.API_URL + "/api/selectiveprocess"
 

@@ -3,9 +3,9 @@ import { User } from "./user";
 
 export interface Subscription {
     id?: string,
-    uid?: string,
+    uuid?: string,
 
-    user?: User
+    userID?: string,
 
     name?: string,
     document?: string,
@@ -43,23 +43,21 @@ export interface Subscription {
     workRegime?: string,
 
     protocol?: string,
-    handicapped?: boolean,
+    disability?: boolean,
     disabilityType?: string,
     specialTreatmentTypes?: string[],
-    vacancyType?: string,    
     status?: SubscriptionStatus,
+    files?: SubscriptionFileCategory[];
+    selectiveProcessID?: string;
+    reservedPlace?: string;
 
     age?: number;
     subscriptionDate: number;
-    selectiveProcessID?: string;
     statusObservation?: string;
-    reservedPlace?: string;
     observation?: string;
     graduationProofFile?: string;
     resources?: SubscriptionResource[];
-    interviewGrade?: number;
-    testGrade?:number
-
+    grades?: SubscriptionGrade[];
 
     //Only for UI
     currentResource?: SubscriptionResource;
@@ -90,4 +88,16 @@ export interface SubscriptionResource {
 export interface SubscriptionGrade{
     grade: number;
     step: ProcessStepsTypes;
+}
+
+export interface SubscriptionFileCategory{
+    subcategoryID: string;
+    files: SubscriptionFile[];
+}
+
+export interface SubscriptionFile{
+    uuid: string;
+    url: string;
+    status: SubscriptionStatus;
+    observation?: string;
 }
