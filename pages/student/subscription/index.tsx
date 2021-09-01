@@ -312,19 +312,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         return values;
     }
 
-    const generateValidation = () => {
-        const values = {};
-        baremaCategories?.forEach((baremaCategory, index) => {                                          
-            baremaCategory.subcategories.forEach((subcategory, index) => {
-                values[subcategory.uuid] = Yup.array()
-                    .required('Selecione o arquivo')
-                    .min(1, 'Selecione ao menos 1 arquivo');
-            })
-        })
-        console.log(values);
-        return values;
-    }
-
     return (    
         <StudentBase>
             {currentStage === 1 && 
@@ -1010,7 +997,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 <Formik
                     enableReinitialize
                     initialValues={generateForm()}
-                    validationSchema={Yup.object().shape(generateValidation())}
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
