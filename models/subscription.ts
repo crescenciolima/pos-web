@@ -58,6 +58,8 @@ export interface Subscription {
     graduationProofFile?: string;
     resources?: SubscriptionResource[];
     grades?: SubscriptionGrade[];
+    interviewGrade?: number;
+    testGrade?: number;
 
     //Only for UI
     currentResource?: SubscriptionResource;
