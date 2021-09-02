@@ -10,7 +10,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 import "react-datepicker/dist/react-datepicker.css";
 import fire from '../../../utils/firebase-util';
 import style from '../../../styles/subscription.module.css';
-import { Subscription, SubscriptionFile } from "../../../models/subscription";
+import { Subscription, SubscriptionFile, SubscriptionTypeFile } from "../../../models/subscription";
 import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
@@ -27,7 +27,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [reload, setReload] = useState(true);
     const api = API();
     const [subscription, setSubscription] = useState<Subscription>();
-    const [currentStage, setCurrentStage] = useState(5);
+    const [currentStage, setCurrentStage] = useState(1);
     const [stageOneValues, setStageOneValues] = useState(null);
     const [stageTwoValues, setStageTwoValues] = useState(null);
     const [stageThreeValues, setStageThreeValues] = useState(null);
@@ -38,7 +38,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
     const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>([]);
     const [baremaCategories, setBaremaCategories] = useState<any>(null);
-    const [files, setFiles] = useState<FileList>();
+    const [documentFile, setDocumentFile] = useState<FileList>();
+    const [graduationProofFile, setGraduationProofFile] = useState<FileList>();
     const router = useRouter();
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
@@ -67,11 +68,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }
     };
 
-    const saveFileSubscription = async (values) => {
+    const saveFileSubscription = async (values, files, type) => {
         console.log(values);
         try {
-            const _values = {subcategoryID: values.subcategoryID, subscriptionID: values.subscriptionID};
-            const result = await api.postFile(APIRoutes.FILE_SUBSCRIPTION, _values, values.files);
+            const route = type === SubscriptionTypeFile.BAREMA ? APIRoutes.FILE_BAREMA_SUBSCRIPTION : APIRoutes.FILE_SUBSCRIPTION;
+            const result = await api.postFile(route, values, files);
             console.log(result);
         } catch (error) {
             console.error(error);
@@ -189,25 +190,53 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         return subscription;
     }
 
-    const buildFiles = async (subscriptionId) => {
+    const buildArrayFiles = async (files) => {
+        const arrayFiles = [];
+        for (let j = 0; j < files.length; j++){
+            const file = files[j];
+            arrayFiles.push(file.file[0])
+        }
+        return arrayFiles;
+    }
+
+    const processDocumentFiles = async (subscriptionId) => {
+        console.log(documentFile);
+
+        const arrayFiles = [documentFile[0]];
+
+        const values = {type: SubscriptionTypeFile.DOCUMENT, subscriptionID: subscriptionId};
+
+        console.log(values);
+
+        await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.DOCUMENT);
+    }
+
+    const processGraduationFiles = async (subscriptionId) => {
+        console.log(graduationProofFile);
+
+        const arrayFiles = [graduationProofFile[0]];
+        const values = {type: SubscriptionTypeFile.GRADUATION, subscriptionID: subscriptionId};
+
+        console.log(values);
+
+        await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.GRADUATION);
+    }
+
+    const processFiles = async (subscriptionId) => {
         console.log(subCategoriesFiles);
         const arraySubcategories = []
 
         for (let i = 0; i < subCategoriesFiles.length; i++){
             const subcategoryFile = subCategoriesFiles[i];
-            const files = subcategoryFile.files;
-            const arrayFiles = [];
-            for (let j = 0; j < files.length; j++){
-                const file = files[j];
-                arrayFiles.push(file.file[0])
-            }
+            const files = subcategoryFile.files;            
+            const arrayFiles = await buildArrayFiles(files);
             arraySubcategories.push({subcategoryID: subcategoryFile.uuid, subscriptionID: subscriptionId, files: arrayFiles})
         }
 
         console.log(arraySubcategories);
 
         for (let i = 0; i < arraySubcategories.length; i++){
-            await saveFileSubscription(arraySubcategories[i]);
+            await saveFileSubscription({subcategoryID: arraySubcategories[i].subcategoryID, subscriptionID: arraySubcategories[i].subscriptionID}, arraySubcategories[i].files, SubscriptionTypeFile.BAREMA);
         }
     }
     
@@ -224,13 +253,14 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }else if(currentStage === 4){
             setStageFourValues(values);
             setCurrentStage(currentStage + 1);
-        }else if(currentStage === 5){     
-            return;       
+        }else if(currentStage === 5){   
             console.log(values);
             setStageFiveValues(values);
             const subscription: Subscription = await buildForm(values);
             const result = await saveSubscription(subscription);
-            await buildFiles(result.id);
+            await processFiles(result.id);
+            await processDocumentFiles(result.id);
+            await processGraduationFiles(result.id);
             //setCurrentStage(currentStage + 1);*/            
             router.push("/student");
         }
@@ -695,7 +725,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         onChange={actions.handleChange} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateStrictoSensuInstitution" className="input-error" /></p>
                                 </div>
-                            </div>                        
+                            </div>                      
                         </div>
                         <br />
                         <div className="text-center">
@@ -996,11 +1026,66 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             {currentStage === 5 && 
                 <Formik
                     enableReinitialize
-                    initialValues={generateForm()}
+                    initialValues={generateForm()}                    
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
+                            <div className="col-12">
+                                <div className="mb-3">
+                                    <label className="form-label row">Documento pessoal com foto</label>
+                                    
+                                    <div className="row">
+                                        <label htmlFor="documentFile" className={`${style.fileButton} col-3`}>
+                                            Escolher arquivo
+                                        </label>
+                                        <div className={`${style.fileName} col-9`}>
+                                            {documentFile ? documentFile[0]?.name : 'Nenhum arquivo selecionado'}
+                                        </div>
+                                        <input 
+                                            type="file"
+                                            className="form-control"
+                                            id="documentFile"
+                                            name="documentFile"
+                                            onChange={(event) => {
+                                                actions.handleChange(event);
+                                                console.log(event.currentTarget.files);
+                                                setDocumentFile(event.currentTarget.files);
+                                            }}
+                                            value={undefined}
+                                            style={{display:'none'}}
+                                        />
+                                    </div>                                    
+                                </div>
+                            </div>
+                                                   
+                            <div className="col-12">
+                                <div className="mb-3">
+                                    <label className="form-label row">Diploma da Graduação</label>
+                                    
+                                    <div className="row">
+                                        <label htmlFor="graduationProofFile" className={`${style.fileButton} col-3`}>
+                                            Escolher arquivo
+                                        </label>
+                                        <div className={`${style.fileName} col-9`}>
+                                            {graduationProofFile ? graduationProofFile[0]?.name : 'Nenhum arquivo selecionado'}
+                                        </div>
+                                        <input 
+                                            type="file"
+                                            className="form-control"
+                                            id="graduationProofFile"
+                                            name="graduationProofFile"
+                                            onChange={(event) => {
+                                                actions.handleChange(event);
+                                                console.log(event.currentTarget.files);
+                                                setGraduationProofFile(event.currentTarget.files);
+                                            }}
+                                            value={undefined}
+                                            style={{display:'none'}}
+                                        />
+                                    </div>                                    
+                                </div>
+                            </div>       
                             <div className="col-12">   
                                 {baremaCategories?.map((baremaCategory, index) => (
                                     <>
@@ -1009,7 +1094,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         </label>                                            
                                         {baremaCategory.subcategories.map((subcategory, idx) => (
                                             <>
-                                            <label htmlFor="files" className="form-label row mt-2" key={idx}>{subcategory.name}</label>  
+                                            <label className="form-label row mt-2" key={idx}>{subcategory.name}</label>  
                                             <FieldArray
                                                 name={subcategory.uuid}
                                                 render={arrayHelpers => (

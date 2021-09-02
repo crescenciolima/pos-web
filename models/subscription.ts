@@ -56,6 +56,7 @@ export interface Subscription {
     statusObservation?: string;
     observation?: string;
     graduationProofFile?: string;
+    documentFile?: string;
     resources?: SubscriptionResource[];
     grades?: SubscriptionGrade[];
     interviewGrade?: number;
@@ -72,6 +73,13 @@ export enum SubscriptionStatus {
     DEFERIDA = "Deferida",
     INDEFERIDA = "Indeferida",
 }
+
+export enum SubscriptionTypeFile {
+    BAREMA = "barema",
+    DOCUMENT = "document",
+    GRADUATION = "graduation",
+}
+
 
 
 export interface SubscriptionResource {
