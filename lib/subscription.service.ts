@@ -41,6 +41,39 @@ export default function SubscriptionService() {
     async function getById(id) {
         let snapshot = await subscriptionRef.doc(id).get();
         const doc = snapshot.data();
+
+        return buildSubscription(id, doc);
+    }
+
+    async function getByUser(userID) {
+        let snapshot = await subscriptionRef.where('userID', "==", userID).get();
+
+        if (snapshot.size > 0) {                  
+            let subs = [];
+            snapshot.forEach(
+                (result) => {
+                    const id = result.id;
+                    const doc = result.data();
+                    const sub: Subscription = buildSubscription(id, doc)
+                    subs.push(sub);
+                });     
+            const doc = subs[0];
+            return doc;
+        }
+
+        return null;
+    }
+
+
+    async function save(sub: Subscription) {
+        return subscriptionRef.add(sub);
+    }
+
+    async function update(sub: Subscription) {
+        subscriptionRef.doc(sub.id).set(sub);
+    }
+
+    function buildSubscription(id, doc) {
         const sub: Subscription = {
             id: id,
 
@@ -92,6 +125,7 @@ export default function SubscriptionService() {
             subscriptionDate : validateField(doc['subscriptionDate']),
 
             graduationProofFile: validateField(doc['graduationProofFile']),
+            documentFile: validateField(doc['documentFile']),
 
             grades: validateField(doc['grades']),
             statusObservation: validateField(doc['statusObservation']),
@@ -104,15 +138,6 @@ export default function SubscriptionService() {
 
         return sub;
     }
-
-    async function save(sub: Subscription) {
-        return subscriptionRef.add(sub);
-    }
-
-    async function update(sub: Subscription) {
-        subscriptionRef.doc(sub.id).set(sub);
-    }
-
     function validateField(field) {
         return field ? field : '';
     }
@@ -120,6 +145,7 @@ export default function SubscriptionService() {
     return {
         getAllByProcessID,
         getById,
+        getByUser,
         save,
         update
     }

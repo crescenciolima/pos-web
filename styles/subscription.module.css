@@ -1,3 +1,31 @@
+.title {
+  font-size: clamp(1rem, 2vw, 2rem);
+}
+
+.steps {
+  text-align: right;
+  align-self: flex-end;
+}
+
+.step {
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbbbbb;
+  border: none;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.5;
+}
+
+.stepActive {
+  opacity: 1;
+}
+
+.stepFinish {
+  background-color: #04AA6D;
+}
+
 .radioGroup {
   margin-top: 0.5em;
   display: flex;

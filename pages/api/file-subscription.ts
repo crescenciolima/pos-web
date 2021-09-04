@@ -68,7 +68,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
             subscription = {...subscription, documentFile: url};
           }
 
-          console.log(subscription);
+          console.log('after',subscription);
 
           await subscriptionService.update(subscription);
     
