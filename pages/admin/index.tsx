@@ -17,6 +17,9 @@ import { authAdmin } from "./../../utils/firebase-admin";
 import Permission from '../../lib/permission.service';
 import { UserType } from '../../enum/type-user.enum';
 import ConfirmDialog from '../../components/confirm-dialog';
+import SelectiveBaremaAnalysisList from '../../components/selectiveprocess/dashboard/barema-analysis';
+import SelectiveBaremaResults from '../../components/selectiveprocess/dashboard/barema-results';
+import SelectiveProcessFinalResult from '../../components/selectiveprocess/dashboard/final-result';
 
 export default function Admin() {
 
@@ -148,13 +151,40 @@ export default function Admin() {
           <div className="row mt-5">
             <div className="col-12">
 
-              {(currentStep.type == ProcessStepsTypes.INSCRICAO || currentStep.type == ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO
-                || (currentStep.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO))
+              {(
+                currentStep.type == ProcessStepsTypes.INSCRICAO
+                || currentStep.type == ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO
+                || currentStep.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO
+
+              )
                 && <SelectiveProcessSubscriptionList process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList}></SelectiveProcessSubscriptionList>}
-              {(currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA )
+              {(
+                currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO
+                || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA
+                || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA
+                || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_AVALIACAO_CURRICULAR
+              )
                 && <SelectiveProcessResourceList process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList}></SelectiveProcessResourceList>}
-              {(currentStep.type == ProcessStepsTypes.ENTREVISTA || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA || currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_ENTREVISTA || currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_ENTREVISTA || currentStep.type == ProcessStepsTypes.PROVA)
+              {(currentStep.type == ProcessStepsTypes.ENTREVISTA
+                || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA
+                || currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_ENTREVISTA
+                || currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_ENTREVISTA
+                || currentStep.type == ProcessStepsTypes.PROVA
+                || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA
+                || currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_PROVA
+                || currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_PROVA
+              )
                 && <SelectiveProcessSubscriptionGrading process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList}></SelectiveProcessSubscriptionGrading>}
+              {(currentStep.type == ProcessStepsTypes.AVALIACAO_CURRICULAR)             
+                && <SelectiveBaremaAnalysisList process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList}></SelectiveBaremaAnalysisList>
+              }
+              {(currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_AVALIACAO_CURRICULAR)
+               || (currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR)
+                && <SelectiveBaremaResults process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList}></SelectiveBaremaResults>
+              }
+              {(currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_PROCESSO_SELETIVO)
+                && <SelectiveProcessFinalResult process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList}></SelectiveProcessFinalResult>
+              }
 
             </div>
           </div>
@@ -167,9 +197,9 @@ export default function Admin() {
         </>
         : null}
 
-    <ConfirmDialog open={openModal} 
-    actionButtonText="Avançar Etapa" title="Avançar Etapa" 
-    text={"Tem certeza que deseja avançar para a próxima etapa do processo seletivo?"} onClose={closeModal} onConfirm={confirmAdvanceStep} />
+      <ConfirmDialog open={openModal}
+        actionButtonText="Avançar Etapa" title="Avançar Etapa"
+        text={"Tem certeza que deseja avançar para a próxima etapa do processo seletivo?"} onClose={closeModal} onConfirm={confirmAdvanceStep} />
 
     </AdminBase>
   )

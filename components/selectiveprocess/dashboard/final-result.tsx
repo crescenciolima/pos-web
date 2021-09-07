@@ -1,0 +1,174 @@
+import { ErrorMessage, Field, Formik } from 'formik'
+import React, { useEffect, useState } from "react";
+import * as Yup from 'yup'
+import { useRouter } from 'next/router';
+import { APIRoutes } from '../../../utils/api.routes';
+import API from '../../../lib/api.service';
+import { APIResponse } from '../../../models/api-response';
+import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
+import { Subscription, SubscriptionStatus } from '../../../models/subscription';
+import { faTrash, faClock, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Link from 'next/link';
+import { format } from 'date-fns';
+import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
+import { group } from 'console';
+
+interface Props {
+    process: SelectiveProcess;
+    currentStep: ProcessStep;
+    subscriptionList: Subscription[];
+}
+
+interface FinalListGroup {
+    name: string;
+    numberPlaces: number;
+    uuid: string;
+    subscriptionList: Subscription[];
+}
+
+export default function SelectiveProcessFinalResult(props: Props) {
+
+    const router = useRouter();
+    // const [subscriptionList, setSubscriptionList] = useState<Subscription[]>([]);
+    const [groupList, setGroupList] = useState<FinalListGroup[]>([]);
+    const [isLoading, setLoading] = useState<boolean>(true);
+    const [interview, setInterview] = useState<ProcessStep>();
+    const [test, setTest] = useState<ProcessStep>();
+    const [barema, setBarema] = useState<ProcessStep>();
+
+    const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0, passingScore: 0, weight: 0, order: 0 });
+
+    const api = API(setLoading);
+    const processUtil = SelectiveProcessUtil();
+
+
+    useEffect(() => {
+        const process = props.process
+        const list: Subscription[] = props.subscriptionList;
+        setCurrentStep(props.currentStep);
+        let finalList: Subscription[] = [];
+
+        setTest(process.steps.find(step => step.type == ProcessStepsTypes.PROVA));
+        setInterview(process.steps.find(step => step.type == ProcessStepsTypes.ENTREVISTA));
+        setBarema(process.steps.find(step => step.type == ProcessStepsTypes.AVALIACAO_CURRICULAR));
+
+
+        //Filtrando a lista com somente quem não foi eliminado
+        for (let sub of list) {
+            if (sub.status == SubscriptionStatus.DEFERIDA) {
+                sub['formatedDate'] = format(new Date(sub.subscriptionDate), 'dd/MM/yyyy')
+                if (processUtil.isSubscriberApproved(sub, process)) {
+                    sub['baremaGrade'] = processUtil.calculateBaremaGrade(sub, process);
+                    sub['finalGrade'] = processUtil.calculateFinalGrade(sub, process);
+                    finalList.push(sub);
+                }
+            }
+        }
+
+        //Ordenando a lista por nota
+        finalList.sort((a, b) => b['finalGrade'] - a['finalGrade']);
+
+        let groupList: FinalListGroup[] = [];
+        let reservedPlaces: number = 0;
+
+        //Vagas
+        for (let place of process.reservedPlaces) {
+            let placeGroup: FinalListGroup = {
+                name: place.name,
+                subscriptionList: [],
+                numberPlaces: place.numberPlaces,
+                uuid: place.uuid
+            }
+            reservedPlaces = reservedPlaces + +place.numberPlaces;
+            groupList.push(placeGroup);
+        }
+
+        //Separando a lista pelas vagas
+        let normalPlace: FinalListGroup = {
+            name: "Ampla Concorrência",
+            subscriptionList: finalList.filter(sub => sub.reservedPlace == null),
+            numberPlaces: process.numberPlaces - reservedPlaces,
+            uuid: null
+        }
+        groupList.push(normalPlace);
+
+        //Filtrando os inscritos
+        for (let group of groupList) {
+            for (let sub of finalList) {
+                if (sub.reservedPlace && sub.reservedPlace == group.uuid) {
+                    group.subscriptionList.push(sub);
+                }
+            }
+        }
+        groupList = groupList.filter(group => group.subscriptionList.length > 0);
+
+        setGroupList(groupList);
+
+        console.log(groupList)
+
+
+    }, []);
+
+
+
+    return (
+        <>
+
+            <div className="row">
+                <div className="col-6">
+                    <h5 className="text-primary-dark">Classificação Final</h5>
+                </div>
+            </div>
+            {groupList.map((group, indexGroup) => {
+                return (
+                    <div key={indexGroup} >
+
+                        <div className="row mt-5">
+                            <div className="col-12 text-center">
+                                <h5>Classificação de candidados de {group.name}</h5>
+                            </div>
+                        </div>
+                        <div className="row mt-2">
+                            <div className="col-12 text-center table-responsive">
+                                <table className="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Nº</th>
+                                            <th>Nome</th>
+                                            {interview && <th>Nota da Entrevista (Peso {interview.weight})</th>}
+                                            {test && <th>Nota da Prova (Peso {test.weight})</th>}
+                                            {barema && <th>Nota Avaliação Curricular (Peso {barema.weight})</th>}
+                                            <th>Nota Final</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {group.subscriptionList.map((sub, indexSub) => {
+                                            return (
+                                                <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} key={sub.id}>
+                                                    <tr>
+                                                        <td>Nº {indexSub + 1}</td>
+                                                        <td>{sub.name}</td>
+                                                        {interview && <td>{sub.interviewGrade}</td>}
+                                                        {test && <td>{sub.testGrade}</td>}
+                                                        {barema && <td>{sub['baremaGrade']}</td>}
+                                                        <td>
+                                                            {sub['finalGrade']}
+                                                        </td>
+                                                    </tr>
+                                                </Link>
+                                            )
+                                        })}
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })}
+
+
+        </>
+    );
+}

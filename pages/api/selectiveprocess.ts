@@ -34,11 +34,11 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
             numberPlaces: 0,
             reservedPlaces: [
               { name: "Servidores do IFBA", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Pessoas com Deficiência", numberPlaces: 0 , uuid: uuidv4()},
-              { name: "Negros (Pretos e Pardos) ", numberPlaces: 0 , uuid: uuidv4()},
-              { name: "Indígenas", numberPlaces: 0 , uuid: uuidv4()},
-              { name: "Quilombolas", numberPlaces: 0 , uuid: uuidv4()},
-              { name: "Pessoas Trans (Transexuais, Transgêneros e Travestis)", numberPlaces: 0 , uuid: uuidv4()},
+              { name: "Pessoas com Deficiência", numberPlaces: 0, uuid: uuidv4() },
+              { name: "Negros (Pretos e Pardos) ", numberPlaces: 0, uuid: uuidv4() },
+              { name: "Indígenas", numberPlaces: 0, uuid: uuidv4() },
+              { name: "Quilombolas", numberPlaces: 0, uuid: uuidv4() },
+              { name: "Pessoas Trans (Transexuais, Transgêneros e Travestis)", numberPlaces: 0, uuid: uuidv4() },
             ]
           }
 
@@ -64,8 +64,10 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         msg: "",
         result: null
       };
-
-      if (req.query.inconstruction == "true") {
+      if (req.query.id) {
+        const process = await selectiveProcessService.getById(req.query.id);
+        getResponse.result = process;
+      } else if (req.query.inconstruction == "true") {
         const process = await selectiveProcessService.getInConstruction();
         getResponse.result = process;
       } else if (req.query.open == "true") {

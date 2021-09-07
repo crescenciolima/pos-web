@@ -29,6 +29,7 @@ export default function SubscriptionService() {
                         resources: doc['resources'],
                         testGrade: doc['testGrade'],
                         interviewGrade: doc['interviewGrade'],
+                        files:doc['files']
                     }
                     subs.push(sub);
                 });
@@ -130,7 +131,8 @@ export default function SubscriptionService() {
             graduationProofFile: validateField(doc['graduationProofFile']),
             documentFile: validateField(doc['documentFile']),
 
-            grades: validateField(doc['grades']),
+            testGrade: validateField(doc['testGrade']),
+            interviewGrade: validateField(doc['interviewGrade']),
             statusObservation: validateField(doc['statusObservation']),
             observation: validateField(doc['observation']),
             resources: validateField(doc['resources']),

@@ -10,7 +10,7 @@ export interface SelectiveProcess {
     processForms?: ProcessDocument[];
     processNotices?: ProcessDocument[];
     steps?: ProcessStep[];
-    currentStep?:number;
+    currentStep?: number;
 }
 
 
@@ -49,7 +49,7 @@ export interface ProcessDocument {
 
 export interface ProcessStep {
 
-    order:number;
+    order: number;
     startDate: number;
     finishDate: number;
     weight: number;
@@ -71,7 +71,11 @@ export enum ProcessStepsTypes {
     RESULTADO_PRELIMINAR_PROVA = "Resultado Preliminar da Prova",
     INTERPOSICAO_RECURSO_PROVA = "Interposição de Recursos da Prova",
     RESULTADO_DEFINITIVO_PROVA = "Resultado Definitivo da Prova",
-    AVALIACAO_BAREMA = "Avaliação Barema",
+    AVALIACAO_CURRICULAR = "Avaliação Curricular",
+    RESULTADO_PRELIMINAR_AVALIACAO_CURRICULAR = "Resultado Preliminar da Avaliação Curricular",
+    INTERPOSICAO_RECURSO_AVALIACAO_CURRICULAR = "Interposição de Recursos da Avaliação Curricular",
+    RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR = "Resultado Definitivo da Avaliação Curricular",
+    RESULTADO_DEFINITIVO_PROCESSO_SELETIVO = "Resultado Definitivo do Processo Seletivo"
 }
 
 

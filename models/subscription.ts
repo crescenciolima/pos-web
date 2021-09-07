@@ -58,13 +58,14 @@ export interface Subscription {
     graduationProofFile?: string;
     documentFile?: string;
     resources?: SubscriptionResource[];
-    grades?: SubscriptionGrade[];
     interviewGrade?: number;
-    testGrade?: number;
+    testGrade?:number
+
 
     //Only for UI
     currentResource?: SubscriptionResource;
     formatedDate?: string;
+
 }
 
 
@@ -111,3 +112,4 @@ export interface SubscriptionFile{
     status: SubscriptionStatus;
     observation?: string;
 }
+
