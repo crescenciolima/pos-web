@@ -11,15 +11,15 @@
   margin-right: 0.5em
 }
 
-.radioVacancyType {
+.radioReservedPlace {
   margin-right: 0.5em;
 }
 
-.radioVacancyType > input {
+.radioReservedPlace > input {
   margin-right: 0.5em;
 }
 
-.radioVacancyType > label {
+.radioReservedPlace > label {
   font-weight: normal !important;
 }
 

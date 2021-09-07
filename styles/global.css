@@ -244,3 +244,7 @@ fieldset {
     font-weight: bold !important;
     color: var(--color-primary-dark)
   }
+
+  .text-bold{
+    font-weight: bold !important;
+  }

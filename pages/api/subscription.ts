@@ -1,11 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { APIResponse } from '../../models/api-response';
 import SubscriptionService from '../../lib/subscription.service';
-import { Subscription } from '../../models/subscription';
+import { Subscription, SubscriptionStatus } from '../../models/subscription';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
+import { v4 as uuidv4 } from 'uuid';
+import fire from '../../utils/firebase-util';
+
 
 const cors = initMiddleware(
   Cors({
@@ -39,20 +42,25 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
                 } 
                 const currentUserId = await authService.currentUser(authorization);
 
+                subscription = { 
+                  ...subscription,
+                   userID: currentUserId as string, 
+                   protocol: uuidv4(),
+                   subscriptionDate: fire.firestore.Timestamp.now().seconds,
+                   status: SubscriptionStatus.AGUARDANDO_ANALISE,
+                };
 
-                subscription = { ...subscription, user: { id: currentUserId as string } };
-
-                await subscriptionService.save(subscription);
-        
+                const _subscription = await subscriptionService.save(subscription); 
+                
                 let response: APIResponse = {
-                msg: "Inscrição salva com sucesso!",
-                result: subscription
+                  msg: "Inscrição salva com sucesso!",
+                  result: {...subscription, id: _subscription.id}
                 }
         
                 res.status(200).json(response);
             }catch(e){
-                return res.status(400).json(treatError.general("Erro ao salvar usuário"));
                 console.log(e);
+                return res.status(400).json(treatError.general("Erro ao salvar usuário"));
             }
 
             break;

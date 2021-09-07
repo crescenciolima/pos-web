@@ -9,15 +9,25 @@ export default function API(setLoading?: Function) {
     async function postFile(url: string, body, file) {
         try {
             if (setLoading) setLoading(true);
+
             let data = new FormData();
-            data.append('file', file);
+            
+            if(file.length){
+                for (let i = 0; i < file.length; i++){
+                    data.append('file', file[i]);
+                }
+            }else{
+                data.append('file', file);
+            }
+
             for (let key in body) {
                 data.append(key, body[key]);
             }
 
             const res = await fetch(url, {
                 method: 'POST',
-                body: data
+                body: data,
+                headers: await buildHeadersFormData(),
             });
 
             const result: APIResponse = await res.json();
@@ -245,6 +255,13 @@ export default function API(setLoading?: Function) {
         const token = await cookies.getTokenClient();
         return {
             'Content-Type': 'application/json',
+            'Authorization': token,
+        };
+    }
+
+    async function buildHeadersFormData(){
+        const token = await cookies.getTokenClient();
+        return {
             'Authorization': token,
         };
     }
