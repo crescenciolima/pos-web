@@ -25,7 +25,7 @@ export default function SelectiveBaremaAnalysisList(props: Props) {
     const [isLoading, setLoading] = useState<boolean>(true);
     const [allChecked, setAllChecked] = useState<boolean>(false);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
-    const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0,  passingScore: 0, weight: 0, order: 0 });
+    const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0, passingScore: 0, weight: 0, order: 0 });
 
     const api = API(setLoading);
 
@@ -43,24 +43,44 @@ export default function SelectiveBaremaAnalysisList(props: Props) {
                 let testStep = props.process.steps.find(step => step.type == ProcessStepsTypes.PROVA);
                 let interviewStep = props.process.steps.find(step => step.type == ProcessStepsTypes.ENTREVISTA);
 
-                if(testStep){
-                    if(testStep.passingScore > sub.testGrade){
+                if (testStep) {
+                    if (testStep.passingScore > sub.testGrade) {
                         aproved = false;
                     }
                 }
 
-                if(interviewStep){
-                    if(interviewStep.passingScore > sub.interviewGrade){
+                if (interviewStep) {
+                    if (interviewStep.passingScore > sub.interviewGrade) {
                         aproved = false;
                     }
                 }
 
-                let baremaCheck = true;
-                // for(let baremaItem of sub.)
+                if(aproved){
+
+                    let baremaChecked = true;
+                    if(sub.files){
+                        for (let baremaCategory of sub.files) {
+                            if(baremaCategory.files){
+                                for(let file of baremaCategory.files){
+                                  if(file.status == SubscriptionStatus.AGUARDANDO_ANALISE){
+                                    baremaChecked = false;
+                                    break;
+                                  }
+                                }
+                               
+                            }
+                        }
+                    }
+                  
+                    sub['baremaChecked'] = baremaChecked;
+                    finalList.push(sub);
+                 }
+
+
                 
             }
         }
-        setSubscriptionList(list);
+        setSubscriptionList(finalList);
 
     }, []);
 
@@ -84,7 +104,7 @@ export default function SelectiveBaremaAnalysisList(props: Props) {
                                 <th>Idade</th>
                                 <th>Data de Inscrição</th>
                                 <th>Vaga</th>
-                                <th>Parecer</th>
+                                <th>Análise do Barema</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -97,14 +117,11 @@ export default function SelectiveBaremaAnalysisList(props: Props) {
                                             <td>{sub['formatedDate']}</td>
                                             <td>{sub.reservedPlace}</td>
                                             <td>
-                                                {sub.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon me-1" />}
-                                                {sub.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon me-1" />}
-                                                {sub.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon me-1" />}
-                                                {sub.status}
+                                                {sub['baremaChecked'] ?
+                                                <><FontAwesomeIcon icon={faCheck} className="sm-icon me-1" /> Finalizada</> : 
+                                                <><FontAwesomeIcon icon={faClock} className="sm-icon me-1" /> Aguardando Análise</> 
+                                                }
                                             </td>
-                                            {/* <td><button className="btn btn-sm btn-danger" onClick={(e) => removeTeacher(e, newsItem)} >
-                                                <FontAwesomeIcon icon={faTrash} className="sm-icon" />
-                                            </button></td> */}
                                         </tr>
                                     </Link>
                                 )

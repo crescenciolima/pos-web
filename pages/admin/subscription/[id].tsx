@@ -15,8 +15,9 @@ import 'suneditor/dist/css/suneditor.min.css';
 import { Subscription, SubscriptionStatus } from '../../../models/subscription';
 import { faClock, faFile, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ProcessStepsTypes } from '../../../models/selective-process';
+import { ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
 import { format } from 'date-fns';
+import SelectiveBaremaAnalysis from '../../../components/selectiveprocess/subscription/subscription-barema-analysis';
 
 export default function ProcessSubscriprionLayout() {
 
@@ -27,6 +28,8 @@ export default function ProcessSubscriprionLayout() {
         name: "", age: 0, protocol: "", reservedPlace: "", status: SubscriptionStatus.AGUARDANDO_ANALISE, selectiveProcessID: "", id: "", graduationProofFile: "", subscriptionDate: 0
     });
     const [stepType, setStepType] = useState<ProcessStepsTypes>(ProcessStepsTypes.INSCRICAO);
+    const [menuSelection, setMenuSelection] = useState<string>("dadosbasicos");
+    const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
 
     useEffect(() => {
 
@@ -61,9 +64,16 @@ export default function ProcessSubscriprionLayout() {
         }
 
         setSubscription(sub);
+
+        getSelectiveProcess(sub.selectiveProcessID)
     }
 
+    const getSelectiveProcess = async (id: string) => {
+        const response: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'id': id });
+        const process: SelectiveProcess = response.result;
 
+        setSelectiveProcess(process);
+    }
 
     const save = async (status: SubscriptionStatus) => {
         try {
@@ -122,104 +132,114 @@ export default function ProcessSubscriprionLayout() {
                     </Link>
                 </div>
             </div>
-            <fieldset>
-                <legend>
-                    Inscrição: 
-                    {subscription.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon mx-2" />}
-                    {subscription.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon mx-2" />}
-                    {subscription.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon mx-2" />}
-                    {subscription.status}
-                </legend>
-            </fieldset>
-            {/* <div className="row">
-                <div className="col-6">
-                    <h5 className="text-primary-dark">
-                        Inscrição
-                        {subscription.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon mx-2" />}
-                        {subscription.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon mx-2" />}
-                        {subscription.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon mx-2" />}
-                        {subscription.status}
-                    </h5>
-                </div>
-            </div> */}
-            <div className="row mt-3">
-                <div className="col-12 ">
-                    <fieldset disabled>
-                        <legend>Dados básicos</legend>
-                        <div className="mb-3">
-                            <label className="form-label">Nome</label>
-                            <input type="text" id="nome" className="form-control form-control-sm" value={subscription.name} readOnly></input>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Idade</label>
-                            <input type="text" id="idade" className="form-control form-control-sm" value={subscription.age} readOnly></input>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Vaga Selecionada</label>
-                            <input type="text" id="vaga" className="form-control form-control-sm" value={subscription.reservedPlace} readOnly></input>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Infomações Adicionais</label>
-                            <textarea className="form-control" id="obs" rows={3} readOnly value={subscription.observation}></textarea>
-                        </div>
-                        <div className="mb-3">
-                            <label className="form-label">Comprovante de Graduação</label>
-                            <a target="blank" href={subscription.graduationProofFile} className="link-primary">
-                                <b><FontAwesomeIcon icon={faFile} className="sm-icon mx-1" />Arquivo </b>
-                            </a>
-                        </div>
-                    </fieldset>
+            <div className="row mt-5 justify-content-center">
+                <div className="col-12">
+                    <ul className="nav nav-tabs nav-fill">
+                        <li className="nav-item">
+                            <a className={'nav-link ' + (menuSelection == 'dadosbasicos' ? 'active' : '')} onClick={(e) => setMenuSelection('dadosbasicos')} aria-current="page" >Inscrição</a>
+                        </li>
+                        <li className="nav-item">
+                            <a className={'nav-link ' + (menuSelection == 'barema' ? 'active' : '')} aria-disabled="true" onClick={(e) => setMenuSelection('barema')} >Barema</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            {subscription.currentResource &&
-                <>
-                    <div className="row justify-content-center">
-                        <div className="col-12 my-4 "><hr></hr></div>
-                        <div className="col-12 text-center my-3">
-                            <b>{stepType}</b>
+            {menuSelection == 'dadosbasicos'
+                && <>
+                    <fieldset className="mt-4">
+                        <legend>
+                            Inscrição:
+                            {subscription.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon mx-2" />}
+                            {subscription.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon mx-2" />}
+                            {subscription.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon mx-2" />}
+                            {subscription.status}
+                        </legend>
+                    </fieldset>
+                    <div className="row mt-3">
+                        <div className="col-12 ">
+                            <fieldset disabled>
+                                <legend>Dados básicos</legend>
+                                <div className="mb-3">
+                                    <label className="form-label">Nome</label>
+                                    <input type="text" id="nome" className="form-control form-control-sm" value={subscription.name} readOnly></input>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Idade</label>
+                                    <input type="text" id="idade" className="form-control form-control-sm" value={subscription.age} readOnly></input>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Vaga Selecionada</label>
+                                    <input type="text" id="vaga" className="form-control form-control-sm" value={subscription.reservedPlace} readOnly></input>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Infomações Adicionais</label>
+                                    <textarea className="form-control" id="obs" rows={3} readOnly value={subscription.observation}></textarea>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">Comprovante de Graduação</label>
+                                    <a target="blank" href={subscription.graduationProofFile} className="link-primary">
+                                        <b><FontAwesomeIcon icon={faFile} className="sm-icon mx-1" />Arquivo </b>
+                                    </a>
+                                </div>
+                            </fieldset>
                         </div>
-                        <div className="col-12">
-                            <div className="mb-3">
-                                <label className="form-label">Justificativa:</label>
-                                <textarea className="form-control" readOnly disabled={true} id="justification" name="justification" rows={4} value={subscription.currentResource.justification} ></textarea>
+                    </div>
+                    {subscription.currentResource &&
+                        <>
+                            <div className="row justify-content-center">
+                                <div className="col-12 my-4 "><hr></hr></div>
+                                <div className="col-12 text-center my-3">
+                                    <b>{stepType}</b>
+                                </div>
+                                <div className="col-12">
+                                    <div className="mb-3">
+                                        <label className="form-label">Justificativa:</label>
+                                        <textarea className="form-control" readOnly disabled={true} id="justification" name="justification" rows={4} value={subscription.currentResource.justification} ></textarea>
+                                    </div>
+                                </div>
+                                <div className="col-12">
+                                    <div className="mb-3">
+                                        <label className="form-label">Parecer do recurso</label>
+                                        <textarea className="form-control" id="obs" name="obs" rows={3} value={subscription.currentResource.statusObservation} onChange={handleResouceStatusObsChange}></textarea>
+                                    </div>
+                                </div>
+                                <div className="col-auto">
+                                    <button className="btn btn-primary" onClick={(e) => saveResourceInfo(SubscriptionStatus.DEFERIDA)}>Deferir</button>
+                                </div>
+                                <div className="col-auto">
+                                    <button className="btn btn-danger" onClick={(e) => saveResourceInfo(SubscriptionStatus.INDEFERIDA)}>Indeferir</button>
+                                </div>
                             </div>
-                        </div>
-                        <div className="col-12">
-                            <div className="mb-3">
-                                <label className="form-label">Parecer do recurso</label>
-                                <textarea className="form-control" id="obs" name="obs" rows={3} value={subscription.currentResource.statusObservation} onChange={handleResouceStatusObsChange}></textarea>
+                        </>}
+                    {
+                        (stepType == ProcessStepsTypes.INSCRICAO || stepType == ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO) &&
+                        <fieldset>
+                            <legend>Parecer Inscrição</legend>
+                            <div className="row justify-content-center">
+                                <div className="col-12">
+                                    <div className="mb-3">
+                                        <label className="form-label">Infomações Adicionais da Análise (Parecer)</label>
+                                        <textarea className="form-control" id="obs" name="obs" rows={3} value={subscription.statusObservation} onChange={handleStatusObsChange}></textarea>
+                                    </div>
+                                </div>
+                                <div className="col-auto">
+                                    <button className="btn btn-primary" onClick={(e) => save(SubscriptionStatus.DEFERIDA)}>Deferir</button>
+                                </div>
+                                <div className="col-auto">
+                                    <button className="btn btn-danger" onClick={(e) => save(SubscriptionStatus.INDEFERIDA)}>Indeferir</button>
+                                </div>
                             </div>
-                        </div>
-                        <div className="col-auto">
-                            <button className="btn btn-primary" onClick={(e) => saveResourceInfo(SubscriptionStatus.DEFERIDA)}>Deferir</button>
-                        </div>
-                        <div className="col-auto">
-                            <button className="btn btn-danger" onClick={(e) => saveResourceInfo(SubscriptionStatus.INDEFERIDA)}>Indeferir</button>
-                        </div>
-                    </div>
-                </>}
-            {
-                (stepType == ProcessStepsTypes.INSCRICAO || stepType == ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO) &&
-                <fieldset>
-                    <legend>Parecer Inscrição</legend>
-                    <div className="row justify-content-center">
-                    <div className="col-12">
-                        <div className="mb-3">
-                            <label className="form-label">Infomações Adicionais da Análise (Parecer)</label>
-                            <textarea className="form-control" id="obs" name="obs" rows={3} value={subscription.statusObservation} onChange={handleStatusObsChange}></textarea>
-                        </div>
-                    </div>
-                    <div className="col-auto">
-                        <button className="btn btn-primary" onClick={(e) => save(SubscriptionStatus.DEFERIDA)}>Deferir</button>
-                    </div>
-                    <div className="col-auto">
-                        <button className="btn btn-danger" onClick={(e) => save(SubscriptionStatus.INDEFERIDA)}>Indeferir</button>
-                    </div>
-                </div>
-                </fieldset>
-            
+                        </fieldset>
+
+                    }
+                </>
             }
 
+            {menuSelection == 'barema'
+                && <>
+                    <SelectiveBaremaAnalysis subscription={subscription} process={selectiveProcess}></SelectiveBaremaAnalysis>
+                </>
+            }
         </AdminBase>
     )
 }

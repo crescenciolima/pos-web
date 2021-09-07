@@ -6,54 +6,113 @@ export default function SelectiveProcessUtil() {
 
 
     function getCurrentStep(process: SelectiveProcess): ProcessStep {
-
-        // const currentDate = (new Date()).setHours(0, 0, 0, 0);
-        // for (let step of process.steps) {
-        //     const startDate = new Date(step.startDate);
-        //     const finishDate = new Date(step.finishDate);
-        //     if (startDate.setHours(0, 0, 0, 0) <= currentDate && finishDate.setHours(23, 59, 59, 999) > currentDate) {
-        //         return step;
-        //     }
-        // }
-
         const currentStep = process.steps.find(step => step.order == process.currentStep);
         return currentStep;
     }
 
-    function calculateFinalGrade(subscription: Subscription, process: SelectiveProcess): number {
+    function calculateTestsGrade(subscription: Subscription, process: SelectiveProcess): number {
 
-        let finalGrade = 0;
+        let testGrade = 0;
 
-            for (let step of process.steps) {
-                if (step.type == ProcessStepsTypes.ENTREVISTA) {
-                    if (subscription.interviewGrade >= step.passingScore) {
-                        finalGrade += (subscription.interviewGrade * step.weight);
-                    }
+        for (let step of process.steps) {
+            if (step.type == ProcessStepsTypes.ENTREVISTA) {
+                if (subscription.interviewGrade >= step.passingScore) {
+                    testGrade += (subscription.interviewGrade * step.weight);
                 }
-                if (step.type == ProcessStepsTypes.PROVA) {
-                    if (subscription.testGrade >= step.passingScore) {
-                        finalGrade += (subscription.testGrade * step.weight);
-                    }
+            }
+            if (step.type == ProcessStepsTypes.PROVA) {
+                if (subscription.testGrade >= step.passingScore) {
+                    testGrade += (subscription.testGrade * step.weight);
                 }
+            }
         }
+        return testGrade;
+    }
+
+    function calculateBaremaGrade(subscription: Subscription, process: SelectiveProcess): number {
+        let baremaStep = process.steps.find(step => step.type == ProcessStepsTypes.AVALIACAO_CURRICULAR);
+
+        let baremaPoints = 0;
+        if (baremaStep) {
+            if (subscription.files) {
+                for (let baremaCat of process.baremaCategories) {
+                    let pointsInCategory: number = 0;
+                    for (let subCat of baremaCat.subcategories) {
+                        let filesGroup = subscription.files.filter(file => file.subcategoryID == subCat.uuid);
+                        for (let group of filesGroup) {
+                            for (let file of group.files) {
+                                if (file.status == SubscriptionStatus.DEFERIDA) {
+                                    pointsInCategory = pointsInCategory + +subCat.points;
+                                }
+                            }
+                        }
+                    }
+                    baremaPoints = baremaPoints + (pointsInCategory > baremaCat.maxPoints ? baremaCat.maxPoints : pointsInCategory);
+                }
+            }
+        }
+
+        return baremaPoints;
+    }
+
+    function calculateFinalGrade(subscription: Subscription, process: SelectiveProcess):number {
+
+        let testStep = process.steps.find(step => step.type == ProcessStepsTypes.PROVA);
+        let interviewStep = process.steps.find(step => step.type == ProcessStepsTypes.ENTREVISTA);
+        let baremaStep = process.steps.find(step => step.type == ProcessStepsTypes.AVALIACAO_CURRICULAR);
+
+        let totalWeight = (testStep ? testStep.weight : 0) + (interviewStep ? interviewStep.weight : 0) + (baremaStep ? baremaStep.weight : 0);
+
+        let finalGrade = ((testStep ? (testStep.weight * subscription.testGrade) : 0) + (interviewStep ? (interviewStep.weight * subscription.interviewGrade) : 0) + (baremaStep ? (baremaStep.weight * calculateBaremaGrade(subscription, process)) : 0)) / (totalWeight == 0 ? 1 : totalWeight);
+
         return finalGrade;
     }
 
-    function orderSubscriptionList(subscriptionList: Subscription[], process:SelectiveProcess) :  Subscription[]{
+    function orderSubscriptionListByTests(subscriptionList: Subscription[], process: SelectiveProcess): Subscription[] {
         //levar em consideração idade e anos de experiência e vagas reservadas
-        for(let sub of subscriptionList){
-            sub['finalGrade'] = calculateFinalGrade(sub, process);
+        for (let sub of subscriptionList) {
+            sub['finalGrade'] = calculateTestsGrade(sub, process);
         }
-        
+
         subscriptionList.sort((a, b) => b['finalGrade'] - a['finalGrade']);
 
         return subscriptionList;
     }
 
+    function isSubscriberApproved(sub: Subscription, process: SelectiveProcess): boolean {
+        let aproved = true;
+        let testStep = process.steps.find(step => step.type == ProcessStepsTypes.PROVA);
+        let interviewStep = process.steps.find(step => step.type == ProcessStepsTypes.ENTREVISTA);
+        let baremaStep = process.steps.find(step => step.type == ProcessStepsTypes.AVALIACAO_CURRICULAR);
+
+        if (testStep) {
+            if (testStep.passingScore > sub.testGrade) {
+                aproved = false;
+            }
+        }
+
+        if (interviewStep) {
+            if (interviewStep.passingScore > sub.interviewGrade) {
+                aproved = false;
+            }
+        }
+
+        if (baremaStep) {
+            if (baremaStep.passingScore > calculateBaremaGrade(sub, process)) {
+                aproved = false;
+            }
+        }
+        return aproved;
+    }
+
+
     return {
         getCurrentStep,
-        calculateFinalGrade,
-        orderSubscriptionList
+        calculateTestsGrade,
+        orderSubscriptionListByTests,
+        isSubscriberApproved,
+        calculateBaremaGrade,
+        calculateFinalGrade
     }
 
 }

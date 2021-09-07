@@ -29,6 +29,7 @@ export default function SubscriptionService() {
                         resources: doc['resources'],
                         testGrade: doc['testGrade'],
                         interviewGrade: doc['interviewGrade'],
+                        files:doc['files']
                     }
                     subs.push(sub);
                 });
@@ -56,6 +57,7 @@ export default function SubscriptionService() {
             resources: doc['resources'],
             testGrade: doc['testGrade'],
             interviewGrade: doc['interviewGrade'],
+            files:doc['files']
         }
 
         return sub;

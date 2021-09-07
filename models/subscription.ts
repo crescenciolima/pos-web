@@ -59,11 +59,13 @@ export interface Subscription {
     resources?: SubscriptionResource[];
     interviewGrade?: number;
     testGrade?:number
+    files?: SubscriptionFileCategory[];
 
 
     //Only for UI
     currentResource?: SubscriptionResource;
     formatedDate?: string;
+
 }
 
 
@@ -71,7 +73,6 @@ export enum SubscriptionStatus {
     AGUARDANDO_ANALISE = "Aguardando Análise",
     DEFERIDA = "Deferida",
     INDEFERIDA = "Indeferida",
-    REPROVADO = "Reprovado",
 }
 
 
@@ -92,3 +93,16 @@ export interface SubscriptionGrade{
     grade: number;
     step: ProcessStepsTypes;
 }
+
+export interface SubscriptionFileCategory{
+    subcategoryID: string;
+    files: SubscriptionFile[];
+}
+
+export interface SubscriptionFile{
+    uuid: string;
+    url: string;
+    status: SubscriptionStatus;
+    observation?: string;
+}
+

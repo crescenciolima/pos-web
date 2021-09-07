@@ -97,7 +97,7 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
     };
 
     const orderSubsList = (subList: Subscription[], process: SelectiveProcess) => {
-        setSubscriptionList(processUtil.orderSubscriptionList(subList, process));
+        setSubscriptionList(processUtil.orderSubscriptionListByTests(subList, process));
     }
 
     const saveGradings = () => {
@@ -143,7 +143,7 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
                                             <td>
                                                 {sub.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon me-1" />}
                                                 {sub.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon me-1" />}
-                                                {sub.status == SubscriptionStatus.INDEFERIDA || sub.status == SubscriptionStatus.REPROVADO && <FontAwesomeIcon icon={faTimes} className="sm-icon me-1" />}
+                                                {sub.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon me-1" />}
                                                 {sub.status}
                                             </td>
                                             <td>
