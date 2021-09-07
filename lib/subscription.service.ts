@@ -45,8 +45,11 @@ export default function SubscriptionService() {
         return buildSubscription(id, doc);
     }
 
-    async function getByUser(userID) {
-        let snapshot = await subscriptionRef.where('userID', "==", userID).get();
+    async function getByUserAndProcess(userID, selectiveProcessID) {
+        let snapshot = await subscriptionRef
+        .where('userID', "==", userID)
+        .where('selectiveProcessID', "==", selectiveProcessID)
+        .get();
 
         if (snapshot.size > 0) {                  
             let subs = [];
@@ -145,7 +148,7 @@ export default function SubscriptionService() {
     return {
         getAllByProcessID,
         getById,
-        getByUser,
+        getByUserAndProcess,
         save,
         update
     }

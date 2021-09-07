@@ -181,7 +181,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             disabilityType: stageFourValues.disabilityType,
             specialTreatmentTypes: stageFourValues.specialTreatmentTypes,
             reservedPlace: stageFourValues.reservedPlace !== 'ampla_concorrencia' ? stageFourValues.reservedPlace : null,  
-            selectiveProcessID: selectiveProcess.id,
+            selectiveProcessID: currentSubscription ? currentSubscription.selectiveProcessID : selectiveProcess.id,
 
             subscriptionDate: Date.now()
         }
@@ -323,7 +323,75 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 return 'Arquivos';
         }
     }
+
+    const loadForm = async (subscriptionData) => {   
+        const stageOneData = {    
+            name: subscriptionData.name,
+            document: subscriptionData.document,
+            identityDocument: subscriptionData.identityDocument,
+            issuingAgency: subscriptionData.issuingAgency,
+            issuanceDate: new Date(subscriptionData.issuanceDate),
+            birthdate: new Date(subscriptionData.birthdate),
+            postalCode: subscriptionData.postalCode,
+            street: subscriptionData.street,
+            houseNumber: subscriptionData.houseNumber,
+            complement: subscriptionData.complement,
+            district: subscriptionData.district,
+            city: subscriptionData.city,
+            state: subscriptionData.state,
+            phoneNumber: subscriptionData.phoneNumber,
+            alternativePhoneNumber: subscriptionData.alternativePhoneNumber,
+        }
+
+        const stageTwoData = { 
+            graduation: subscriptionData.graduation,
+            graduationInstitution: subscriptionData.graduationInstitution,
+            postgraduateLatoSensu: subscriptionData.postgraduateLatoSensu,
+            postgraduateLatoSensuInstitution: subscriptionData.postgraduateLatoSensuInstitution,
+            postgraduateStrictoSensu: subscriptionData.postgraduateStrictoSensu,
+            postgraduateStrictoSensuInstitution: subscriptionData.postgraduateStrictoSensuInstitution,
+        }
+
+        const stageThreeData = {         
+            profession: subscriptionData.profession,
+            company: subscriptionData.company,
+            postalCodeCompany: subscriptionData.postalCodeCompany,
+            streetCompany: subscriptionData.streetCompany,
+            houseNumberCompany: subscriptionData.houseNumberCompany,
+            complementCompany: subscriptionData.complementCompany,
+            districtCompany: subscriptionData.districtCompany,
+            cityCompany: subscriptionData.cityCompany,
+            stateCompany: subscriptionData.stateCompany,
+            phoneNumberCompany: subscriptionData.phoneNumberCompany,
+            workShift: subscriptionData.workShift,
+            workRegime: subscriptionData.workRegime,
+        }
+
+        const stageFourData = { 
+            disability: subscriptionData.disability,
+            disabilityType: subscriptionData.disabilityType,
+            specialTreatmentTypes: subscriptionData.specialTreatmentTypes,
+            reservedPlace: !!subscriptionData.reservedPlace ? subscriptionData.reservedPlace : 'ampla_concorrencia',  
+            subscriptionDate: new Date(subscriptionData.subscriptionDate),
+        }
+
+        setStageOneValues(stageOneData);
+        setStageTwoValues(stageTwoData);
+        setStageThreeValues(stageThreeData);
+        setStageFourValues(stageFourData);
+    }
     
+    const getSubcategoryName = (id) => {
+        const categories = selectiveProcess.baremaCategories;
+        for(let category of categories){
+            for(let subcategory of category.subcategories){
+                if(subcategory.uuid === id){
+                    return subcategory.name;  
+                }          
+            } 
+        }
+    }
+
     useEffect(() => {   
         const loadData = async () => {
             const resultProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'inconstruction': "true" });
@@ -344,6 +412,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             const resultSubscription: APIResponse = await api.get(APIRoutes.CURRENT_SUBSCRIPTION);
             if (resultSubscription.result) {
                 setCurrentSubscription(resultSubscription.result);
+                await loadForm(resultSubscription.result);
             }
             setLoading(false);
         };      
@@ -375,7 +444,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         );
     }
 
-    if(currentSubscription){        
+    /*if(currentSubscription){        
         return (
             <StudentBase>
                 <div>
@@ -383,7 +452,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 </div>
             </StudentBase>
         );
-    }
+    }*/
 
     return (    
         <StudentBase>
@@ -452,7 +521,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="name" 
                                             id="name" 
                                             value={actions.values.name}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="name" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -468,6 +538,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             customInput={
                                                 <MaskedInput maskChar="" mask="99/99/9999"/>
                                             }
+                                            disabled={!!currentSubscription}
                                         />                                        
                                         <p className="input-error"><ErrorMessage name="birthdate" className="input-error" /></p>
                                     </div>
@@ -482,7 +553,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 {({field}) => {
                                                     return (
                                                     <MaskedInput
-                                                        {...field}                                    
+                                                        {...field}        
+                                                        disabled={!!currentSubscription}                             
                                                         className="form-control"
                                                         maskChar=""
                                                         mask={MaskHelper.makeMask(field.value, '', 'cpf')}
@@ -502,7 +574,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="identityDocument" 
                                             id="identityDocument" 
                                             value={actions.values.identityDocument}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="identityDocument" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -515,7 +588,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="issuingAgency" 
                                             id="issuingAgency" 
                                             value={actions.values.issuingAgency}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="issuingAgency" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -528,6 +602,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             dateFormat="dd/MM/yyyy" 
                                             onChange={(date) => { actions.setFieldValue('issuanceDate', date); }} 
                                             className="form-control" 
+                                            disabled={!!currentSubscription} 
                                             customInput={
                                                 <MaskedInput maskChar="" mask="99/99/9999"/>
                                             }
@@ -545,7 +620,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 {({field}) => {
                                                     return (
                                                     <MaskedInput
-                                                        {...field}                                    
+                                                        {...field}     
+                                                        disabled={!!currentSubscription}                                
                                                         className="form-control"
                                                         maskChar=""
                                                         mask={MaskHelper.makeMask(field.value, '', 'phone')}
@@ -566,7 +642,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 {({field}) => {
                                                     return (
                                                     <MaskedInput
-                                                        {...field}                                    
+                                                        {...field}  
+                                                        disabled={!!currentSubscription}                                   
                                                         className="form-control"
                                                         maskChar=""
                                                         mask={MaskHelper.makeMask(field.value, '', 'phone')}
@@ -583,11 +660,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <Field 
                                             name="postalCode"
                                             value={actions.values.postalCode}                
-                                            onChange={actions.handleChange} >
+                                            onChange={actions.handleChange}  >
                                                 {({field}) => {
                                                     return (
                                                     <MaskedInput
-                                                        {...field}                                    
+                                                        {...field}  
+                                                        disabled={!!currentSubscription}                                   
                                                         className="form-control"
                                                         maskChar=""
                                                         mask={MaskHelper.makeMask(field.value, '', 'cep')}
@@ -607,7 +685,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="street" 
                                             id="street" 
                                             value={actions.values.street}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="street" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -620,7 +699,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="houseNumber" 
                                             id="houseNumber" 
                                             value={actions.values.houseNumber}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="houseNumber" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -633,7 +713,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="complement" 
                                             id="complement" 
                                             value={actions.values.complement}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="complement" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -646,7 +727,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="district" 
                                             id="district" 
                                             value={actions.values.district}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="district" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -659,7 +741,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="city" 
                                             id="city" 
                                             value={actions.values.city}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="city" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -672,7 +755,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="state" 
                                             id="state" 
                                             value={actions.values.state}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="state" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -716,7 +800,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="graduation" 
                                         id="graduation" 
                                         value={actions.values.graduation}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="graduation" className="input-error" /></p>
                                 </div>
                             </div>
@@ -729,7 +814,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="graduationInstitution" 
                                         id="graduationInstitution" 
                                         value={actions.values.graduationInstitution}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="graduationInstitution" className="input-error" /></p>
                                 </div>
                             </div>
@@ -742,7 +828,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="postgraduateLatoSensu" 
                                         id="postgraduateLatoSensu" 
                                         value={actions.values.postgraduateLatoSensu}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateLatoSensu" className="input-error" /></p>
                                 </div>
                             </div>
@@ -755,7 +842,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="postgraduateLatoSensuInstitution" 
                                         id="postgraduateLatoSensuInstitution" 
                                         value={actions.values.postgraduateLatoSensuInstitution}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateLatoSensuInstitution" className="input-error" /></p>
                                 </div>
                             </div>
@@ -768,7 +856,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="postgraduateStrictoSensu" 
                                         id="postgraduateStrictoSensu" 
                                         value={actions.values.postgraduateStrictoSensu}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateStrictoSensu" className="input-error" /></p>
                                 </div>
                             </div>
@@ -781,7 +870,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="postgraduateStrictoSensuInstitution" 
                                         id="postgraduateStrictoSensuInstitution" 
                                         value={actions.values.postgraduateStrictoSensuInstitution}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateStrictoSensuInstitution" className="input-error" /></p>
                                 </div>
                             </div>                      
@@ -827,7 +917,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="profession" 
                                         id="profession" 
                                         value={actions.values.profession}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                        disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="profession" className="input-error" /></p>
                                 </div>
                             </div>
@@ -840,7 +931,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="company" 
                                         id="company" 
                                         value={actions.values.company}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                        disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="company" className="input-error" /></p>
                                 </div>
                             </div>
@@ -852,11 +944,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <Field 
                                         name="postalCodeCompany"
                                         value={actions.values.postalCodeCompany}                
-                                        onChange={actions.handleChange} >
+                                        onChange={actions.handleChange}  >
                                             {({field}) => {
                                                 return (
                                                 <MaskedInput
-                                                    {...field}                                    
+                                                    {...field}    
+                                                    disabled={!!currentSubscription}                                
                                                     className="form-control"
                                                     maskChar=""
                                                     mask={MaskHelper.makeMask(field.value, '', 'cep')}
@@ -876,7 +969,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="streetCompany" 
                                         id="streetCompany" 
                                         value={actions.values.streetCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="streetCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -889,7 +983,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="houseNumberCompany" 
                                         id="houseNumberCompany" 
                                         value={actions.values.houseNumberCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="houseNumberCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -902,7 +997,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="complementCompany" 
                                         id="complementCompany" 
                                         value={actions.values.complementCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="complementCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -915,7 +1011,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="districtCompany" 
                                         id="districtCompany" 
                                         value={actions.values.districtCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="districtCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -928,7 +1025,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="cityCompany" 
                                         id="cityCompany" 
                                         value={actions.values.cityCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="cityCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -941,7 +1039,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="stateCompany" 
                                         id="stateCompany" 
                                         value={actions.values.stateCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="stateCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -954,7 +1053,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="workShift" 
                                         id="workShift" 
                                         value={actions.values.workShift}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="workShift" className="input-error" /></p>
                                 </div>
                             </div>
@@ -967,7 +1067,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="workRegime" 
                                         id="workRegime" 
                                         value={actions.values.workRegime}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="workRegime" className="input-error" /></p>
                                 </div>
                             </div>
@@ -1005,11 +1106,13 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 <div role="group" aria-labelledby="my-radio-group"> 
                                     <div className={style.radioGroup}>
                                         <div className={style.radio}>
-                                            <input type="radio" name="disability" value="1" onChange={actions.handleChange} checked={actions.values.disability === "1"}/>
+                                            <input type="radio" name="disability" value="1" onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} checked={actions.values.disability === "1"}/>
                                             <label>Sim</label>
                                         </div>  
                                         <div className={style.radio}>
-                                            <input type="radio" name="disability" value="0" onChange={actions.handleChange} checked={actions.values.disability === "0"} />
+                                            <input type="radio" name="disability" value="0" onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} checked={actions.values.disability === "0"} />
                                             <label>Não</label>                                  
                                         </div>
                                     </div>
@@ -1026,7 +1129,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="disabilityType" 
                                             id="disabilityType" 
                                             value={actions.values.disabilityType}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="disabilityType" className="input-error" /></p>
                                     </div>
                                 }
@@ -1041,7 +1145,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             id="specialTreatmentTypes"
                                             placeholder=""
                                             value={actions.values.specialTreatmentTypes}
-                                            onChange={actions.handleChange}
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription}
                                             multiple
                                         >
                                             {specialTreatmentTypes.map((specialTreatmentType, index) => (
@@ -1057,14 +1162,16 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 <div role="group" aria-labelledby="my-radio-group"> 
                                     <div className={style.radioGroup}>
                                         <div className={style.radioReservedPlace}>
-                                        <input type="radio" name="reservedPlace" value="ampla_concorrencia" onChange={actions.handleChange} checked={actions.values.reservedPlace === 'ampla_concorrencia'}/>
+                                        <input type="radio" name="reservedPlace" value="ampla_concorrencia" onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} checked={actions.values.reservedPlace === 'ampla_concorrencia'}/>
                                         <label>Ampla concorrência</label>
                                         </div>  
                                     </div>
                                     {selectiveProcess.reservedPlaces.map((reservedPlace, index) => (
                                         <div className={style.radioGroup} key={index}>
                                             <div className={style.radioReservedPlace}>
-                                            <input type="radio" name="reservedPlace" value={reservedPlace.uuid} onChange={actions.handleChange} checked={actions.values.reservedPlace === reservedPlace.uuid}/>
+                                            <input type="radio" name="reservedPlace" value={reservedPlace.uuid} onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} checked={actions.values.reservedPlace === reservedPlace.uuid}/>
                                             <label>{reservedPlace.name}</label>
                                             </div>  
                                         </div>
@@ -1082,7 +1189,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     )}
                 </Formik>
             }
-            {currentStage === 5 && 
+            {currentStage === 5 && !currentSubscription &&
                 <Formik
                     enableReinitialize
                     initialValues={generateForm()}                      
@@ -1218,6 +1325,59 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             <button onClick={() => back(actions.values)} className="btn btn-secondary m-1" disabled={actions.isSubmitting}>Anterior</button>
                             <button type="submit" className="btn btn-primary m-1" disabled={actions.isSubmitting}>Concluir</button>
                         </div>
+                    </Form>
+                    )}
+                </Formik>
+            }
+            {currentStage === 5 && currentSubscription &&
+                <Formik
+                    enableReinitialize
+                    initialValues={generateForm()}                      
+                    validationSchema={generateFormValidation()}                  
+                    onSubmit={handleSubmit}>
+                    {(actions) => (
+                    <Form>
+                        <div className="row mt-5 justify-content-center">
+                            <div className="col-12">
+                                <div className="mb-3">                                    
+                                    <div className="row">
+                                        <label className="form-label text-bold">Documento pessoal com foto<span>*</span></label>
+                                    </div>                                    
+                                    <div className="row">
+                                        <div className={`col-9`}>
+                                            <a href={currentSubscription?.documentFile} target="_blank">Arquivo</a>
+                                        </div>
+                                    </div>                                    
+                                </div>
+                            </div>                                                   
+                            <div className="col-12">
+                                <div className="mb-3">
+                                    <div className="row">
+                                        <label className="form-label text-bold">Diploma da Graduação<span>*</span></label>
+                                    </div>                                                                  
+                                    <div className="row">
+                                        <div className={`col-9`}>
+                                            <a href={currentSubscription?.graduationProofFile} target="_blank">Arquivo</a>                                            
+                                        </div>
+                                    </div>     
+                                </div>
+                            </div>       
+                            <div className="col-12">   
+                                {currentSubscription?.files.map((fileSubscription, index) => (
+                                    <>
+                                        <label htmlFor="files" className="form-label row mt-5 text-bold" key={index}>
+                                            {getSubcategoryName(fileSubscription.subcategoryID)}
+                                        </label>                                            
+                                        {fileSubscription.files.map((fileSubcategory, idx) => (
+                                            <div><a href={fileSubcategory.url} target="_blank">Arquivo</a></div>                      
+                                        ))}
+                                    </>
+                                ))}
+                            </div>
+                        </div>
+                        <br />
+                        <div className="text-center">
+                            <button onClick={() => back(actions.values)} className="btn btn-secondary m-1" disabled={actions.isSubmitting}>Anterior</button>                        </div>
                     </Form>
                     )}
                 </Formik>

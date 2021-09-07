@@ -6,6 +6,7 @@ import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
+import SelectiveProcessService from '../../lib/selectiveprocess.service';
 
 
 const cors = initMiddleware(
@@ -35,8 +36,12 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         if(!currentUserId){            
           return res.status(401).json(await treatError.general('Usuário não autorizado.'));
         }
+
+        const selectiveProcessService = SelectiveProcessService();
         
-        const subs = await subscriptionService.getByUser(currentUserId);
+        const process = await selectiveProcessService.getInConstruction();
+        
+        const subs = await subscriptionService.getByUserAndProcess(currentUserId, process.id);
 
         let response: APIResponse = {
             msg: "Incrição atual encontrada com sucesso!",
