@@ -97,3 +97,22 @@
   border-radius: .25rem 0 0 .25rem;
 }
 
+.iconFile {
+  color:#34A853;
+  margin-bottom: 8px;
+  width: 1em;
+  margin-right: .5em;
+}
+
+.titleFile{
+  margin-right: .5em;
+}
+
+.completedLink{
+  text-decoration-line: underline;
+}
+
+.titleFile:hover, .completedLink:hover {
+  color:#34A853;
+}
+

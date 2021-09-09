@@ -8,7 +8,6 @@ import MaskedInput from 'react-input-mask';
 import DatePicker, { registerLocale, setDefaultLocale }  from "react-datepicker";
 import ptBR from 'date-fns/locale/pt-BR';
 import "react-datepicker/dist/react-datepicker.css";
-import fire from '../../../utils/firebase-util';
 import style from '../../../styles/subscription.module.css';
 import { Subscription, SubscriptionFile, SubscriptionTypeFile } from "../../../models/subscription";
 import { APIRoutes } from '../../../utils/api.routes';
@@ -20,6 +19,8 @@ import { APIResponse } from '../../../models/api-response';
 import { BaremaCategory, BaremaSubCategory, SelectiveProcess } from '../../../models/selective-process';
 import { MaskHelper } from '../../../helpers/mask-helper';
 import { useRouter } from 'next/router';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFile } from '@fortawesome/free-solid-svg-icons';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -40,6 +41,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [baremaCategories, setBaremaCategories] = useState<any>(null);
     const [documentFile, setDocumentFile] = useState<FileList>();
     const [graduationProofFile, setGraduationProofFile] = useState<FileList>();
+    const [invalidDocumentFile, setInvalidDocumentFile] = useState<any>(false);
+    const [invalidGraduationProofFile, setInvalidGraduationProofFile] = useState<any>(false);
     const router = useRouter();
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
@@ -270,7 +273,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             setStageFourValues(values);
             setCurrentStage(currentStage + 1);
         }else if(currentStage === 5){   
-            console.log(values);
+            console.log(values, !documentFile, !graduationProofFile);
+            setInvalidDocumentFile(!documentFile)
+            setInvalidGraduationProofFile(!graduationProofFile)
+            if(!documentFile || !graduationProofFile) {
+                return;
+            }
             await processSubscription(values);
         }
     }
@@ -300,13 +308,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         })
         console.log(values);
         return values;
-    }
-
-    const generateFormValidation = () => {
-        return Yup.object().shape({
-            graduationProofFile: Yup.mixed().required('Preencha este campo.'),
-            documentFile: Yup.mixed().required('Preencha este campo.'),
-        });
     }
 
     const getTitle = () => {
@@ -903,7 +904,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             workRegime: '',
                         }
                     }
-                    validationSchema={Yup.object().shape({})}
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
@@ -1192,8 +1192,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             {currentStage === 5 && !currentSubscription &&
                 <Formik
                     enableReinitialize
-                    initialValues={generateForm()}                      
-                    validationSchema={generateFormValidation()}                  
+                    initialValues={generateForm()}      
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
@@ -1219,12 +1218,17 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             onChange={(event) => {
                                                 actions.handleChange(event);
                                                 console.log(event.currentTarget.files);
-                                                setDocumentFile(event.currentTarget.files);
+                                                const files = event.currentTarget.files;
+                                                setDocumentFile(files.length > 0 ? files : null);
+                                                setInvalidDocumentFile(files.length === 0);
                                             }}
                                             value={undefined}
                                             style={{display:'none'}}
                                         />
-                                        <p className="input-error"><ErrorMessage name="documentFile" className="input-error" /></p>
+                                        <p className="input-error">
+                                            <ErrorMessage name="documentFile" className="input-error"/>
+                                            {invalidDocumentFile ? 'Preencha este campo.' : ''}
+                                        </p>
                                     </div>                                    
                                 </div>
                             </div>
@@ -1249,19 +1253,24 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             onChange={(event) => {
                                                 actions.handleChange(event);
                                                 console.log(event.currentTarget.files);
-                                                setGraduationProofFile(event.currentTarget.files);
+                                                const files = event.currentTarget.files;
+                                                setGraduationProofFile(files.length > 0 ? files : null);
+                                                setInvalidGraduationProofFile(files.length === 0);
                                             }}
                                             value={undefined}
                                             style={{display:'none'}}
                                         />
-                                        <p className="input-error"><ErrorMessage name="graduationProofFile" className="input-error" /></p>
+                                        <p className="input-error">
+                                            <ErrorMessage name="graduationProofFile" className="input-error"/>
+                                            {invalidGraduationProofFile ? 'Preencha este campo.' : ''}
+                                        </p>
                                     </div>                                    
                                 </div>
                             </div>       
                             <div className="col-12">   
                                 {baremaCategories?.map((baremaCategory, index) => (
                                     <>
-                                        <label htmlFor="files" className="form-label row mt-5 text-bold" key={index}>
+                                        <label htmlFor="files" className="form-label mt-5 text-bold" key={index}>
                                             {baremaCategory.name}
                                         </label>                                            
                                         {baremaCategory.subcategories.map((subcategory, idx) => (
@@ -1332,8 +1341,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             {currentStage === 5 && currentSubscription &&
                 <Formik
                     enableReinitialize
-                    initialValues={generateForm()}                      
-                    validationSchema={generateFormValidation()}                  
+                    initialValues={generateForm()}                               
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
@@ -1345,7 +1353,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     </div>                                    
                                     <div className="row">
                                         <div className={`col-9`}>
-                                            <a href={currentSubscription?.documentFile} target="_blank">Arquivo</a>
+                                            <span>                                  
+                                                <a href={currentSubscription?.documentFile} className={style.titleFile} target="_blank">
+                                                    <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
+                                                </a>
+                                            </span>
                                         </div>
                                     </div>                                    
                                 </div>
@@ -1356,21 +1368,27 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <label className="form-label text-bold">Diploma da Graduação<span>*</span></label>
                                     </div>                                                                  
                                     <div className="row">
-                                        <div className={`col-9`}>
-                                            <a href={currentSubscription?.graduationProofFile} target="_blank">Arquivo</a>                                            
+                                        <div className={`col-9`}>                      
+                                            <a href={currentSubscription?.graduationProofFile} className={style.titleFile} target="_blank">
+                                                <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
+                                            </a>
                                         </div>
                                     </div>     
                                 </div>
                             </div>       
                             <div className="col-12">   
-                                {currentSubscription?.files.map((fileSubscription, index) => (
+                                {currentSubscription && currentSubscription?.files && currentSubscription?.files.map((fileSubscription, index) => (
                                     <>
-                                        <label htmlFor="files" className="form-label row mt-5 text-bold" key={index}>
+                                        <label htmlFor="files" className="form-label mt-5 text-bold" key={index}>
                                             {getSubcategoryName(fileSubscription.subcategoryID)}
-                                        </label>                                            
-                                        {fileSubscription.files.map((fileSubcategory, idx) => (
-                                            <div><a href={fileSubcategory.url} target="_blank">Arquivo</a></div>                      
-                                        ))}
+                                        </label>   
+                                        <div>                                     
+                                            {fileSubscription.files.map((fileSubcategory, idx) => (
+                                                <a href={fileSubcategory.url} className={style.titleFile} target="_blank">
+                                                    <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo {idx + 1}
+                                                </a>      
+                                            ))}
+                                        </div> 
                                     </>
                                 ))}
                             </div>
@@ -1403,7 +1421,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             A sua inscrição foi concluída.
                         </h1>                   
                         <h1 className="text-primary fw-bold title-sm-font-size" >
-                            <a href="/admin" >Acompanhe aqui</a>                    
+                            <a href="/student/subscription" className={style.completedLink}>Acompanhe aqui</a>                    
                         </h1>
                     </div>
                 </div>
