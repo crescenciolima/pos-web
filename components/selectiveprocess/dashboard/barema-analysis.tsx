@@ -16,6 +16,8 @@ interface Props {
     process: SelectiveProcess;
     currentStep: ProcessStep;
     subscriptionList: Subscription[];
+    reservedPlacesMap: any;
+
 }
 
 export default function SelectiveBaremaAnalysisList(props: Props) {
@@ -26,6 +28,7 @@ export default function SelectiveBaremaAnalysisList(props: Props) {
     const [allChecked, setAllChecked] = useState<boolean>(false);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
     const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0, passingScore: 0, weight: 0, order: 0 });
+    const [reservedPlacesMap, setReservedPlacesMap] = useState<any>({});
 
     const api = API(setLoading);
 
@@ -33,6 +36,7 @@ export default function SelectiveBaremaAnalysisList(props: Props) {
     useEffect(() => {
         setSelectiveProcess(props.process);
         setCurrentStep(props.currentStep);
+        setReservedPlacesMap(props.reservedPlacesMap);
         const list: Subscription[] = props.subscriptionList;
         const finalList: Subscription[] = [];
         for (let sub of list) {
@@ -115,7 +119,7 @@ export default function SelectiveBaremaAnalysisList(props: Props) {
                                             <td>{sub.name}</td>
                                             <td>{sub.age}</td>
                                             <td>{sub['formatedDate']}</td>
-                                            <td>{sub.reservedPlace}</td>
+                                            <td>{reservedPlacesMap[sub.reservedPlace] || "Ampla Concorrência"}</td>
                                             <td>
                                                 {sub['baremaChecked'] ?
                                                 <><FontAwesomeIcon icon={faCheck} className="sm-icon me-1" /> Finalizada</> : 

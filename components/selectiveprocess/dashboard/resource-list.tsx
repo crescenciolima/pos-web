@@ -16,6 +16,8 @@ interface Props {
     process: SelectiveProcess;
     currentStep: ProcessStep;
     subscriptionList: Subscription[];
+    reservedPlacesMap: any;
+
 }
 
 export default function SelectiveProcessResourceList(props: Props) {
