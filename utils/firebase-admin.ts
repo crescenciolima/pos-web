@@ -1,9 +1,9 @@
 import * as admin from 'firebase-admin';
-var serviceAccount = require("../firebase/credentials-firebase-adminsdk.json");
+import FirebaseAdminSdkCredentials from '../firebase/credentials-firebase-adminsdk';
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert(JSON.parse(JSON.stringify(FirebaseAdminSdkCredentials))),
     databaseURL: `https://${process.env.FB_PROJECT_ID}.firebaseio.com`,
   });
 }
