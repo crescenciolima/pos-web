@@ -43,7 +43,6 @@ export default function SelectiveBaremaAnalysis(props: Props) {
 
 
     useEffect(() => {
-        console.log(props.process)
         const process = props.process;
         const sub = props.subscription;
         let analysisCategoryList: AnalysisCategory[] = [];

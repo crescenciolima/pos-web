@@ -33,7 +33,6 @@ export default function CourseLayout({course}: CourseProps, props: InferGetServe
       const result = await api.post(APIRoutes.COURSE, values);
 
       setReload(!reload);
-      console.log(result)
     } catch (error) {
       console.error(error);
     }

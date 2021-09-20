@@ -59,7 +59,6 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         
                 res.status(200).json(response);
             }catch(e){
-                console.log(e);
                 return res.status(400).json(treatError.general("Erro ao salvar usuário"));
             }
 

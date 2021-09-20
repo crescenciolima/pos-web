@@ -40,7 +40,6 @@ export default function SelectiveProcessResourceList(props: Props) {
         let checked = true;
 
         for (let sub of list) {
-            console.log(sub)
             if (sub.resources?.length > 0) {
                 for (let resource of sub.resources) {
                     if (resource.step == props.currentStep.type || 

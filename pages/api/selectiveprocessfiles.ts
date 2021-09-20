@@ -44,7 +44,6 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
 
         let process = await selectiveProcessService.getById(id);
-        console.log(process)
         let updateProcess: SelectiveProcess = {
           id: id,
           title: process.title,
@@ -129,7 +128,6 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
 
     default:
-      console.log(req.method)
       res.status(405);
       break;
   }

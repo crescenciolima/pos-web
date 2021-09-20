@@ -83,7 +83,6 @@ export const getStaticProps: GetStaticProps = async () => {
 
   const docenteList = await teacherService.getAll();
 
-  console.log(docenteList)
 
   return {
     props: {

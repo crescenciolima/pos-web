@@ -129,12 +129,10 @@ export const getStaticProps: GetStaticProps = async () => {
     const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
     news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
-  console.log('newsList',newsList)
 
   const courseService = CourseService();
   
   let courseData = await courseService.getFirstCourse();
-  console.log('courseData',courseData)
 
   //mockup de dados quando não houver cadastro do curso 
   //TODO melhor retornar um componente vazio e não renderizar a seção "Sobre"?

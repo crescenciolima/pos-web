@@ -41,7 +41,6 @@ export default function SelectiveProcessLayout() {
         } else {
           setHasProcess(false);
         }
-        console.log(result)
       }
     )
 
@@ -54,7 +53,6 @@ export default function SelectiveProcessLayout() {
       state: ProcessStepsState.IN_CONSTRUCTION,
       creationDate: fire.firestore.Timestamp.now().seconds
     }
-    console.log(process)
     api.post(APIRoutes.SELECTIVE_PROCESS, process).then(
       (result: APIResponse) => {
         if (result.result) {

@@ -68,7 +68,6 @@ export default function Admin() {
         } else {
           setOpen(false);
         }
-        console.log(result)
       }
     )
 
