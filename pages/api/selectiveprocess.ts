@@ -98,7 +98,6 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
       break;
 
     default:
-      console.log(req.method)
       res.status(405);
       break;
   }

@@ -33,7 +33,6 @@ export default function SelectiveProcessBarema(props: Props) {
     }, []);
 
     const onSubmit = async (values, actions) => {
-        console.log("aqui")
         let totalPoints = 0;
         //Validating
         for (let category of baremaCategories) {

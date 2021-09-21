@@ -163,6 +163,7 @@ export default function SelectiveProcessSteps(props: Props) {
                                                             name={`steps.${index}.passingScore`}
                                                             id={'passingScore' + index}
                                                             placeholder="De 0 a 100"
+                                                            readOnly={!(step.type == ProcessStepsTypes.AVALIACAO_CURRICULAR || step.type == ProcessStepsTypes.ENTREVISTA || step.type == ProcessStepsTypes.PROVA)}
                                                             value={step.passingScore}
                                                             maxLength={3}
                                                             onChange={handleChange} />
@@ -175,16 +176,17 @@ export default function SelectiveProcessSteps(props: Props) {
                                                             id={'weight' + index}
                                                             placeholder="Peso"
                                                             value={step.weight}
+                                                            readOnly={!(step.type == ProcessStepsTypes.AVALIACAO_CURRICULAR || step.type == ProcessStepsTypes.ENTREVISTA || step.type == ProcessStepsTypes.PROVA)}
                                                             maxLength={3}
                                                             onChange={handleChange} />
                                                         <ErrorMessage name={`steps.${index}.weight`} className="input-error" />
 
                                                     </td>
                                                     <td>
-                                                        {index > 0 ? <button type="button"  className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index - 1)} >
+                                                        {index > 0 ? <button type="button" className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index - 1)} >
                                                             <FontAwesomeIcon icon={faArrowUp} className="sm-icon" />
                                                         </button> : null}
-                                                        {index < (values.steps.length - 1) ? <button type="button"  className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index + 1)} >
+                                                        {index < (values.steps.length - 1) ? <button type="button" className="btn btn-sm btn-link me-1" onClick={(e) => arrayHelpers.swap(index, index + 1)} >
                                                             <FontAwesomeIcon icon={faArrowDown} className="sm-icon" />
                                                         </button> : null}
                                                         <button type="button" className="btn btn-sm btn-link text-danger" onClick={(e) => arrayHelpers.remove(index)} >

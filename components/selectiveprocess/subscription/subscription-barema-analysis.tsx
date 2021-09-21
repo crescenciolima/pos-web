@@ -18,11 +18,11 @@ interface Props {
     process: SelectiveProcess;
 }
 
-interface AnalysisCategory {
+export interface AnalysisCategory {
     name: string;
     categories: AnalysisSubCategory[];
 }
-interface AnalysisSubCategory {
+export interface AnalysisSubCategory {
     name: string;
     files: SubscriptionFile[];
 }
@@ -34,13 +34,15 @@ export default function SelectiveBaremaAnalysis(props: Props) {
     const [baremaList, setBaremaList] = useState<AnalysisCategory[]>([]);
     const [isLoading, setLoading] = useState<boolean>(true);
     const [selectedFile, setSelectedFile] = useState<SubscriptionFile>();
+    const [selectedCategory, setSelectedCategory] = useState<number>(0);
+    const [selectedSubCategory, setSelectedSubCategory] = useState<number>(0);
+
     const [modalOpen, setModalOpen] = useState<boolean>(false);
 
     const api = API(setLoading);
 
 
     useEffect(() => {
-        console.log(props.process)
         const process = props.process;
         const sub = props.subscription;
         let analysisCategoryList: AnalysisCategory[] = [];
@@ -101,36 +103,34 @@ export default function SelectiveBaremaAnalysis(props: Props) {
         setBaremaList(newBaremaList);
     }
 
-    const handleObservationChange = (fileIndex, subCatIndex, catIndex, evt) => {
-        const newBaremaList = baremaList.map((cat, i) => {
-            if (catIndex !== i) return cat;
-            let subCategory = cat.categories[subCatIndex];
-            let file = subCategory.files[fileIndex];
-            file.observation = evt.target.value;
-            return cat;
-        });
-
-        setBaremaList(newBaremaList);
-    }
-
     const saveBaremaChanges = async () => {
         const response: APIResponse = await api.post(APIRoutes.SELECTIVE_PROCESS_SUBSCRIPTION, subscription);
         const sub: Subscription = response.result;
         setSubscription(sub);
     }
 
-    const onCloseModal = async () => {
+    const onCloseModal = async (selectedFile: SubscriptionFile) => {
+        const newBaremaList = baremaList.map((cat, i) => {
+            if (selectedCategory !== i) return cat;
+            let subCategory = cat.categories[selectedSubCategory];
+            let file = subCategory.files.find( f => f.uuid == selectedFile.uuid);
+            file.status = selectedFile.status;
+            file.observation = selectedFile.observation;
+            return cat;
+        });
+
+        setBaremaList(newBaremaList);
         setModalOpen(false);
     }
 
-    const onFileClick = (file: SubscriptionFile) => {
+    const onFileClick = (file: SubscriptionFile, categoryIndex:number, subCategoryIndex:number) => {
         setSelectedFile(file);
+        setSelectedCategory(categoryIndex);
+        setSelectedSubCategory(subCategoryIndex);
+        setModalOpen(true);
+
     }
 
-    useEffect(() => {
-        if (selectedFile)
-            setModalOpen(true);
-    }, [selectedFile]);
 
 
     return (
@@ -167,28 +167,12 @@ export default function SelectiveBaremaAnalysis(props: Props) {
                                                                 <tbody>
                                                                     {subCategory.files.map((file, fileIndex) => {
                                                                         return (
-                                                                            <tr key={fileIndex} onClick={(e) => onFileClick(file)}>
+                                                                            <tr key={fileIndex} onClick={(e) => onFileClick(file, catIndex, subIndex)}>
                                                                                 <td>
-                                                                                    <a target="blank" href={file.url} className="link-primary">
-                                                                                        <b><FontAwesomeIcon icon={faFile} className="sm-icon mx-1" />Link do Arquivo</b>
-                                                                                    </a>
+                                                                                    Arquivo nº {fileIndex + 1}
                                                                                 </td>
-                                                                                <td>
-                                                                                    <select
-                                                                                        className="form-select form-select-sm"
-                                                                                        name="type"
-                                                                                        value={file.status}
-                                                                                        onChange={(e) => { handleStatusChange(fileIndex, subIndex, catIndex, e) }} >
-                                                                                        <option>{SubscriptionStatus.DEFERIDA}</option>
-                                                                                        <option>{SubscriptionStatus.INDEFERIDA}</option>
-                                                                                        <option>{SubscriptionStatus.AGUARDANDO_ANALISE}</option>
-
-                                                                                    </select>
-                                                                                </td>
-                                                                                <td>
-                                                                                    <input type="text" id={"obs" + catIndex + "" + fileIndex} className="form-control form-control-sm"
-                                                                                        value={file.observation} onChange={(e) => { handleObservationChange(fileIndex, subIndex, catIndex, e) }}></input>
-                                                                                </td>
+                                                                                <td> {file.status}  </td>
+                                                                                <td>  {file.observation || "-"}  </td>
                                                                             </tr>
                                                                         )
                                                                     })}
@@ -214,7 +198,7 @@ export default function SelectiveBaremaAnalysis(props: Props) {
                 </div>
             </div>
 
-            <BaremaModal open={modalOpen} file={selectedFile} onClose={onCloseModal} ></BaremaModal>
+            <BaremaModal open={modalOpen} file={selectedFile} onClose={onCloseModal} subCategory={baremaList[selectedCategory]?.categories[selectedSubCategory]} category={baremaList[selectedCategory]}></BaremaModal>
         </>
     );
 }

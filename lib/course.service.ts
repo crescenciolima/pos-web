@@ -67,7 +67,6 @@ export default function CourseService() {
 
         //pior caso, retorna nada para uma collection vazia
         if (snapshot.empty){
-            console.log("No course information found.")
             return null
         }
         //melhor caso, se nao está vazia recupera o primeiro doc da collection
@@ -85,7 +84,6 @@ export default function CourseService() {
             coordPhone: coordPhone
         }
 
-        //console.log("Value: %j",snapshot)
 
         return course;
     }

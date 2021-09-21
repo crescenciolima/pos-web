@@ -13,14 +13,17 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 import { group } from 'console';
+import PDFDownload from '../pdfs/pdf-final-result';
+import PDFFinalResult from '../pdfs/pdf-final-result';
 
 interface Props {
     process: SelectiveProcess;
     currentStep: ProcessStep;
     subscriptionList: Subscription[];
+    reservedPlacesMap: any;
 }
 
-interface FinalListGroup {
+export interface FinalListGroup {
     name: string;
     numberPlaces: number;
     uuid: string;
@@ -36,6 +39,7 @@ export default function SelectiveProcessFinalResult(props: Props) {
     const [interview, setInterview] = useState<ProcessStep>();
     const [test, setTest] = useState<ProcessStep>();
     const [barema, setBarema] = useState<ProcessStep>();
+    const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
 
     const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0, passingScore: 0, weight: 0, order: 0 });
 
@@ -52,7 +56,7 @@ export default function SelectiveProcessFinalResult(props: Props) {
         setTest(process.steps.find(step => step.type == ProcessStepsTypes.PROVA));
         setInterview(process.steps.find(step => step.type == ProcessStepsTypes.ENTREVISTA));
         setBarema(process.steps.find(step => step.type == ProcessStepsTypes.AVALIACAO_CURRICULAR));
-
+        setSelectiveProcess(process)
 
         //Filtrando a lista com somente quem não foi eliminado
         for (let sub of list) {
@@ -105,7 +109,6 @@ export default function SelectiveProcessFinalResult(props: Props) {
 
         setGroupList(groupList);
 
-        console.log(groupList)
 
 
     }, []);
@@ -118,6 +121,9 @@ export default function SelectiveProcessFinalResult(props: Props) {
             <div className="row">
                 <div className="col-6">
                     <h5 className="text-primary-dark">Classificação Final</h5>
+                </div>
+                <div className="col-6 text-right">
+                    <PDFFinalResult process={selectiveProcess} currentStep={currentStep} groupList={groupList} interview={interview} barema={barema} test={test}></PDFFinalResult>
                 </div>
             </div>
             {groupList.map((group, indexGroup) => {
@@ -168,7 +174,7 @@ export default function SelectiveProcessFinalResult(props: Props) {
                 )
             })}
 
-
+           
         </>
     );
 }

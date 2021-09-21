@@ -36,7 +36,6 @@ export default function SelectiveProcessDocuments(props: Props) {
     }, []);
 
     const onSubmit = async (values, actions) => {
-        console.log("aqui", values)
         try {
             actions.setSubmitting(true);
 
