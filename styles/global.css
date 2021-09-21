@@ -237,16 +237,18 @@ fieldset {
     border-left-width: .25rem !important;
     border-radius: .30rem !important;
     border-left-color: var(--color-primary-dark) !important;
-  }
+}
   
-  legend {
+legend {
     font-size: 1.15rem !important;
     font-weight: bold !important;
     color: var(--color-primary-dark)
-  }
+}
 
-  .text-bold{
+.text-bold{
     font-weight: bold !important;
-  }
+}
 
-  
+label>span {
+    color: red!important;
+}
