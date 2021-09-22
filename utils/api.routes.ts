@@ -28,7 +28,11 @@ export class APIRoutes {
 
     static SUBSCRIPTION:string = APIRoutes.API_URL + "/api/subscription"
     
+    static FILE_BAREMA_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-barema-subscription"
+
     static FILE_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-subscription"
+
+    static CURRENT_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/current-subscription"
 
     static SELECTIVE_PROCESS:string = APIRoutes.API_URL + "/api/selectiveprocess"
 

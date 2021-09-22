@@ -31,6 +31,7 @@ export default function API(setLoading?: Function) {
             });
 
             const result: APIResponse = await res.json();
+            console.error(result);
 
             toast.notify(result.msg, {
                 duration: 3,
@@ -41,7 +42,7 @@ export default function API(setLoading?: Function) {
             return result;
 
         } catch (error) {
-            console.error(error);
+            console.log(error);
         }
 
     }
