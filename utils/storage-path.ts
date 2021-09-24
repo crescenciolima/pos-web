@@ -5,5 +5,6 @@ export class StoragePaths {
     static NEWS_COVER: string = "news/cover/";
     static SELECTIVE_PROCESS: string = "selectiveprocess/docs/";
     static SUBSCRIPTION: string = "subscription/";
+    static RESOURCE: string = "resource/";
 
 }
