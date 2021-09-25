@@ -90,7 +90,7 @@ export interface SubscriptionResource {
     step: ProcessStepsTypes;
     status: SubscriptionStatus;
     statusObservation?: string;
-    files: string[];
+    files?: string[];
     
     //Only for UI
     formatedDate?: string;

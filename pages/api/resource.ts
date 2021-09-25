@@ -37,21 +37,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       try{
         await multerAny(req, res);
 
-        const { subscriptionID, justification, step } = req.body;
-  
-        if(!req.files?.length){                
-          return res.status(400).json(await treatError.general("Arquivo não encontrado."));
-        }
-        
-        const uploadService = FileUploadService();
-        const urls = [];      
-
-        for (let i = 0; i < req.files.length; i++){
-          const blob: BlobCorrected = req.files[i];
-          const path = `${StoragePaths.SUBSCRIPTION}${subscriptionID}/${StoragePaths.RESOURCE}`;
-          const url = await uploadService.upload(path, blob, uuidv4());
-          urls.push(url);
-        }
+        const { subscriptionID, justification, step } = req.body;        
 
         const subscription = await subscriptionService.getById(subscriptionID);
         const selectiveProcess = await selectiveProcessService.getById(subscription.selectiveProcessID)
@@ -62,11 +48,31 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           justification,
           date: fire.firestore.Timestamp.now().seconds,
           status: SubscriptionStatus.AGUARDANDO_ANALISE,
-          files: urls,
           step: currentStep.type
         }
 
-        subscription.resources.push(resource);
+        if(req.files?.length > 0){                        
+          const uploadService = FileUploadService();
+          const urls = [];      
+  
+          for (let i = 0; i < req.files.length; i++){
+            const blob: BlobCorrected = req.files[i];
+            const path = `${StoragePaths.SUBSCRIPTION}${subscriptionID}/${StoragePaths.RESOURCE}`;
+            const url = await uploadService.upload(path, blob, uuidv4());
+            urls.push(url);
+          }  
+
+          resource.files = urls;
+        }
+
+        if(subscription.resources){
+          subscription.resources.push(resource);
+        }else{          
+          subscription.resources = [resource];
+        }
+
+        
+        await subscriptionService.update(subscription); 
   
         let response: APIResponse = {
           msg: "Recurso salvo com sucesso!",

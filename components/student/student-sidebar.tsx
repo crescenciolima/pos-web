@@ -28,6 +28,14 @@ export default function StudentSidebar() {
                             <label className={adminStyle.sidebarLabel}>Inscrição</label>
                         </a>
                     </li>
+                    <li>
+                        <a href="/student/resource" className="nav-link text-primary">
+                            <i className={adminStyle.icon}>
+                                <FontAwesomeIcon icon={faBookReader} className="sm-icon" />
+                            </i>
+                            <label className={adminStyle.sidebarLabel}>Recurso</label>
+                        </a>
+                    </li>
                 </ul>
             </div>
         </nav>

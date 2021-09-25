@@ -135,7 +135,7 @@ export default function SubscriptionService() {
             interviewGrade: validateField(doc['interviewGrade']),
             statusObservation: validateField(doc['statusObservation']),
             observation: validateField(doc['observation']),
-            resources: validateField(doc['resources']),
+            resources: validateField(doc['resources'], 'array'),
 
             age: validateField(doc['age']),
 
@@ -143,8 +143,8 @@ export default function SubscriptionService() {
 
         return sub;
     }
-    function validateField(field) {
-        return field ? field : '';
+    function validateField(field, defaultValue = 'string') {
+        return field ? field : (defaultValue === 'string' ? '' : []);
     }
 
     return {
