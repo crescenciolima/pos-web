@@ -8,9 +8,8 @@ import MaskedInput from 'react-input-mask';
 import DatePicker, { registerLocale, setDefaultLocale }  from "react-datepicker";
 import ptBR from 'date-fns/locale/pt-BR';
 import "react-datepicker/dist/react-datepicker.css";
-import fire from '../../../utils/firebase-util';
 import style from '../../../styles/subscription.module.css';
-import { Subscription, SubscriptionFile } from "../../../models/subscription";
+import { Subscription, SubscriptionFile, SubscriptionTypeFile } from "../../../models/subscription";
 import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
@@ -20,6 +19,8 @@ import { APIResponse } from '../../../models/api-response';
 import { BaremaCategory, BaremaSubCategory, SelectiveProcess } from '../../../models/selective-process';
 import { MaskHelper } from '../../../helpers/mask-helper';
 import { useRouter } from 'next/router';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFile } from '@fortawesome/free-solid-svg-icons';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -27,18 +28,21 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [reload, setReload] = useState(true);
     const api = API();
     const [subscription, setSubscription] = useState<Subscription>();
+    const [currentSubscription, setCurrentSubscription] = useState<Subscription>();
     const [currentStage, setCurrentStage] = useState(1);
     const [stageOneValues, setStageOneValues] = useState(null);
     const [stageTwoValues, setStageTwoValues] = useState(null);
     const [stageThreeValues, setStageThreeValues] = useState(null);
     const [stageFourValues, setStageFourValues] = useState(null);
     const [stageFiveValues, setStageFiveValues] = useState(null);
-    const [stageSixValues, setStageSixValues] = useState(null);
     const [inConstruction, setInConstruction] = useState<boolean>(null);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
     const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>([]);
     const [baremaCategories, setBaremaCategories] = useState<any>(null);
-    const [files, setFiles] = useState<FileList>();
+    const [documentFile, setDocumentFile] = useState<FileList>();
+    const [graduationProofFile, setGraduationProofFile] = useState<FileList>();
+    const [invalidDocumentFile, setInvalidDocumentFile] = useState<any>(false);
+    const [invalidGraduationProofFile, setInvalidGraduationProofFile] = useState<any>(false);
     const router = useRouter();
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
@@ -60,18 +64,17 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 setSubscription(result.result)
                 return result.result;
             }
-
             //setReload(!reload);
         } catch (error) {
             console.error(error);
         }
     };
 
-    const saveFileSubscription = async (values) => {
+    const saveFileSubscription = async (values, files, type) => {
         console.log(values);
         try {
-            const _values = {subcategoryID: values.subcategoryID, subscriptionID: values.subscriptionID};
-            const result = await api.postFile(APIRoutes.FILE_SUBSCRIPTION, _values, values.files);
+            const route = type === SubscriptionTypeFile.BAREMA ? APIRoutes.FILE_BAREMA_SUBSCRIPTION : APIRoutes.FILE_SUBSCRIPTION;
+            const result = await api.postFile(route, values, files);
             console.log(result);
         } catch (error) {
             console.error(error);
@@ -116,10 +119,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         const subCategoriesFile = subCategoriesFiles.find((subcategory) => subcategory.uuid == subcategoryUuid);
         if(subCategoriesFile){
             const file = subCategoriesFile.files.find((file) => file.position === position);
-            return file ? file.file[0]?.name : <></>;
+            return file ? file.file[0]?.name : 'Nenhum arquivo selecionado';
         }
 
-        return <></>;
+        return 'Nenhum arquivo selecionado';
     }
 
     const removeFile = async (subcategoryUuid, position) => {
@@ -181,7 +184,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             disabilityType: stageFourValues.disabilityType,
             specialTreatmentTypes: stageFourValues.specialTreatmentTypes,
             reservedPlace: stageFourValues.reservedPlace !== 'ampla_concorrencia' ? stageFourValues.reservedPlace : null,  
-            selectiveProcessID: selectiveProcess.id,
+            selectiveProcessID: currentSubscription ? currentSubscription.selectiveProcessID : selectiveProcess.id,
 
             subscriptionDate: Date.now()
         }
@@ -189,25 +192,70 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         return subscription;
     }
 
-    const buildFiles = async (subscriptionId) => {
+    const buildArrayFiles = async (files) => {
+        const arrayFiles = [];
+        for (let j = 0; j < files.length; j++){
+            const file = files[j];
+            arrayFiles.push(file.file[0])
+        }
+        return arrayFiles;
+    }
+
+    const processDocumentFiles = async (subscriptionId) => {
+        console.log(documentFile);
+
+        const arrayFiles = [documentFile[0]];
+
+        const values = {type: SubscriptionTypeFile.DOCUMENT, subscriptionID: subscriptionId};
+
+        console.log(values);
+
+        await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.DOCUMENT);
+    }
+
+    const processGraduationFiles = async (subscriptionId) => {
+        console.log(graduationProofFile);
+
+        const arrayFiles = [graduationProofFile[0]];
+        const values = {type: SubscriptionTypeFile.GRADUATION, subscriptionID: subscriptionId};
+
+        console.log(values);
+
+        await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.GRADUATION);
+    }
+
+    const processFiles = async (subscriptionId) => {
         console.log(subCategoriesFiles);
         const arraySubcategories = []
 
         for (let i = 0; i < subCategoriesFiles.length; i++){
             const subcategoryFile = subCategoriesFiles[i];
-            const files = subcategoryFile.files;
-            const arrayFiles = [];
-            for (let j = 0; j < files.length; j++){
-                const file = files[j];
-                arrayFiles.push(file.file[0])
-            }
+            const files = subcategoryFile.files;            
+            const arrayFiles = await buildArrayFiles(files);
             arraySubcategories.push({subcategoryID: subcategoryFile.uuid, subscriptionID: subscriptionId, files: arrayFiles})
         }
 
         console.log(arraySubcategories);
 
         for (let i = 0; i < arraySubcategories.length; i++){
-            await saveFileSubscription(arraySubcategories[i]);
+            await saveFileSubscription({subcategoryID: arraySubcategories[i].subcategoryID, subscriptionID: arraySubcategories[i].subscriptionID}, arraySubcategories[i].files, SubscriptionTypeFile.BAREMA);
+        }
+    }
+
+    const processSubscription = async (values) => {
+        try {
+            setCurrentStage(currentStage + 1);    
+            console.log(values);
+            setStageFiveValues(values);
+            const subscription: Subscription = await buildForm(values);
+            const result = await saveSubscription(subscription);
+            await processFiles(result.id);
+            await processDocumentFiles(result.id);
+            await processGraduationFiles(result.id);   
+            setCurrentStage(currentStage + 2);    
+            //router.push("/student");
+        } catch (e) {
+            setCurrentStage(5);     
         }
     }
     
@@ -224,16 +272,15 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }else if(currentStage === 4){
             setStageFourValues(values);
             setCurrentStage(currentStage + 1);
-        }else if(currentStage === 5){            
-            console.log(values);
-            setStageFiveValues(values);
-            const subscription: Subscription = await buildForm(values);
-            const result = await saveSubscription(subscription);
-            await buildFiles(result.id);
-            //setCurrentStage(currentStage + 1);*/            
-            router.push("/student");
+        }else if(currentStage === 5){   
+            console.log(values, !documentFile, !graduationProofFile);
+            setInvalidDocumentFile(!documentFile)
+            setInvalidGraduationProofFile(!graduationProofFile)
+            if(!documentFile || !graduationProofFile) {
+                return;
+            }
+            await processSubscription(values);
         }
-        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     const back = async (values:any) => {    
@@ -251,14 +298,108 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }
         window.scrollTo({top: 0, behavior: 'smooth'});
     }
+
+    const generateForm = () => {
+        const values = {};
+        baremaCategories?.forEach((baremaCategory, index) => {                                          
+            baremaCategory.subcategories.forEach((subcategory, index) => {
+                values[subcategory.uuid] = [''];
+            })
+        })
+        console.log(values);
+        return values;
+    }
+
+    const getTitle = () => {
+        switch (currentStage) {
+            case 1:
+                return 'Dados Pessoais';
+            case 2:
+                return 'Dados Acadêmicos';
+            case 3:
+                return 'Dados Profissionais';
+            case 4:
+                return 'Vagas';
+            case 5:
+                return 'Arquivos';
+        }
+    }
+
+    const loadForm = async (subscriptionData) => {   
+        const stageOneData = {    
+            name: subscriptionData.name,
+            document: subscriptionData.document,
+            identityDocument: subscriptionData.identityDocument,
+            issuingAgency: subscriptionData.issuingAgency,
+            issuanceDate: new Date(subscriptionData.issuanceDate),
+            birthdate: new Date(subscriptionData.birthdate),
+            postalCode: subscriptionData.postalCode,
+            street: subscriptionData.street,
+            houseNumber: subscriptionData.houseNumber,
+            complement: subscriptionData.complement,
+            district: subscriptionData.district,
+            city: subscriptionData.city,
+            state: subscriptionData.state,
+            phoneNumber: subscriptionData.phoneNumber,
+            alternativePhoneNumber: subscriptionData.alternativePhoneNumber,
+        }
+
+        const stageTwoData = { 
+            graduation: subscriptionData.graduation,
+            graduationInstitution: subscriptionData.graduationInstitution,
+            postgraduateLatoSensu: subscriptionData.postgraduateLatoSensu,
+            postgraduateLatoSensuInstitution: subscriptionData.postgraduateLatoSensuInstitution,
+            postgraduateStrictoSensu: subscriptionData.postgraduateStrictoSensu,
+            postgraduateStrictoSensuInstitution: subscriptionData.postgraduateStrictoSensuInstitution,
+        }
+
+        const stageThreeData = {         
+            profession: subscriptionData.profession,
+            company: subscriptionData.company,
+            postalCodeCompany: subscriptionData.postalCodeCompany,
+            streetCompany: subscriptionData.streetCompany,
+            houseNumberCompany: subscriptionData.houseNumberCompany,
+            complementCompany: subscriptionData.complementCompany,
+            districtCompany: subscriptionData.districtCompany,
+            cityCompany: subscriptionData.cityCompany,
+            stateCompany: subscriptionData.stateCompany,
+            phoneNumberCompany: subscriptionData.phoneNumberCompany,
+            workShift: subscriptionData.workShift,
+            workRegime: subscriptionData.workRegime,
+        }
+
+        const stageFourData = { 
+            disability: subscriptionData.disability,
+            disabilityType: subscriptionData.disabilityType,
+            specialTreatmentTypes: subscriptionData.specialTreatmentTypes,
+            reservedPlace: !!subscriptionData.reservedPlace ? subscriptionData.reservedPlace : 'ampla_concorrencia',  
+            subscriptionDate: new Date(subscriptionData.subscriptionDate),
+        }
+
+        setStageOneValues(stageOneData);
+        setStageTwoValues(stageTwoData);
+        setStageThreeValues(stageThreeData);
+        setStageFourValues(stageFourData);
+    }
     
-    useEffect(() => {
-        api.get(APIRoutes.SELECTIVE_PROCESS, { 'inconstruction': "true" }).then(
-          (result: APIResponse) => {
-            if (result.result) {
+    const getSubcategoryName = (id) => {
+        const categories = selectiveProcess.baremaCategories;
+        for(let category of categories){
+            for(let subcategory of category.subcategories){
+                if(subcategory.uuid === id){
+                    return subcategory.name;  
+                }          
+            } 
+        }
+    }
+
+    useEffect(() => {   
+        const loadData = async () => {
+            const resultProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'inconstruction': "true" });
+            if (resultProcess.result) {
                 setInConstruction(true);
-                setSelectiveProcess(result.result);
-                let cloneCategories = JSON.parse(JSON.stringify(result.result.baremaCategories))
+                setSelectiveProcess(resultProcess.result);
+                let cloneCategories = JSON.parse(JSON.stringify(resultProcess.result.baremaCategories))
                 cloneCategories.map((baremaCategory) => (
                     baremaCategory.subcategories.map((subcategory) => {
                         subcategory.files = [{position: 1, file: ''}]
@@ -266,13 +407,17 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 ))
                 setBaremaCategories(cloneCategories);
             } else {
-              setInConstruction(false);
+                setInConstruction(false);
+            }
+
+            const resultSubscription: APIResponse = await api.get(APIRoutes.CURRENT_SUBSCRIPTION);
+            if (resultSubscription.result) {
+                setCurrentSubscription(resultSubscription.result);
+                await loadForm(resultSubscription.result);
             }
             setLoading(false);
-            console.log(result)
-          }
-        )
-    
+        };      
+        loadData();
     }, []);
    
     const override = css`  
@@ -300,301 +445,331 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         );
     }
 
-    const generateForm = () => {
-        const values = {};
-        baremaCategories?.forEach((baremaCategory, index) => {                                          
-            baremaCategory.subcategories.forEach((subcategory, index) => {
-                values[subcategory.uuid] = [''];
-            })
-        })
-        console.log(values);
-        return values;
-    }
+    /*if(currentSubscription){        
+        return (
+            <StudentBase>
+                <div>
+                    <p>Incrição já realizada.</p>
+                </div>
+            </StudentBase>
+        );
+    }*/
 
     return (    
         <StudentBase>
+            {[1, 2, 3, 4, 5].includes(currentStage) &&
+                <div className="row">   
+                    <div className={`${style.title} col-6`}>       
+                        {getTitle()}
+                    </div>
+                    <div className={`${style.steps} col-6`}>
+                        <span className={`${style.step} ${currentStage === 1 ? style.stepActive : ''} ${currentStage > 1 ? style.stepFinish : ''}`}></span>
+                        <span className={`${style.step} ${currentStage === 2 ? style.stepActive : ''} ${currentStage > 2 ? style.stepFinish : ''}`}></span>
+                        <span className={`${style.step} ${currentStage === 3 ? style.stepActive : ''} ${currentStage > 3 ? style.stepFinish : ''}`}></span>
+                        <span className={`${style.step} ${currentStage === 4 ? style.stepActive : ''} ${currentStage > 4 ? style.stepFinish : ''}`}></span>
+                        <span className={`${style.step} ${currentStage === 5 ? style.stepActive : ''} ${currentStage > 5 ? style.stepFinish : ''}`}></span>
+                    </div>
+                </div>
+            }
             {currentStage === 1 && 
-                <Formik
-                    enableReinitialize
-                    initialValues={
-                        stageOneValues ? stageOneValues : {
-                            name: '',
-                            birthdate: new Date(),
-                            postalCode: '',
-                            street: '',
-                            houseNumber: '',
-                            complement: '',
-                            district: '',
-                            city: '',
-                            state: '',
-                            alternativePhoneNumber: '',
-                            phoneNumber: '',
-                            document: '',
-                            identityDocument: '',
-                            issuingAgency: '',
-                            issuanceDate: new Date(),
+                <>
+                    <Formik
+                        enableReinitialize
+                        initialValues={
+                            stageOneValues ? stageOneValues : {
+                                name: '',
+                                birthdate: new Date(),
+                                postalCode: '',
+                                street: '',
+                                houseNumber: '',
+                                complement: '',
+                                district: '',
+                                city: '',
+                                state: '',
+                                alternativePhoneNumber: '',
+                                phoneNumber: '',
+                                document: '',
+                                identityDocument: '',
+                                issuingAgency: '',
+                                issuanceDate: new Date(),
+                            }
                         }
-                    }
-                    validationSchema={Yup.object().shape({
-                        name: Yup.string().required('Preencha este campo.'),
-                        birthdate: Yup.date().required('Preencha este campo.').nullable(),
-                        postalCode: Yup.string().required('Preencha este campo.'),
-                        street: Yup.string().required('Preencha este campo.'),
-                        houseNumber: Yup.string().required('Preencha este campo.'),
-                        district: Yup.string().required('Preencha este campo.'),
-                        city: Yup.string().required('Preencha este campo.'),
-                        state: Yup.string().required('Preencha este campo.'),
-                        phoneNumber: Yup.string().required('Preencha este campo.'),
-                        document: Yup.string().required('Preencha este campo.'),
-                        identityDocument: Yup.string().required('Preencha este campo.'),
-                        issuingAgency: Yup.string().required('Preencha este campo.'),
-                        issuanceDate: Yup.date().required('Preencha este campo.').nullable(),
-                    })}
-                    onSubmit={handleSubmit}>
-                    {(actions) => (
-                    <Form>
-                        <div className="row mt-5 justify-content-center">
-                            <div className="col-6">
-                                <div className="mb-3">
-                                    <label htmlFor="name" className="form-label">Nome</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="name" 
-                                        id="name" 
-                                        value={actions.values.name}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="name" className="input-error" /></p>
+                        validationSchema={Yup.object().shape({
+                            name: Yup.string().required('Preencha este campo.'),
+                            birthdate: Yup.date().required('Preencha este campo.').nullable(),
+                            postalCode: Yup.string().required('Preencha este campo.'),
+                            street: Yup.string().required('Preencha este campo.'),
+                            houseNumber: Yup.string().required('Preencha este campo.'),
+                            district: Yup.string().required('Preencha este campo.'),
+                            city: Yup.string().required('Preencha este campo.'),
+                            state: Yup.string().required('Preencha este campo.'),
+                            phoneNumber: Yup.string().required('Preencha este campo.'),
+                            document: Yup.string().required('Preencha este campo.'),
+                            identityDocument: Yup.string().required('Preencha este campo.'),
+                            issuingAgency: Yup.string().required('Preencha este campo.'),
+                            issuanceDate: Yup.date().required('Preencha este campo.').nullable(),
+                        })}
+                        onSubmit={handleSubmit}>
+                        {(actions) => (
+                        <Form>
+                            <div className="row mt-5 justify-content-center">
+                                <div className="col-6">
+                                    <div className="mb-3">
+                                        <label htmlFor="name" className="form-label">Nome<span>*</span></label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="name" 
+                                            id="name" 
+                                            value={actions.values.name}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="name" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-3">
+                                    <div className="mb-3">
+                                        <label htmlFor="birthdate" className="form-label">Data de Nascimento<span>*</span></label>                 
+                                        <DatePicker 
+                                            locale="pt-BR" 
+                                            selected={actions.values.birthdate} 
+                                            dateFormat="dd/MM/yyyy" 
+                                            onChange={(date) => { actions.setFieldValue('birthdate', date); }} 
+                                            className="form-control" 
+                                            customInput={
+                                                <MaskedInput maskChar="" mask="99/99/9999"/>
+                                            }
+                                            disabled={!!currentSubscription}
+                                        />                                        
+                                        <p className="input-error"><ErrorMessage name="birthdate" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-3">
+                                    <div className="mb-3">
+                                        <label htmlFor="document" className="form-label">CPF<span>*</span></label>
+                                        <Field 
+                                            name="document"
+                                            value={actions.values.document}                
+                                            onChange={actions.handleChange} >
+                                                {({field}) => {
+                                                    return (
+                                                    <MaskedInput
+                                                        {...field}        
+                                                        disabled={!!currentSubscription}                             
+                                                        className="form-control"
+                                                        maskChar=""
+                                                        mask={MaskHelper.makeMask(field.value, '', 'cpf')}
+                                                    />
+                                                    );
+                                                }}
+                                        </Field>               
+                                        <p className="input-error"><ErrorMessage name="document" className="input-error" /></p>
+                                    </div>                
+                                </div> 
+                                <div className="col-3">
+                                    <div className="mb-3">
+                                        <label htmlFor="identityDocument" className="form-label">Documento de Identidade<span>*</span></label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="identityDocument" 
+                                            id="identityDocument" 
+                                            value={actions.values.identityDocument}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="identityDocument" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-2">
+                                    <div className="mb-3">
+                                        <label htmlFor="issuingAgency" className="form-label">Órgão Expedidor<span>*</span></label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="issuingAgency" 
+                                            id="issuingAgency" 
+                                            value={actions.values.issuingAgency}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="issuingAgency" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-3">
+                                    <div className="mb-3">
+                                        <label htmlFor="issuanceDate" className="form-label">Data de Expedição<span>*</span></label>                                                   
+                                        <DatePicker 
+                                            locale="pt-BR" 
+                                            selected={actions.values.issuanceDate} 
+                                            dateFormat="dd/MM/yyyy" 
+                                            onChange={(date) => { actions.setFieldValue('issuanceDate', date); }} 
+                                            className="form-control" 
+                                            disabled={!!currentSubscription} 
+                                            customInput={
+                                                <MaskedInput maskChar="" mask="99/99/9999"/>
+                                            }
+                                        />         
+                                        <p className="input-error"><ErrorMessage name="issuanceDate" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-4">
+                                    <div className="mb-3">
+                                        <label htmlFor="phoneNumber" className="form-label">Telefone<span>*</span></label>
+                                        <Field 
+                                            name="phoneNumber"
+                                            value={actions.values.phoneNumber}                
+                                            onChange={actions.handleChange} >
+                                                {({field}) => {
+                                                    return (
+                                                    <MaskedInput
+                                                        {...field}     
+                                                        disabled={!!currentSubscription}                                
+                                                        className="form-control"
+                                                        maskChar=""
+                                                        mask={MaskHelper.makeMask(field.value, '', 'phone')}
+                                                    />
+                                                    );
+                                                }}
+                                        </Field>               
+                                        <p className="input-error"><ErrorMessage name="phoneNumber" className="input-error" /></p>
+                                    </div>                
+                                </div>
+                                <div className="col-4">
+                                    <div className="mb-3">
+                                        <label htmlFor="alternativePhoneNumber" className="form-label">Telefone Alternativo</label>
+                                        <Field 
+                                            name="alternativePhoneNumber"
+                                            value={actions.values.alternativePhoneNumber}                
+                                            onChange={actions.handleChange} >
+                                                {({field}) => {
+                                                    return (
+                                                    <MaskedInput
+                                                        {...field}  
+                                                        disabled={!!currentSubscription}                                   
+                                                        className="form-control"
+                                                        maskChar=""
+                                                        mask={MaskHelper.makeMask(field.value, '', 'phone')}
+                                                    />
+                                                    );
+                                                }}
+                                        </Field>                  
+                                        <p className="input-error"><ErrorMessage name="alternativePhoneNumber" className="input-error" /></p>
+                                    </div>
+                                </div>        
+                                <div className="col-2">
+                                    <div className="mb-3">
+                                        <label htmlFor="postalCode" className="form-label">CEP<span>*</span></label>    
+                                        <Field 
+                                            name="postalCode"
+                                            value={actions.values.postalCode}                
+                                            onChange={actions.handleChange}  >
+                                                {({field}) => {
+                                                    return (
+                                                    <MaskedInput
+                                                        {...field}  
+                                                        disabled={!!currentSubscription}                                   
+                                                        className="form-control"
+                                                        maskChar=""
+                                                        mask={MaskHelper.makeMask(field.value, '', 'cep')}
+                                                    />
+                                                    );
+                                                }}
+                                        </Field>            
+                                        <p className="input-error"><ErrorMessage name="postalCode" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-4">
+                                    <div className="mb-3">
+                                        <label htmlFor="street" className="form-label">Endereço<span>*</span></label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="street" 
+                                            id="street" 
+                                            value={actions.values.street}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="street" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-2">
+                                    <div className="mb-3">
+                                        <label htmlFor="houseNumber" className="form-label">Número<span>*</span></label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="houseNumber" 
+                                            id="houseNumber" 
+                                            value={actions.values.houseNumber}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="houseNumber" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-4">
+                                    <div className="mb-3">
+                                        <label htmlFor="complement" className="form-label">Complemento</label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="complement" 
+                                            id="complement" 
+                                            value={actions.values.complement}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="complement" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-3">
+                                    <div className="mb-3">
+                                        <label htmlFor="district" className="form-label">Bairro<span>*</span></label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="district" 
+                                            id="district" 
+                                            value={actions.values.district}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="district" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-3">
+                                    <div className="mb-3">
+                                        <label htmlFor="city" className="form-label">Cidade<span>*</span></label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="city" 
+                                            id="city" 
+                                            value={actions.values.city}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="city" className="input-error" /></p>
+                                    </div>
+                                </div>
+                                <div className="col-2">
+                                    <div className="mb-3">
+                                        <label htmlFor="state" className="form-label">Estado<span>*</span></label>
+                                        <input 
+                                            type="text" 
+                                            className="form-control" 
+                                            name="state" 
+                                            id="state" 
+                                            value={actions.values.state}                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
+                                        <p className="input-error"><ErrorMessage name="state" className="input-error" /></p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="col-3">
-                                <div className="mb-3">
-                                    <label htmlFor="birthdate" className="form-label">Data de Nascimento</label>                 
-                                    <DatePicker 
-                                        locale="pt-BR" 
-                                        selected={actions.values.birthdate} 
-                                        dateFormat="dd/MM/yyyy" 
-                                        onChange={(date) => { actions.setFieldValue('birthdate', date); }} 
-                                        className="form-control" 
-                                        customInput={
-                                            <MaskedInput maskChar="" mask="99/99/9999"/>
-                                        }
-                                    />                                        
-                                    <p className="input-error"><ErrorMessage name="birthdate" className="input-error" /></p>
-                                </div>
+                            <br />
+                            <div className="text-center">
+                                <button type="submit" className="btn btn-primary" disabled={actions.isSubmitting}>Próximo</button>
                             </div>
-                            <div className="col-3">
-                                <div className="mb-3">
-                                    <label htmlFor="document" className="form-label">CPF</label>
-                                    <Field 
-                                        name="document"
-                                        value={actions.values.document}                
-                                        onChange={actions.handleChange} >
-                                            {({field}) => {
-                                                return (
-                                                <MaskedInput
-                                                    {...field}                                    
-                                                    className="form-control"
-                                                    maskChar=""
-                                                    mask={MaskHelper.makeMask(field.value, '', 'cpf')}
-                                                />
-                                                );
-                                            }}
-                                    </Field>               
-                                    <p className="input-error"><ErrorMessage name="document" className="input-error" /></p>
-                                </div>                
-                            </div> 
-                            <div className="col-3">
-                                <div className="mb-3">
-                                    <label htmlFor="identityDocument" className="form-label">Documento de Identidade</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="identityDocument" 
-                                        id="identityDocument" 
-                                        value={actions.values.identityDocument}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="identityDocument" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-2">
-                                <div className="mb-3">
-                                    <label htmlFor="issuingAgency" className="form-label">Órgão Expedidor</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="issuingAgency" 
-                                        id="issuingAgency" 
-                                        value={actions.values.issuingAgency}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="issuingAgency" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-3">
-                                <div className="mb-3">
-                                    <label htmlFor="issuanceDate" className="form-label">Data de Expedição</label>                                                   
-                                    <DatePicker 
-                                        locale="pt-BR" 
-                                        selected={actions.values.issuanceDate} 
-                                        dateFormat="dd/MM/yyyy" 
-                                        onChange={(date) => { actions.setFieldValue('issuanceDate', date); }} 
-                                        className="form-control" 
-                                        customInput={
-                                            <MaskedInput maskChar="" mask="99/99/9999"/>
-                                        }
-                                    />         
-                                    <p className="input-error"><ErrorMessage name="issuanceDate" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-4">
-                                <div className="mb-3">
-                                    <label htmlFor="phoneNumber" className="form-label">Telefone</label>
-                                    <Field 
-                                        name="phoneNumber"
-                                        value={actions.values.phoneNumber}                
-                                        onChange={actions.handleChange} >
-                                            {({field}) => {
-                                                return (
-                                                <MaskedInput
-                                                    {...field}                                    
-                                                    className="form-control"
-                                                    maskChar=""
-                                                    mask={MaskHelper.makeMask(field.value, '', 'phone')}
-                                                />
-                                                );
-                                            }}
-                                    </Field>               
-                                    <p className="input-error"><ErrorMessage name="phoneNumber" className="input-error" /></p>
-                                </div>                
-                            </div>
-                            <div className="col-4">
-                                <div className="mb-3">
-                                    <label htmlFor="alternativePhoneNumber" className="form-label">Telefone Alternativo</label>
-                                    <Field 
-                                        name="alternativePhoneNumber"
-                                        value={actions.values.alternativePhoneNumber}                
-                                        onChange={actions.handleChange} >
-                                            {({field}) => {
-                                                return (
-                                                <MaskedInput
-                                                    {...field}                                    
-                                                    className="form-control"
-                                                    maskChar=""
-                                                    mask={MaskHelper.makeMask(field.value, '', 'phone')}
-                                                />
-                                                );
-                                            }}
-                                    </Field>                  
-                                    <p className="input-error"><ErrorMessage name="alternativePhoneNumber" className="input-error" /></p>
-                                </div>
-                            </div>        
-                            <div className="col-2">
-                                <div className="mb-3">
-                                    <label htmlFor="postalCode" className="form-label">CEP</label>    
-                                    <Field 
-                                        name="postalCode"
-                                        value={actions.values.postalCode}                
-                                        onChange={actions.handleChange} >
-                                            {({field}) => {
-                                                return (
-                                                <MaskedInput
-                                                    {...field}                                    
-                                                    className="form-control"
-                                                    maskChar=""
-                                                    mask={MaskHelper.makeMask(field.value, '', 'cep')}
-                                                />
-                                                );
-                                            }}
-                                    </Field>            
-                                    <p className="input-error"><ErrorMessage name="postalCode" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-4">
-                                <div className="mb-3">
-                                    <label htmlFor="street" className="form-label">Endereço</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="street" 
-                                        id="street" 
-                                        value={actions.values.street}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="street" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-2">
-                                <div className="mb-3">
-                                    <label htmlFor="houseNumber" className="form-label">Número</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="houseNumber" 
-                                        id="houseNumber" 
-                                        value={actions.values.houseNumber}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="houseNumber" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-4">
-                                <div className="mb-3">
-                                    <label htmlFor="complement" className="form-label">Complemento</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="complement" 
-                                        id="complement" 
-                                        value={actions.values.complement}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="complement" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-3">
-                                <div className="mb-3">
-                                    <label htmlFor="district" className="form-label">Bairro</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="district" 
-                                        id="district" 
-                                        value={actions.values.district}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="district" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-3">
-                                <div className="mb-3">
-                                    <label htmlFor="city" className="form-label">Cidade</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="city" 
-                                        id="city" 
-                                        value={actions.values.city}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="city" className="input-error" /></p>
-                                </div>
-                            </div>
-                            <div className="col-2">
-                                <div className="mb-3">
-                                    <label htmlFor="state" className="form-label">Estado</label>
-                                    <input 
-                                        type="text" 
-                                        className="form-control" 
-                                        name="state" 
-                                        id="state" 
-                                        value={actions.values.state}                
-                                        onChange={actions.handleChange} />                
-                                    <p className="input-error"><ErrorMessage name="state" className="input-error" /></p>
-                                </div>
-                            </div>
-                        </div>
-                        <br />
-                        <div className="text-center">
-                            <button type="submit" className="btn btn-primary" disabled={actions.isSubmitting}>Próximo</button>
-                        </div>
-                    </Form>
-                    )}
-                </Formik>
+                        </Form>
+                        )}
+                    </Formik>
+                </>
             }
             {currentStage === 2 && 
                 <Formik
@@ -616,30 +791,32 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
-                        <div className="row justify-content-center">
+                        <div className="row mt-5 justify-content-center">
                             <div className="col-5">
                                 <div className="mb-3">
-                                    <label htmlFor="graduation" className="form-label">Graduação</label>
+                                    <label htmlFor="graduation" className="form-label">Graduação<span>*</span></label>
                                     <input 
                                         type="text" 
                                         className="form-control" 
                                         name="graduation" 
                                         id="graduation" 
                                         value={actions.values.graduation}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="graduation" className="input-error" /></p>
                                 </div>
                             </div>
                             <div className="col-7">
                                 <div className="mb-3">
-                                    <label htmlFor="graduationInstitution" className="form-label">Instituição de obtenção do título de Graduação</label>
+                                    <label htmlFor="graduationInstitution" className="form-label">Instituição de obtenção do título de Graduação<span>*</span></label>
                                     <input 
                                         type="text" 
                                         className="form-control" 
                                         name="graduationInstitution" 
                                         id="graduationInstitution" 
                                         value={actions.values.graduationInstitution}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="graduationInstitution" className="input-error" /></p>
                                 </div>
                             </div>
@@ -652,7 +829,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="postgraduateLatoSensu" 
                                         id="postgraduateLatoSensu" 
                                         value={actions.values.postgraduateLatoSensu}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateLatoSensu" className="input-error" /></p>
                                 </div>
                             </div>
@@ -665,7 +843,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="postgraduateLatoSensuInstitution" 
                                         id="postgraduateLatoSensuInstitution" 
                                         value={actions.values.postgraduateLatoSensuInstitution}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateLatoSensuInstitution" className="input-error" /></p>
                                 </div>
                             </div>
@@ -678,7 +857,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="postgraduateStrictoSensu" 
                                         id="postgraduateStrictoSensu" 
                                         value={actions.values.postgraduateStrictoSensu}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateStrictoSensu" className="input-error" /></p>
                                 </div>
                             </div>
@@ -691,10 +871,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="postgraduateStrictoSensuInstitution" 
                                         id="postgraduateStrictoSensuInstitution" 
                                         value={actions.values.postgraduateStrictoSensuInstitution}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="postgraduateStrictoSensuInstitution" className="input-error" /></p>
                                 </div>
-                            </div>                        
+                            </div>                      
                         </div>
                         <br />
                         <div className="text-center">
@@ -723,7 +904,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             workRegime: '',
                         }
                     }
-                    validationSchema={Yup.object().shape({})}
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
@@ -737,7 +917,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="profession" 
                                         id="profession" 
                                         value={actions.values.profession}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                        disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="profession" className="input-error" /></p>
                                 </div>
                             </div>
@@ -750,7 +931,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="company" 
                                         id="company" 
                                         value={actions.values.company}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                        disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="company" className="input-error" /></p>
                                 </div>
                             </div>
@@ -762,11 +944,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <Field 
                                         name="postalCodeCompany"
                                         value={actions.values.postalCodeCompany}                
-                                        onChange={actions.handleChange} >
+                                        onChange={actions.handleChange}  >
                                             {({field}) => {
                                                 return (
                                                 <MaskedInput
-                                                    {...field}                                    
+                                                    {...field}    
+                                                    disabled={!!currentSubscription}                                
                                                     className="form-control"
                                                     maskChar=""
                                                     mask={MaskHelper.makeMask(field.value, '', 'cep')}
@@ -786,7 +969,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="streetCompany" 
                                         id="streetCompany" 
                                         value={actions.values.streetCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="streetCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -799,7 +983,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="houseNumberCompany" 
                                         id="houseNumberCompany" 
                                         value={actions.values.houseNumberCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="houseNumberCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -812,7 +997,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="complementCompany" 
                                         id="complementCompany" 
                                         value={actions.values.complementCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="complementCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -825,7 +1011,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="districtCompany" 
                                         id="districtCompany" 
                                         value={actions.values.districtCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="districtCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -838,7 +1025,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="cityCompany" 
                                         id="cityCompany" 
                                         value={actions.values.cityCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="cityCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -851,7 +1039,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="stateCompany" 
                                         id="stateCompany" 
                                         value={actions.values.stateCompany}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="stateCompany" className="input-error" /></p>
                                 </div>
                             </div>
@@ -864,7 +1053,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="workShift" 
                                         id="workShift" 
                                         value={actions.values.workShift}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="workShift" className="input-error" /></p>
                                 </div>
                             </div>
@@ -877,7 +1067,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         name="workRegime" 
                                         id="workRegime" 
                                         value={actions.values.workRegime}                
-                                        onChange={actions.handleChange} />                
+                                        onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                     <p className="input-error"><ErrorMessage name="workRegime" className="input-error" /></p>
                                 </div>
                             </div>
@@ -911,15 +1102,17 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     <Form>
                         <div className="row mt-5 justify-content-center">
                             <div className="col-3">
-                                <label htmlFor="disability" className="form-label">Portador de Deficiência</label>
+                                <label htmlFor="disability" className="form-label">Portador de Deficiência<span>*</span></label>
                                 <div role="group" aria-labelledby="my-radio-group"> 
                                     <div className={style.radioGroup}>
                                         <div className={style.radio}>
-                                            <input type="radio" name="disability" value="1" onChange={actions.handleChange} checked={actions.values.disability === "1"}/>
+                                            <input type="radio" name="disability" value="1" onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} checked={actions.values.disability === "1"}/>
                                             <label>Sim</label>
                                         </div>  
                                         <div className={style.radio}>
-                                            <input type="radio" name="disability" value="0" onChange={actions.handleChange} checked={actions.values.disability === "0"} />
+                                            <input type="radio" name="disability" value="0" onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} checked={actions.values.disability === "0"} />
                                             <label>Não</label>                                  
                                         </div>
                                     </div>
@@ -936,7 +1129,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name="disabilityType" 
                                             id="disabilityType" 
                                             value={actions.values.disabilityType}                
-                                            onChange={actions.handleChange} />                
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} />                
                                         <p className="input-error"><ErrorMessage name="disabilityType" className="input-error" /></p>
                                     </div>
                                 }
@@ -951,7 +1145,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             id="specialTreatmentTypes"
                                             placeholder=""
                                             value={actions.values.specialTreatmentTypes}
-                                            onChange={actions.handleChange}
+                                            onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription}
                                             multiple
                                         >
                                             {specialTreatmentTypes.map((specialTreatmentType, index) => (
@@ -963,18 +1158,20 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 }
                             </div>
                             <div className="col-12">
-                                <label htmlFor="reservedPlace" className="form-label">Concorrência às vagas destinadas para:</label>
+                                <label htmlFor="reservedPlace" className="form-label">Concorrência às vagas destinadas para:<span>*</span></label>
                                 <div role="group" aria-labelledby="my-radio-group"> 
                                     <div className={style.radioGroup}>
                                         <div className={style.radioReservedPlace}>
-                                        <input type="radio" name="reservedPlace" value="ampla_concorrencia" onChange={actions.handleChange} checked={actions.values.reservedPlace === 'ampla_concorrencia'}/>
+                                        <input type="radio" name="reservedPlace" value="ampla_concorrencia" onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} checked={actions.values.reservedPlace === 'ampla_concorrencia'}/>
                                         <label>Ampla concorrência</label>
                                         </div>  
                                     </div>
                                     {selectiveProcess.reservedPlaces.map((reservedPlace, index) => (
                                         <div className={style.radioGroup} key={index}>
                                             <div className={style.radioReservedPlace}>
-                                            <input type="radio" name="reservedPlace" value={reservedPlace.uuid} onChange={actions.handleChange} checked={actions.values.reservedPlace === reservedPlace.uuid}/>
+                                            <input type="radio" name="reservedPlace" value={reservedPlace.uuid} onChange={actions.handleChange} 
+                                            disabled={!!currentSubscription} checked={actions.values.reservedPlace === reservedPlace.uuid}/>
                                             <label>{reservedPlace.name}</label>
                                             </div>  
                                         </div>
@@ -992,37 +1189,107 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     )}
                 </Formik>
             }
-            {currentStage === 5 && 
+            {currentStage === 5 && !currentSubscription &&
                 <Formik
                     enableReinitialize
-                    initialValues={generateForm()}
-                    validationSchema={Yup.object().shape({                        
-                        //files: Yup.string().required('Preencha este campo.'),
-                    })}
+                    initialValues={generateForm()}      
                     onSubmit={handleSubmit}>
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
-                            <div className="col-12">                                
+                            <div className="col-12">
+                                <div className="mb-3">                                    
+                                    <div className="row">
+                                        <label className="form-label">Documento pessoal com foto<span>*</span></label>
+                                    </div>
+                                    
+                                    <div className="row">
+                                        <label htmlFor="documentFile" className={`${style.fileButton} col-3`}>
+                                            Escolher arquivo
+                                        </label>
+                                        <div className={`${style.fileName} col-9`}>
+                                            {documentFile ? documentFile[0]?.name : 'Nenhum arquivo selecionado'}
+                                        </div>
+                                        <input 
+                                            type="file"
+                                            className="form-control"
+                                            id="documentFile"
+                                            name="documentFile"
+                                            onChange={(event) => {
+                                                actions.handleChange(event);
+                                                console.log(event.currentTarget.files);
+                                                const files = event.currentTarget.files;
+                                                setDocumentFile(files.length > 0 ? files : null);
+                                                setInvalidDocumentFile(files.length === 0);
+                                            }}
+                                            value={undefined}
+                                            style={{display:'none'}}
+                                        />
+                                        <p className="input-error">
+                                            <ErrorMessage name="documentFile" className="input-error"/>
+                                            {invalidDocumentFile ? 'Preencha este campo.' : ''}
+                                        </p>
+                                    </div>                                    
+                                </div>
+                            </div>
+                                                   
+                            <div className="col-12">
                                 <div className="mb-3">
-                                    {baremaCategories?.map((baremaCategory, index) => (
-                                        <>
-                                            <label htmlFor="files" className="form-label mt-5 text-bold" key={index}>
-                                                {baremaCategory.name}
-                                            </label>                                            
-                                            {baremaCategory.subcategories.map((subcategory, idx) => (
-                                                <>
-                                                <label htmlFor="files" className="form-label mt-2" key={idx}>{subcategory.name}</label>  
-                                                <FieldArray
-                                                    name={subcategory.uuid}
-                                                    render={arrayHelpers => (
-                                                        <>
-                                                            {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, _idx) => (    
-                                                                <div key={`${subcategory.uuid}.${_idx}`} className="row">  
-                                                                    <div className="col-11">
-                                                                        <Field 
+                                    <div className="row">
+                                        <label className="form-label">Diploma da Graduação<span>*</span></label>
+                                    </div>
+                                    <div className="row">
+                                        <label htmlFor="graduationProofFile" className={`${style.fileButton} col-3`}>
+                                            Escolher arquivo
+                                        </label>
+                                        <div className={`${style.fileName} col-9`}>
+                                            {graduationProofFile ? graduationProofFile[0]?.name : 'Nenhum arquivo selecionado'}
+                                        </div>
+                                        <input 
+                                            type="file"
+                                            className="form-control"
+                                            id="graduationProofFile"
+                                            name="graduationProofFile"
+                                            onChange={(event) => {
+                                                actions.handleChange(event);
+                                                console.log(event.currentTarget.files);
+                                                const files = event.currentTarget.files;
+                                                setGraduationProofFile(files.length > 0 ? files : null);
+                                                setInvalidGraduationProofFile(files.length === 0);
+                                            }}
+                                            value={undefined}
+                                            style={{display:'none'}}
+                                        />
+                                        <p className="input-error">
+                                            <ErrorMessage name="graduationProofFile" className="input-error"/>
+                                            {invalidGraduationProofFile ? 'Preencha este campo.' : ''}
+                                        </p>
+                                    </div>                                    
+                                </div>
+                            </div>       
+                            <div className="col-12">   
+                                {baremaCategories?.map((baremaCategory, index) => (
+                                    <>
+                                        <label htmlFor="files" className="form-label mt-5 text-bold" key={index}>
+                                            {baremaCategory.name}
+                                        </label>                                            
+                                        {baremaCategory.subcategories.map((subcategory, idx) => (
+                                            <>
+                                            <label className="form-label row mt-2" key={idx}>{subcategory.name}</label>  
+                                            <FieldArray
+                                                name={subcategory.uuid}
+                                                render={arrayHelpers => (
+                                                    <>
+                                                        {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, _idx) => (    
+                                                            <div key={`${subcategory.uuid}.${_idx}`} className="row">  
+                                                                <div className="col-11">
+                                                                    <div className="row">
+                                                                        <label htmlFor={`${subcategory.uuid}.${_idx}`} className={`${style.fileButton} col-3`}>Escolher arquivo</label>
+                                                                        <div className={`${style.fileName} col-9`}>{getFileName(subcategory.uuid, _idx)}</div>
+                                                                        <input 
                                                                             type="file"
                                                                             className="form-control"
+                                                                            id={`${subcategory.uuid}.${_idx}`}
                                                                             name={`${subcategory.uuid}.${_idx}`}
                                                                             onChange={(event) => {
                                                                                 actions.handleChange(event);
@@ -1030,36 +1297,36 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                                                 handleFile(subcategory.uuid, _idx, event.currentTarget.files);
                                                                             }}
                                                                             value={undefined}
+                                                                            style={{display:'none'}}
                                                                         />
-                                                                        {/*getFileName(subcategory.uuid, index)*/}
-                                                                        <p className="input-error"><ErrorMessage name="files" className="input-error" /></p>
                                                                     </div>
-                                                                    <div className="col-1">
-                                                                        {_idx !== 0 && 
-                                                                            <button 
-                                                                                className="btn btn-secondary"
-                                                                                type="button" 
-                                                                                onClick={async () => {
-                                                                                    await removeFile(subcategory.uuid, _idx);
-                                                                                    arrayHelpers.remove(_idx); 
-                                                                                }}
-                                                                            >-</button>}
-                                                                        {_idx === 0 &&
-                                                                            <button type="button" onClick={() => arrayHelpers.push('')} className="btn btn-primary">
-                                                                                +
-                                                                            </button>
-                                                                        }
-                                                                    </div>
+                                                                    <p className="input-error"><ErrorMessage name={`${subcategory.uuid}.${_idx}`} className="input-error" /></p>
                                                                 </div>
-                                                            )))}
-                                                        </>
-                                                    )}
-                                                />   
-                                                </>                                             
-                                            ))}
-                                        </>
-                                    ))}
-                                </div>
+                                                                <div className="col-1">
+                                                                    {_idx !== 0 && 
+                                                                        <button 
+                                                                            className="btn btn-secondary"
+                                                                            type="button" 
+                                                                            onClick={async () => {
+                                                                                await removeFile(subcategory.uuid, _idx);
+                                                                                arrayHelpers.remove(_idx); 
+                                                                            }}
+                                                                        >-</button>}
+                                                                    {_idx === 0 &&
+                                                                        <button type="button" onClick={() => arrayHelpers.push('')} className="btn btn-primary">
+                                                                            +
+                                                                        </button>
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        )))}
+                                                    </>
+                                                )}
+                                            />   
+                                            </>                                             
+                                        ))}
+                                    </>
+                                ))}
                             </div>
                         </div>
                         <br />
@@ -1071,8 +1338,93 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     )}
                 </Formik>
             }
+            {currentStage === 5 && currentSubscription &&
+                <Formik
+                    enableReinitialize
+                    initialValues={generateForm()}                               
+                    onSubmit={handleSubmit}>
+                    {(actions) => (
+                    <Form>
+                        <div className="row mt-5 justify-content-center">
+                            <div className="col-12">
+                                <div className="mb-3">                                    
+                                    <div className="row">
+                                        <label className="form-label text-bold">Documento pessoal com foto<span>*</span></label>
+                                    </div>                                    
+                                    <div className="row">
+                                        <div className={`col-9`}>
+                                            <span>                                  
+                                                <a href={currentSubscription?.documentFile} className={style.titleFile} target="_blank">
+                                                    <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
+                                                </a>
+                                            </span>
+                                        </div>
+                                    </div>                                    
+                                </div>
+                            </div>                                                   
+                            <div className="col-12">
+                                <div className="mb-3">
+                                    <div className="row">
+                                        <label className="form-label text-bold">Diploma da Graduação<span>*</span></label>
+                                    </div>                                                                  
+                                    <div className="row">
+                                        <div className={`col-9`}>                      
+                                            <a href={currentSubscription?.graduationProofFile} className={style.titleFile} target="_blank">
+                                                <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
+                                            </a>
+                                        </div>
+                                    </div>     
+                                </div>
+                            </div>       
+                            <div className="col-12">   
+                                {currentSubscription && currentSubscription?.files && currentSubscription?.files.map((fileSubscription, index) => (
+                                    <>
+                                        <label htmlFor="files" className="form-label mt-5 text-bold" key={index}>
+                                            {getSubcategoryName(fileSubscription.subcategoryID)}
+                                        </label>   
+                                        <div>                                     
+                                            {fileSubscription.files.map((fileSubcategory, idx) => (
+                                                <a href={fileSubcategory.url} className={style.titleFile} target="_blank">
+                                                    <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo {idx + 1}
+                                                </a>      
+                                            ))}
+                                        </div> 
+                                    </>
+                                ))}
+                            </div>
+                        </div>
+                        <br />
+                        <div className="text-center">
+                            <button onClick={() => back(actions.values)} className="btn btn-secondary m-1" disabled={actions.isSubmitting}>Anterior</button>                        </div>
+                    </Form>
+                    )}
+                </Formik>
+            }
             {currentStage === 6 && 
-                <p>Inscrição realizada com sucesso!</p>
+                <div className="col-md-12 d-flex justify-content-center align-items-center mh-100">
+                    <div>
+                        <h1 className="text-primary-dark title-sm-font-size">
+                            A sua inscrição está sendo processada.
+                        </h1>                   
+                        <h1 className="text-primary fw-bold title-sm-font-size" >
+                            Aguarde...
+                        </h1>
+                    </div>
+                    <img src="/images/subscription/processing.svg" className="img-fluid w-50" alt="..."></img>
+                </div>
+            }
+            {currentStage === 7 && 
+                <div className="col-md-12 d-flex justify-content-center align-items-center mh-100">
+                    <img src="/images/subscription/completed.svg" className="img-fluid w-50" alt="..."></img>
+                    <div>                    
+                        <h1 className="text-primary-dark title-sm-font-size">
+                            A sua inscrição foi concluída.
+                        </h1>                   
+                        <h1 className="text-primary fw-bold title-sm-font-size" >
+                            <a href="/student/subscription" className={style.completedLink}>Acompanhe aqui</a>                    
+                        </h1>
+                    </div>
+                </div>
             }
         </StudentBase>
     )

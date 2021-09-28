@@ -1,3 +1,31 @@
+.title {
+  font-size: clamp(1rem, 2vw, 2rem);
+}
+
+.steps {
+  text-align: right;
+  align-self: flex-end;
+}
+
+.step {
+  height: 15px;
+  width: 15px;
+  margin: 0 2px;
+  background-color: #bbbbbb;
+  border: none;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.5;
+}
+
+.stepActive {
+  opacity: 1;
+}
+
+.stepFinish {
+  background-color: #04AA6D;
+}
+
 .radioGroup {
   margin-top: 0.5em;
   display: flex;
@@ -21,5 +49,70 @@
 
 .radioReservedPlace > label {
   font-weight: normal !important;
+}
+
+.fileName {
+  padding: .375rem .75rem;
+  border-top: 0.1em solid #ced4da;
+  border-bottom: 0.1em solid #ced4da;
+  border-right: 0.1em solid #ced4da;
+  border-radius: 0 5px 5px 0;
+}
+
+.fileButton {   
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: #e9ecef;
+  border: 1px solid #ced4da;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  border-radius: .25rem 0 0 .25rem;
+}
+
+.fileButton:hover {  
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #212529;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: #dde0e3;
+  border: 1px solid #ced4da;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  border-radius: .25rem 0 0 .25rem;
+}
+
+.iconFile {
+  color:#34A853;
+  margin-bottom: 8px;
+  width: 1em;
+  margin-right: .5em;
+}
+
+.titleFile{
+  margin-right: .5em;
+}
+
+.completedLink{
+  text-decoration-line: underline;
+}
+
+.titleFile:hover, .completedLink:hover {
+  color:#34A853;
 }
 

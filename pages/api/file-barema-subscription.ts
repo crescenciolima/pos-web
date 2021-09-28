@@ -3,7 +3,7 @@ import Cors from 'cors'
 import multer from 'multer';
 import { APIResponse } from '../../models/api-response';
 import SubscriptionService from '../../lib/subscription.service';
-import { Subscription, SubscriptionStatus, SubscriptionTypeFile } from '../../models/subscription';
+import { Subscription, SubscriptionStatus } from '../../models/subscription';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import initMiddleware from '../../utils/init-middleware';
@@ -50,25 +50,46 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           }
           
           const uploadService = FileUploadService();
-          const { subscriptionID, type } = req.body; 
+          const { subcategoryID, subscriptionID } = req.body;  
+          const urls = [];      
 
-          const blob: BlobCorrected = req.files[0];
-          const path = `${StoragePaths.SUBSCRIPTION}/${subscriptionID}/${type}/`;
-          const url = await uploadService.upload(path, blob, uuidv4());
-
-          console.log(url);
-          
-          let subscription = await subscriptionService.getById(subscriptionID);
-
-          console.log('before',subscription);
-
-          if(type === SubscriptionTypeFile.GRADUATION){
-            subscription = {...subscription, graduationProofFile: url};
-          } else if(type === SubscriptionTypeFile.DOCUMENT){
-            subscription = {...subscription, documentFile: url};
+          for (let i = 0; i < req.files.length; i++){
+            const blob: BlobCorrected = req.files[i];
+            const path = `${StoragePaths.SUBSCRIPTION}/${subscriptionID}/${subcategoryID}`;
+            const url = await uploadService.upload(path, blob, uuidv4());
+            urls.push({uuid: uuidv4(), url: url, status: SubscriptionStatus.AGUARDANDO_ANALISE, observation: ''});
           }
 
-          console.log('after',subscription);
+          console.log(urls);
+          
+          let subscription = await subscriptionService.getById(subscriptionID);
+          console.log(subscription);
+
+          let subscriptionFiles = [];
+          if(subscription.files && subscription.files.length){
+            const subcategoryFound = subscription.files.find((subcategory) => subcategory.subcategoryID === subcategoryID);
+
+            if(subcategoryFound){
+              subscriptionFiles = subscription.files.map(subscriptionFile => {
+                if(subscriptionFile.subcategoryID === subcategoryID){
+                  subscriptionFile.files = {...subscriptionFile.files, ...urls}
+                }
+                return subscriptionFile;
+              })
+            }else{
+              subscriptionFiles = [...subscription.files, { subcategoryID: subcategoryID, files: urls }] 
+            }
+
+          }else{
+            subscriptionFiles = [{ subcategoryID: subcategoryID, files: urls }] 
+          }
+
+          subscription = {
+            ...subscription,     
+            files: subscriptionFiles        
+          };
+
+          console.log(subscription);
 
           await subscriptionService.update(subscription);
     

@@ -158,14 +158,24 @@ export default function ProcessSubscriprionLayout() {
                     <div className="row mt-3">
                         <div className="col-12 ">
                             <fieldset disabled>
-                                <legend>Dados básicos</legend>
+                                <legend>Dados Pessoais</legend>
                                 <div className="mb-3">
                                     <label className="form-label">Nome</label>
                                     <input type="text" id="nome" className="form-control form-control-sm" value={subscription.name} readOnly></input>
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Idade</label>
-                                    <input type="text" id="idade" className="form-control form-control-sm" value={subscription.age} readOnly></input>
+                                    <input type="number" id="idade" className="form-control form-control-sm" value={subscription.age} readOnly></input>
+                                </div>
+                                <div className="mb-3">
+                                    <label className="form-label">RG</label>
+                                    <input type="text" id="rg" className="form-control form-control-sm" value={subscription.identityDocument} readOnly></input>
+                                    <label className="form-label">Data de Emissão</label>
+                                    <input type="text" id="data-emissao-rg" className="form-control form-control-sm" value={new Date(subscription.issuanceDate).toLocaleDateString()} readOnly></input>
+                                    <label className="form-label">Orgão Emissor</label>
+                                    <input type="text" id="orgao-emissor-rg" className="form-control form-control-sm" value={subscription.issuingAgency} readOnly></input>
+                                    <label className="form-label">CPF</label>
+                                    <input type="text" id="cpf" className="form-control form-control-sm" value={subscription.document} readOnly></input>
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Vaga Selecionada</label>
@@ -181,9 +191,61 @@ export default function ProcessSubscriprionLayout() {
                                         <b><FontAwesomeIcon icon={faFile} className="sm-icon mx-1" />Arquivo </b>
                                     </a>
                                 </div>
+                                <div>
+                                    <label className="form-label">Endereço Residencial</label>
+                                    <br />
+                                    <label className="form-label">Cidade</label>
+                                    <input className="form-control form-control-sm" type="text" id="" value={subscription.city} readOnly/>
+                                    <label className="form-label">Estado</label>
+                                    <input className="form-control form-control-sm" type="text" id="" value={subscription.state} readOnly/>
+                                    <label className="form-label">Bairro</label>
+                                    <input className="form-control form-control-sm" type="text" id="" value={subscription.district} readOnly/>
+                                    <label className="form-label">Rua</label>
+                                    <input className="form-control form-control-sm" type="text" id="" value={subscription.street} readOnly/>
+                                    <label className="form-label">CEP</label>
+                                    <input className="form-control form-control-sm" type="text" id="" value={subscription.postalCode} readOnly/>
+                                    <label className="form-label">Complemento</label>
+                                    <input className="form-control form-control-sm" type="text" id="" value={subscription.complement} readOnly/>
+                                    <label className="form-label">Número</label>
+                                    <input className="form-control form-control-sm" type="text" id="" value={subscription.houseNumber} readOnly/>
+                                </div>
                             </fieldset>
                         </div>
                     </div>
+                    <div className="row mt-3">
+    <div className="col-12 ">
+        <fieldset>
+            <legend>Dados Profissionais</legend>
+            <div className="mb-3">
+                <label className="form-label">Empresa</label>
+                <input className="form-control form-control-sm" type="text" id="" value={subscription.company} readOnly/>
+                <label className="form-label">Cargo</label>
+                <input className="form-control form-control-sm" type="text" id="" value={subscription.profession} readOnly/>
+                <label className="form-label">Modalidade</label>
+                <input className="form-control form-control-sm" type="text" id="" value={subscription.workRegime} readOnly/>
+                <label className="form-label">Carga Horária</label>
+                <input className="form-control form-control-sm" type="text" id="" value={subscription.workShift} readOnly/>
+            </div>
+            <div className="mb-3">
+                <label className="form-label">Endereço Empresarial</label>
+                    <div>
+                        <label className="form-label">Cidade</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.cityCompany} readOnly/>
+                        <label className="form-label">Estado</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.stateCompany} readOnly/>
+                        <label className="form-label">Bairro</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.districtCompany} readOnly/>
+                        <label className="form-label">Rua</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.streetCompany} readOnly/>
+                        <label className="form-label">CEP</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.postalCodeCompany} readOnly/>
+                        <label className="form-label">Complemento</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.complementCompany} readOnly/>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
                     {subscription.currentResource &&
                         <>
                             <div className="row justify-content-center">
