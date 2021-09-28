@@ -23,7 +23,6 @@ export default function PDFTableLine(props: Props) {
             alignItems: 'center',
             flexGrow: 1,
             fontSize: 12,
-            textAlign:"left",
             paddingVertical:"5"
             
 
@@ -38,7 +37,7 @@ export default function PDFTableLine(props: Props) {
         <View style={styles.container}>
             {columnList.map((column, index) => {
                 return (
-                    <Text  key={index} style={{ width: column.width, borderRightWidth: index+1 == columnList.length ? 0 : 1, marginHorizontal:"5" }}>{column.value} </Text>
+                    <Text  key={index} style={{ width: column.width, borderRightWidth: index+1 == columnList.length ? 0 : 1, marginHorizontal:"5", textAlign: column.textAlign }}>{column.value} </Text>
                 )
             })}
 

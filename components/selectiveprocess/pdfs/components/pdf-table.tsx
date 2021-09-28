@@ -6,6 +6,7 @@ import PDFTableLine from './pdf-table-line';
 export interface PDFTableInfo {
     value: string;
     width: string;
+    textAlign: 'left' | 'right' | 'center' | 'justify';
 }
 
 interface Props {
@@ -22,10 +23,9 @@ export default function PDFTable(props: Props) {
 
         tableContainer: {
             flexDirection: 'column',
-            marginTop: 24,
+            marginTop: 14,
             justifyContent: 'center',
             textAlign: 'center',
-            padding: 20
         },
         title: {
             color: 'black',

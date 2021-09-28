@@ -15,6 +15,7 @@ import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 import { group } from 'console';
 import PDFDownload from '../pdfs/pdf-final-result';
 import PDFFinalResult from '../pdfs/pdf-final-result';
+import PDFButtons from '../pdfs/pdf-buttons';
 
 interface Props {
     process: SelectiveProcess;
@@ -113,7 +114,7 @@ export default function SelectiveProcessFinalResult(props: Props) {
 
     }, []);
 
-
+    const PDF = PDFFinalResult({process: selectiveProcess, currentStep:currentStep, groupList:groupList, interview:interview, barema:barema, test:test})
 
     return (
         <>
@@ -123,7 +124,7 @@ export default function SelectiveProcessFinalResult(props: Props) {
                     <h5 className="text-primary-dark">Classificação Final</h5>
                 </div>
                 <div className="col-6 text-right">
-                    <PDFFinalResult process={selectiveProcess} currentStep={currentStep} groupList={groupList} interview={interview} barema={barema} test={test}></PDFFinalResult>
+                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()}></PDFButtons>
                 </div>
             </div>
             {groupList.map((group, indexGroup) => {

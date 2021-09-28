@@ -5,7 +5,6 @@ const styles = StyleSheet.create({
    
     titleContainer:{
         flexDirection: 'column',
-        marginTop: 24,
         justifyContent:'center',
         textAlign:'center'
     },

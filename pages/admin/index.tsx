@@ -144,7 +144,7 @@ export default function Admin() {
           <div className="row">
             <div className="col-12">
               <h4 className="text-success mt-3" >
-                Processo Seletivo {selectiveProcess.title} Em Andamento
+                Processo Seletivo {selectiveProcess.title}
               </h4>
             </div>
           </div>

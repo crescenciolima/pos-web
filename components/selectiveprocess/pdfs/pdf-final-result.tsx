@@ -1,12 +1,9 @@
-import React from 'react';
-import ReactPDF, { Page, Text, View, Document, StyleSheet, PDFDownloadLink, Font } from '@react-pdf/renderer';
+import React, { useEffect, useState } from 'react';
+import ReactPDF, { Page, Text, View, Document, StyleSheet, PDFDownloadLink, Font, usePDF, pdf } from '@react-pdf/renderer';
 import { ProcessStep, SelectiveProcess } from '../../../models/selective-process';
 import PDFHeader from './components/pdf-header';
 import PDFTable, { PDFTableInfo } from './components/pdf-table';
 import { FinalListGroup } from '../dashboard/final-result';
-
-// Create styles
-
 
 interface Props {
   process: SelectiveProcess;
@@ -21,69 +18,64 @@ export default function PDFFinalResult(props: Props) {
 
   const { process, currentStep, groupList, barema, test, interview } = props;
 
-  // Font.register({
-  //   family: 'Poppins',
-  //   fonts: [
-  //     {
-  //       src: `https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap`
-  //     },
-  //   ]
-  // })
 
   const styles = StyleSheet.create({
     page: {
       flexDirection: 'column',
-      backgroundColor: '#ffffff'
+      backgroundColor: '#ffffff',
+      padding: 20
     },
   });
 
   //Headers
   let tableHeaders: PDFTableInfo[] = [
-    { value: "Nº", width: "10%" },
-    { value: "Candidato(a)", width: "30%" },
+    { value: "Nº", width: "10%", textAlign: "left" },
+    { value: "Candidato(a)", width: "30%", textAlign: "left" },
   ];
   const resultWidth = (60 / ((test ? 1 : 0) + (interview ? 1 : 0) + (barema ? 1 : 0))) + "%"
   if (test) {
-    tableHeaders.push({ value: "Pontuação da \nAvaliação (Peso " + test.weight + ")", width: resultWidth });
+    tableHeaders.push({ value: "Pontuação da \nAvaliação (Peso " + test.weight + ")", width: resultWidth, textAlign: "center" });
   }
   if (interview) {
-    tableHeaders.push({ value: "Pontuação da \nEntrevista (Peso " + interview.weight + ")", width: resultWidth });
+    tableHeaders.push({ value: "Pontuação da \nEntrevista (Peso " + interview.weight + ")", width: resultWidth, textAlign: "center" });
   }
   if (barema) {
-    tableHeaders.push({ value: "Pontuação do \nCurrículo (Peso " + barema.weight + ")", width: resultWidth });
+    tableHeaders.push({ value: "Pontuação do \nCurrículo (Peso " + barema.weight + ")", width: resultWidth, textAlign: "center" });
   }
-  tableHeaders.push({ value: "Pontuação Final", width: resultWidth });
+  tableHeaders.push({ value: "Pontuação Final", width: resultWidth, textAlign: "center" });
 
 
-  let groupLines : PDFTableInfo[][][] = []
+  let groupLines: PDFTableInfo[][][] = []
 
-  for( let group of groupList){
+  for (let group of groupList) {
 
-    let lines:PDFTableInfo[][] = [];
+    let lines: PDFTableInfo[][] = [];
     let index = 1;
-    for(let sub of group.subscriptionList){
-      let subInfo:PDFTableInfo[] = [
-        {value:index+"", width:"10%"},
-        {value:sub.name, width:"30%"},
+    for (let sub of group.subscriptionList) {
+      let subInfo: PDFTableInfo[] = [
+        { value: index + "", width: "10%", textAlign: "left" },
+        { value: sub.name, width: "30%", textAlign: "left" },
       ];
       if (test) {
-        subInfo.push({ value: sub.testGrade+ "", width: resultWidth });
+        subInfo.push({ value: sub.testGrade + "", width: resultWidth, textAlign: "center" });
       }
       if (interview) {
-        subInfo.push({ value: sub.interviewGrade+"", width: resultWidth });
+        subInfo.push({ value: sub.interviewGrade + "", width: resultWidth, textAlign: "center" });
       }
       if (barema) {
-        subInfo.push({ value: sub['baremaGrade'], width: resultWidth });
+        subInfo.push({ value: sub['baremaGrade'], width: resultWidth, textAlign: "center" });
       }
-      subInfo.push({ value: sub['finalGrade'], width: resultWidth });
+      subInfo.push({ value: sub['finalGrade'], width: resultWidth, textAlign: "center" });
       index++;
       lines.push(subInfo);
     }
     groupLines.push(lines);
   }
 
+
+
   // Create Document Component
-  const MyDocument = () => (
+  const PDF = () => (
     <Document>
       <Page size="A4" style={styles.page}>
         <PDFHeader title={process.title} description={process.description} step={currentStep.type} />
@@ -94,25 +86,14 @@ export default function PDFFinalResult(props: Props) {
         })}
 
 
+
       </Page>
     </Document>
   );
 
-  return (<PDFDownloadLink
-    document={MyDocument()}
-    fileName="movielist.pdf"
-    style={{
-      textDecoration: "none",
-      padding: "10px",
-      color: "#4a4a4a",
-      backgroundColor: "#ffffff",
-      border: "1px solid #4a4a4a"
-    }}
-  >
-    {({ blob, url, loading, error }) =>
-      loading ? "Loading document..." : "Download Pdf"
-    }
-  </PDFDownloadLink>
+
+  return (
+    PDF
   )
 
 
