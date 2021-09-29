@@ -10,6 +10,18 @@ export default function SelectiveProcessUtil() {
         return currentStep;
     }
 
+    function setSubscriptionPlaceName(sub: Subscription, process: SelectiveProcess): void {
+        sub.placeName = process?.reservedPlaces.find(place => place.uuid == sub.reservedPlace)?.name || "Ampla Concorrência";
+    }
+
+    function hasPassedTest(sub: Subscription, step: ProcessStep): boolean {
+        return sub.testGrade != undefined && sub.testGrade >= step.passingScore;
+    }
+
+    function hasPassedInterview(sub: Subscription, step: ProcessStep): boolean {
+        return sub.interviewGrade != undefined && sub.interviewGrade >= step.passingScore;
+    }
+
     function calculateTestsGrade(subscription: Subscription, process: SelectiveProcess): number {
 
         let testGrade = 0;
@@ -55,7 +67,7 @@ export default function SelectiveProcessUtil() {
         return baremaPoints;
     }
 
-    function calculateFinalGrade(subscription: Subscription, process: SelectiveProcess):number {
+    function calculateFinalGrade(subscription: Subscription, process: SelectiveProcess): number {
 
         let testStep = process.steps.find(step => step.type == ProcessStepsTypes.PROVA);
         let interviewStep = process.steps.find(step => step.type == ProcessStepsTypes.ENTREVISTA);
@@ -112,7 +124,10 @@ export default function SelectiveProcessUtil() {
         orderSubscriptionListByTests,
         isSubscriberApproved,
         calculateBaremaGrade,
-        calculateFinalGrade
+        calculateFinalGrade,
+        hasPassedInterview,
+        hasPassedTest,
+        setSubscriptionPlaceName
     }
 
 }

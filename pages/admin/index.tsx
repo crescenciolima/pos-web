@@ -185,8 +185,8 @@ export default function Admin() {
               {(currentStep.type == ProcessStepsTypes.AVALIACAO_CURRICULAR)             
                 && <SelectiveBaremaAnalysisList process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveBaremaAnalysisList>
               }
-              {(currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_AVALIACAO_CURRICULAR)
-               || (currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR)
+              {((currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_AVALIACAO_CURRICULAR)
+               || (currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR))
                 && <SelectiveBaremaResults process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveBaremaResults>
               }
               {(currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_PROCESSO_SELETIVO)

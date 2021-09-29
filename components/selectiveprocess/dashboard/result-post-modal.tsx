@@ -1,6 +1,6 @@
 import { SubscriptionFile, SubscriptionStatus } from "../../../models/subscription";
 import { Document, Page, pdfjs } from "react-pdf";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile } from "@fortawesome/free-solid-svg-icons";
 import { AnalysisSubCategory, AnalysisCategory } from "../subscription/subscription-barema-analysis";
@@ -64,6 +64,7 @@ export default function ResultPostModal(props: Props) {
     }
 
     function close() {
+
         onClose ? onClose(selectedFile) : false;
     }
 
@@ -144,7 +145,7 @@ export default function ResultPostModal(props: Props) {
 
                                     <div className="mb-3 text-start">
                                         <label htmlFor="about" className="form-label">Texto</label>
-                                        <SunEditor onBlur={handleSunEditorBlur} setContents={news.text} setOptions={{
+                                        {open && <SunEditor onBlur={handleSunEditorBlur} setContents={news.text} setOptions={{
                                             height: "400",
                                             font: [
                                                 'Roboto',
@@ -156,6 +157,7 @@ export default function ResultPostModal(props: Props) {
                                             ],
                                             buttonList: [['font', 'fontSize', 'formatBlock', 'align', 'bold', 'underline', 'italic', 'strike',], ['fontColor', 'hiliteColor', 'image', 'fullScreen']]
                                         }} />
+                                    }
                                     </div>
 
                                 </form>

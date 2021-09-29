@@ -28,7 +28,8 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textAlign: 'center',
         textTransform: 'uppercase',
-        marginBottom:'15',
+        marginBottom:'6',
+        marginTop: "6",
         fontWeight:'bold',
     },
     logo:{

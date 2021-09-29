@@ -23,7 +23,7 @@ export default function PDFTable(props: Props) {
 
         tableContainer: {
             flexDirection: 'column',
-            marginTop: 14,
+            marginTop: 4,
             justifyContent: 'center',
             textAlign: 'center',
         },

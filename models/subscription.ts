@@ -59,13 +59,14 @@ export interface Subscription {
     documentFile?: string;
     resources?: SubscriptionResource[];
     interviewGrade?: number;
+    interviewObs?:string;
     testGrade?:number
-
+    testObs?:string;
 
     //Only for UI
     currentResource?: SubscriptionResource;
     formatedDate?: string;
-
+    placeName?:string;
 }
 
 

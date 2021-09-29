@@ -29,7 +29,9 @@ export default function SubscriptionService() {
                         resources: doc['resources'],
                         testGrade: doc['testGrade'],
                         interviewGrade: doc['interviewGrade'],
-                        files:doc['files']
+                        files:doc['files'],
+                        testObs:doc['testObs'],
+                        interviewObs:doc['interviewObs'],
                     }
                     subs.push(sub);
                 });
@@ -133,6 +135,8 @@ export default function SubscriptionService() {
 
             testGrade: validateField(doc['testGrade']),
             interviewGrade: validateField(doc['interviewGrade']),
+            testObs:validateField(doc['testObs']),
+            interviewObs:validateField(doc['interviewObs']),
             statusObservation: validateField(doc['statusObservation']),
             observation: validateField(doc['observation']),
             resources: validateField(doc['resources']),

@@ -27,6 +27,11 @@ export default function PDFButtons(props: Props) {
 
   const api = API(setLoading);
 
+  Font.register({ family: 'Poppins', fonts: [
+    { src: "/fonts/Poppins-Regular.ttf" }, // font-style: normal, font-weight: normal
+    { src: "/fonts/Poppins-Bold.ttf", fontWeight: 700 },
+   ]});
+
   const disponibilizarResultado = async () => {
     setModalOpen(true);
     // if (instance.loading == false && instance.url) {

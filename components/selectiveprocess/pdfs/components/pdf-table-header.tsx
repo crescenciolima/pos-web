@@ -21,7 +21,7 @@ export default function PDFTableHeader(props: Props) {
             borderBottomWidth: 1,
             alignItems: 'center',
             flexGrow: 1,
-            fontSize: 12,
+            fontSize: 11,
             paddingVertical:"5"
             
 

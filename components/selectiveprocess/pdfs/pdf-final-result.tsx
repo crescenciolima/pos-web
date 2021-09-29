@@ -23,7 +23,8 @@ export default function PDFFinalResult(props: Props) {
     page: {
       flexDirection: 'column',
       backgroundColor: '#ffffff',
-      padding: 20
+      padding: 20,
+      fontFamily: 'Poppins'
     },
   });
 

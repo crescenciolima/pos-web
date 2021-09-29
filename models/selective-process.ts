@@ -61,7 +61,7 @@ export interface ProcessStep {
 export enum ProcessStepsTypes {
     INSCRICAO = "Inscrição",
     HOMOLOGACAO_PRELIMINAR_INSCRICAO = "Homologação Preliminar Inscrição",
-    INTERPOSICAO_RECURSO_INSCRICAO = "Recurso da Inscrição",
+    INTERPOSICAO_RECURSO_INSCRICAO = "Interposição de Recurso da Inscrição",
     HOMOLOGACAO_DEFINITIVA_INSCRICAO = "Homologação Definitiva Inscrição",
     ENTREVISTA = "Entrevista",
     RESULTADO_PRELIMINAR_ENTREVISTA = "Resultado Preliminar da Entrevista",
