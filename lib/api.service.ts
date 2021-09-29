@@ -98,6 +98,7 @@ export default function API(setLoading?: Function) {
             });
 
             const result: APIResponse = await res.json();
+            console.log(result);
 
             if(result.error){                              
                 if (setLoading) setLoading(false);
@@ -109,6 +110,7 @@ export default function API(setLoading?: Function) {
 
         } catch (error) {
             console.error(error);
+            console.log(error);
             toast.notify("Ocorreu um erro ao buscar os dados", {
                 duration: 3,
                 type: "error",

@@ -7,23 +7,43 @@ import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
 import { APIResponse } from '../../../models/api-response';
-import { Subscription } from '../../../models/subscription';
+import { Subscription, SubscriptionResource } from '../../../models/subscription';
 import { UserType } from '../../../enum/type-user.enum';
+import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
+import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
 
 export default function ResourceLayout() {
-  const [isLoading, setLoading] = useState<boolean>(true);
+  const [isLoading, setLoading] = useState<boolean>(false);
   const [currentSubscription, setCurrentSubscription] = useState<Subscription>();
-
+  const [canAddResource, setCanAddResource] = useState<boolean>(true);
+  const resourceSteps = ResourceStepsHelper.steps();
   const api = API(setLoading);
 
   useEffect(() => {   
     const loadData = async () => {
         const resultSubscription: APIResponse = await api.get(APIRoutes.CURRENT_SUBSCRIPTION);
-        if (resultSubscription.result) {
-            setCurrentSubscription(resultSubscription.result);
+
+        if (!resultSubscription.result) {
+          return;
         }
+
+        const subscription: Subscription = resultSubscription.result;
+        const resultSelectiveProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'id': subscription.selectiveProcessID });
+        const selectiveProcess: SelectiveProcess = resultSelectiveProcess.result;
+       
+        let currentStep: ProcessStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
+        
+        let resourceFound: SubscriptionResource = subscription.resources.find((resource) => currentStep.type === resource.step);
+        console.log(resourceFound);
+        
+        if(resourceSteps.includes(currentStep.type) && !resourceFound) {
+          setCanAddResource(true);
+        }
+
+        setCurrentSubscription(resultSubscription.result);
         setLoading(false);
-    };      
+    };    
+
     loadData();
   }, []);
 
@@ -34,13 +54,13 @@ export default function ResourceLayout() {
           <h3 className="text-primary-dark">Recursos</h3>
         </div>
         <div className="col-6 text-right">
-          <Link href={{
+          {canAddResource && <Link href={{
                   pathname: "/student/resource/new",
                   query: { subscriptionID: currentSubscription?.id },
                 }}
           >
             <a className="btn btn-primary">Cadastrar</a>
-          </Link>
+          </Link>}
         </div>
       </div>
       <div className="row mt-5">
@@ -56,7 +76,10 @@ export default function ResourceLayout() {
             <tbody>
               {currentSubscription?.resources && currentSubscription?.resources.map((resource, i) => {
                 return (
-                  <Link href={`/admin/resource`} key={i}>
+                  <Link href={{
+                    pathname: "/student/resource/edit",
+                    query: { subscriptionID: currentSubscription?.id, step: resource.step },
+                  }} key={i}>
                     <tr>
                       <td>{resource.step}</td>
                       <td>{(new Date(resource.date)).toISOString()}</td>

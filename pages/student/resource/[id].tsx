@@ -8,24 +8,64 @@ import * as Yup from 'yup'
 import { ErrorMessage, Field, FieldArray, Formik } from 'formik'
 import { toast } from 'react-nextjs-toast'
 import API from '../../../lib/api.service';
-import { APIResponse } from '../../../models/api-response';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
-import { SubscriptionResource } from '../../../models/subscription';
+import { Subscription, SubscriptionResource } from '../../../models/subscription';
 import StudentBase from '../../../components/student/student-base';
+import { APIResponse } from '../../../models/api-response';
+import { ProcessStep, SelectiveProcess } from '../../../models/selective-process';
+import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFile } from '@fortawesome/free-solid-svg-icons';
+import Loading from '../../../components/loading';
 
 export default function SaveResourceLayout() {
+    const [isLoading, setLoading] = useState<boolean>(true);
     const router = useRouter();
     const {
-      query: { subscriptionID },
+      query: { subscriptionID, step },
     } = router;
     const api = API();
 
     const [resource, setResource] = useState<SubscriptionResource>();
     const [files, setFiles] = useState<any>([]);
+    const resourceSteps = ResourceStepsHelper.steps();
 
+    useEffect(() => {   
+        const loadData = async () => {
+            const resultSubscription: APIResponse = await api.get(APIRoutes.CURRENT_SUBSCRIPTION);
+    
+            if (!resultSubscription.result) {
+              return;
+            }
+    
+            const subscription: Subscription = resultSubscription.result;
 
+            if(step){
+                let resourceFound: SubscriptionResource = subscription.resources.find((resource) => step === resource.step);
+                console.log(resourceFound);
+                setResource(resourceFound);
+            } else {
+                const resultSelectiveProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'id': subscription.selectiveProcessID });
+                const selectiveProcess: SelectiveProcess = resultSelectiveProcess.result;
+               
+                let currentStep: ProcessStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
+                
+                let resourceFound: SubscriptionResource = subscription.resources.find((resource) => currentStep.type === resource.step);
+                console.log(resourceFound);
+                
+                if(resourceSteps.includes(currentStep.type) && !resourceFound) {
+                    router.push("/student/resource");
+                }
+            }
+
+            setLoading(false);
+        };    
+    
+        loadData();
+      }, []);
+      
     const buildArrayFiles = async (files) => {
         const arrayFiles = [];
         for (let j = 0; j < files.length; j++){
@@ -44,6 +84,7 @@ export default function SaveResourceLayout() {
         try {
             actions.setSubmitting(true);
             await saveResource(values);
+            router.push("/student/resource");
         } catch (error) {
             console.error(error);
             actions.setSubmitting(false);
@@ -89,6 +130,13 @@ export default function SaveResourceLayout() {
         console.log(newFiles)
     }
 
+    if(isLoading){
+        return (        
+            <StudentBase>
+                <Loading />
+            </StudentBase>
+        );
+    }
 
     return (
         <StudentBase>
@@ -102,9 +150,11 @@ export default function SaveResourceLayout() {
                     </Link>
                 </div>
             </div>
+            {resource && "Etapa: " + resource?.step}            
+            {resource && " | Data: " + resource?.date}
             <Formik
                 enableReinitialize
-                initialValues={{ ...resource, files: [''] }}
+                initialValues={{ justification: resource?.justification, files: [''] }}
                 validationSchema={
                     Yup.object().shape({
                         justification: Yup.string().required('Preencha este campo.'),
@@ -129,10 +179,11 @@ export default function SaveResourceLayout() {
                                         rows={3}
                                         value={values.justification}
                                         onChange={handleChange}
+                                        disabled={!!resource}
                                     ></textarea>
                                     <p className="input-error"><ErrorMessage name="justification" className="input-error" /></p>
                                 </div>
-                                <div className="mb-3">
+                                {!resource && <div className="mb-3">
                                     <label className="form-label row mt-2">Arquivos</label>  
                                     <FieldArray
                                         name="files"
@@ -181,12 +232,21 @@ export default function SaveResourceLayout() {
                                             </>
                                         )}
                                     />   
-                                </div>   
+                                </div>}
+                                {resource && resource.files?.length && 
+                                    <div>                                     
+                                        {resource.files.map((file, idx) => (
+                                            <a href={file} className={style.titleFile} target="_blank">
+                                                <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo {idx + 1}
+                                            </a>      
+                                        ))}
+                                    </div> 
+                                }
                             </div>    
                         </div> 
-                        <div className="text-right">
-                        <button type="submit" className="btn btn-primary mt-3 me-auto" disabled={isSubmitting}>Salvar</button>
-                        </div>
+                        {!resource && <div className="text-right">
+                            <button type="submit" className="btn btn-primary mt-3 me-auto" disabled={isSubmitting}>Salvar</button>
+                        </div>}
                     </form>
                 )}
             </Formik>

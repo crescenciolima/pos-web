@@ -1,4 +1,6 @@
 import { NextApiResponse } from 'next'
+import Cors from 'cors'
+import AuthService from '../../lib/auth.service';
 import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../utils/storage-path';
 import multer from 'multer';
@@ -13,23 +15,34 @@ import SubscriptionService from '../../lib/subscription.service';
 import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
+import { ResourceStepsHelper } from '../../helpers/resource-steps-helper';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer();
 
-// for parsing multipart/form-data
-// note that Multer limits to 1MB file size by default
 const multerAny = initMiddleware(
   upload.any()
 );
 
+const cors = initMiddleware(
+  Cors({
+      methods: ['GET', 'POST', 'OPTIONS'],
+  })
+)
 
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   const subscriptionService = SubscriptionService();
   const selectiveProcessService = SelectiveProcessService();
   const treatError = TreatError();
+  const resourceSteps = ResourceStepsHelper.steps();
+  const authService = AuthService();
 
+  await cors(req, res);
+
+  if(!await authService.checkAuthentication(req)){
+    return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+  }
 
   switch (req.method) {
 
@@ -37,12 +50,24 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       try{
         await multerAny(req, res);
 
-        const { subscriptionID, justification, step } = req.body;        
+        const { subscriptionID, justification } = req.body;        
 
         const subscription = await subscriptionService.getById(subscriptionID);
+
+        
+        if(!subscription) {
+          return res.status(404).json(await treatError.general("Inscrição não encontrada."));
+        }
+
         const selectiveProcess = await selectiveProcessService.getById(subscription.selectiveProcessID)
 
         let currentStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
+        
+        let resourceFound: SubscriptionResource = subscription.resources?.find((resource) => currentStep.type === resource.step);
+
+        if(!resourceSteps.includes(currentStep.type) || resourceFound) {
+          return res.status(400).json(await treatError.general("A etapa atual não permite recurso."));
+        }
 
         const resource: SubscriptionResource = {
           justification,
@@ -70,7 +95,6 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         }else{          
           subscription.resources = [resource];
         }
-
         
         await subscriptionService.update(subscription); 
   
