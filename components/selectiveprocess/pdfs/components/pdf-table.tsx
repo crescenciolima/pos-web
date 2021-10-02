@@ -13,17 +13,19 @@ interface Props {
     title: string;
     headerList: PDFTableInfo[];
     lines: PDFTableInfo[][];
+    marginTop?:number;
 }
 
 export default function PDFTable(props: Props) {
 
 
+    const { headerList, title, lines, marginTop } = props;
 
     const styles = StyleSheet.create({
 
         tableContainer: {
             flexDirection: 'column',
-            marginTop: 4,
+            marginTop: marginTop || 4,
             justifyContent: 'center',
             textAlign: 'center',
         },
@@ -38,7 +40,6 @@ export default function PDFTable(props: Props) {
 
     });
 
-    const { headerList, title, lines } = props;
 
 
     return (

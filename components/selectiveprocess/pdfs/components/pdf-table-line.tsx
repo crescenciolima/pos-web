@@ -23,7 +23,7 @@ export default function PDFTableLine(props: Props) {
             alignItems: 'center',
             flexGrow: 1,
             fontSize: 10,
-            paddingVertical:"5"
+            paddingVertical:"3"
             
 
         },
