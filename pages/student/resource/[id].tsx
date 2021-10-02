@@ -31,6 +31,7 @@ export default function SaveResourceLayout() {
     const [resource, setResource] = useState<SubscriptionResource>();
     const [files, setFiles] = useState<any>([]);
     const resourceSteps = ResourceStepsHelper.steps();
+    const decodeStep = atob(step as string);
 
     useEffect(() => {   
         const loadData = async () => {
@@ -43,14 +44,14 @@ export default function SaveResourceLayout() {
             const subscription: Subscription = resultSubscription.result;
 
             if(step){
-                let resourceFound: SubscriptionResource = subscription.resources.find((resource) => step === resource.step);
+                let resourceFound: SubscriptionResource = subscription.resources.find((resource) => decodeStep === resource.step);
                 console.log(resourceFound);
                 setResource(resourceFound);
             } else {
                 const resultSelectiveProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'id': subscription.selectiveProcessID });
                 const selectiveProcess: SelectiveProcess = resultSelectiveProcess.result;
                
-                let currentStep: ProcessStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
+                let currentStep: ProcessStep = selectiveProcess.steps.find((_step) => selectiveProcess.currentStep === _step.order);
                 
                 let resourceFound: SubscriptionResource = subscription.resources.find((resource) => currentStep.type === resource.step);
                 console.log(resourceFound);
@@ -150,8 +151,13 @@ export default function SaveResourceLayout() {
                     </Link>
                 </div>
             </div>
-            {resource && "Etapa: " + resource?.step}            
-            {resource && " | Data: " + resource?.date}
+            {resource && (
+                <>
+                    <b>Etapa:</b> {resource?.step}
+                    <br />  
+                    <b>Data:</b> {resource?.date}
+                </>
+            )}  
             <Formik
                 enableReinitialize
                 initialValues={{ justification: resource?.justification, files: [''] }}

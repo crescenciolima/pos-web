@@ -9,7 +9,7 @@ import Permission from '../../../lib/permission.service';
 import { APIResponse } from '../../../models/api-response';
 import { Subscription, SubscriptionResource } from '../../../models/subscription';
 import { UserType } from '../../../enum/type-user.enum';
-import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
+import { ProcessStep, SelectiveProcess } from '../../../models/selective-process';
 import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
 
 export default function ResourceLayout() {
@@ -78,7 +78,7 @@ export default function ResourceLayout() {
                 return (
                   <Link href={{
                     pathname: "/student/resource/edit",
-                    query: { subscriptionID: currentSubscription?.id, step: resource.step },
+                    query: { subscriptionID: currentSubscription?.id, step: btoa(resource.step) },
                   }} key={i}>
                     <tr>
                       <td>{resource.step}</td>
