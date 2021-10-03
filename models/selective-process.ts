@@ -55,6 +55,7 @@ export interface ProcessStep {
     weight: number;
     passingScore: number;
     type: ProcessStepsTypes;
+    resultURL?:string;
 
 }
 

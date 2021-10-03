@@ -29,55 +29,40 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         await multerAny(req, res);
 
         const blob: BlobCorrected = req.files?.length ? req.files[0] : null;
-        const { id } = req.body
+        const { id, currentStepType } = req.body
+
 
 
         const uploadService = FileUploadService();
         let process = await selectiveProcessService.getById(id);
+        let steps = process.steps;
+      
 
-        let name = process.steps[process.currentStep].type + process.title;
+        const step = steps.find(st => st.type == currentStepType);
+
+        let name = step.type + process.title;
 
         let url = await uploadService.upload(StoragePaths.SELECTIVE_PROCESS_RESULTS, blob, name);
 
-      
-        // const doc: ProcessDocument = {
-        //   name: name,
-        //   url: url
-        // };
+        if(step.resultURL){
+          await uploadService.remove(step.resultURL)
+        }
 
+        step.resultURL = url;
 
-        // let updateProcess: SelectiveProcess = {
-        //   id: id,
-        //   title: process.title,
-        //   state: process.state
-        // }
+        let updateProcess: SelectiveProcess = {
+          id: id,
+          title: process.title,
+          state: process.state,
+          steps: steps
+        }
 
-        // switch (type) {
-        //   case "Edital":
-        //     let docs = process.processNotices;
-        //     if (!docs) {
-        //       docs = [];
-        //     }
-        //     docs.push(doc);
-        //     updateProcess.processNotices = docs;
-        //     await selectiveProcessService.update(updateProcess);
-        //     break;
-        //   case "Formulário":
-        //     let forms = process.processForms;
-        //     if (!forms) {
-        //       forms = [];
-        //     }
-        //     forms.push(doc);
-        //     updateProcess.processForms = forms;
-        //     await selectiveProcessService.update(updateProcess);
-        //     break;
-        // }
-
+        await selectiveProcessService.update(updateProcess);
 
 
         let response: APIResponse = {
-          msg: "Processo seletivo salvo com sucesso!",
-          result: {url: url}
+          msg: "Resultado salvo com sucesso!",
+          result: step
         }
 
 
@@ -92,42 +77,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
     case "DELETE":
 
-      await multerAny(req, res);
-
-      const { id, document, processNotices, processForms } = req.body
-      let process = await selectiveProcessService.getById(id);
-
-      try {
-        const deletedDoc = JSON.parse(document);
-        let uploadService = FileUploadService();
-        await uploadService.remove(deletedDoc.url);
-      } catch (error) {
-
-      }
-
-
-      let updateProcess: SelectiveProcess = {
-        id: id,
-        title: process.title,
-        state: process.state
-      }
-
-      if (processNotices) {
-        updateProcess.processNotices = JSON.parse(processNotices);
-        await selectiveProcessService.update(updateProcess);
-      } else if (processForms) {
-        updateProcess.processForms = JSON.parse(processForms);
-        await selectiveProcessService.update(updateProcess);
-      }
-
-      let deleteResponse: APIResponse = {
-        msg: "Arquivo removido com sucesso!",
-        result: updateProcess
-      }
-
-      res.status(200).json(deleteResponse);
-      break;
-
+   
 
     default:
       res.status(405);

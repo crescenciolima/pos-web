@@ -10,7 +10,7 @@ export default function NewsService() {
     async function getAll() {
         let newsList = [];
 
-        await newsRef.orderBy('date', 'desc').limit(2).get().then(
+        await newsRef.orderBy('date', 'desc').get().then(
             (snapshot) => {
                 snapshot.forEach(
                     (result) => {

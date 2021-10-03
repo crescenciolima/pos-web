@@ -77,7 +77,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         const news = await newsService.getById(req.query.id);
         getResponse.result = news;
       } else {
-        const newsList = req.query.page ? await newsService.getPage(+req.query.page.toString()) : await newsService.getAll();
+        const newsList =  await newsService.getAll();
         getResponse.result = newsList;
       }
 

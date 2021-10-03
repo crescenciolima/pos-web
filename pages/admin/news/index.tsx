@@ -37,7 +37,7 @@ export default function NewsLayout() {
 
   }, []);
 
-  function removeTeacher(event, news: News) {
+  function removeNews(event, news: News) {
     event.stopPropagation();
     setSelectedNews(news);
     setOpenModal(true);
@@ -84,7 +84,7 @@ export default function NewsLayout() {
                     <tr>
                       <td>{newsItem.title}</td>
                       <td>{newsItem.dateString}</td>
-                      <td><button className="btn btn-sm btn-danger" onClick={(e) => removeTeacher(e, newsItem)} >
+                      <td><button className="btn btn-sm btn-danger" onClick={(e) => removeNews(e, newsItem)} >
                         <FontAwesomeIcon icon={faTrash} className="sm-icon" />
                       </button></td>
                     </tr>
