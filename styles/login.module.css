@@ -13,10 +13,13 @@
   }
   
   .formSignin {
+    text-align: center;
     width: 100%;
-    max-width: 330px;
-    padding: 15px;
+    max-width: 400px;
+    padding: 3.2rem;
     margin: auto;
+    background-color: var(--background-light);
+    border-radius: 1rem;
   }
   
   .form-signin .checkbox {
@@ -45,6 +48,21 @@
   }
 
   .buttonForgotPassword{
+    margin-top:1rem;
     font-size: 13px;
-    color: #459e45;
+    color: var(--primary);
+  }
+
+  .buttonForgotPassword:hover{
+    color: var(--primary-dark);
+  }
+
+  .main{
+    background-color: var(--background-color);
+    min-height: calc(100vh - 94px);
+    display: flex;
+    background-image: url("/images/home/login.svg");
+    background-repeat: no-repeat;
+    background-position-y: bottom;
+    background-position-x: right;
   }

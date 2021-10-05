@@ -44,10 +44,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
         let url = await uploadService.upload(StoragePaths.SELECTIVE_PROCESS_RESULTS, blob, name);
 
-        if(step.resultURL){
-          await uploadService.remove(step.resultURL)
-        }
-
+       
         step.resultURL = url;
 
         let updateProcess: SelectiveProcess = {

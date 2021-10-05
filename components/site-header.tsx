@@ -33,10 +33,14 @@ export default function SiteHeader() {
           <div className={"collapse navbar-collapse justify-content-end " + (navBarCollapsed ? 'show' : '')} id="navbarNav">
             <ul className="navbar-nav">
               <li className="nav-item">
-                <a className="nav-link" aria-current="page" href="#">Notícias</a>
+                <Link href="/">
+                  <a className="nav-link">Início</a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">Sobre</a>
+                <Link href="/noticia">
+                  <a className="nav-link">Notícias</a>
+                </Link>
               </li>
               <li className="nav-item">
                 <Link href="/docentes">
@@ -50,7 +54,7 @@ export default function SiteHeader() {
               </li>
             </ul>
           </div>
-          
+
         </div>
       </nav>
     </header>

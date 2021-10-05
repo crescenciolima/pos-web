@@ -35,10 +35,10 @@ export default function NewsService() {
 
     }
 
-    async function getPage(page: number) {
+    async function getFirstResults() {
         let newsList = [];
 
-        await newsRef.orderBy('date', 'desc').get().then(
+        await newsRef.orderBy('date', 'desc').limit(3).get().then(
             (snapshot) => {
                 snapshot.forEach(
                     (result) => {
@@ -134,7 +134,7 @@ export default function NewsService() {
 
     return {
         getAll,
-        getPage,
+        getFirstResults,
         save,
         update,
         remove,
