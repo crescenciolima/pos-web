@@ -2,7 +2,7 @@ import Head from 'next/head'
 import homeStyle from '../styles/home.module.css'
 import Link from 'next/link'
 import { GetStaticProps } from 'next'
-import React from 'react'
+import React, { useRef } from 'react'
 import SiteHeader from '../components/site-header'
 import NewsService from '../lib/news.service'
 import CourseService from '../lib/course.service'
@@ -11,10 +11,18 @@ import { News } from '../models/news'
 import { Course } from '../models/course'
 import fire from '../utils/firebase-util'
 import Image from 'next/image'
+import SiteFooter from '../components/site-footer'
+import SelectiveProcessService from '../lib/selectiveprocess.service'
+import { ProcessStepsState, ProcessStepsTypes } from '../models/selective-process'
+import { format, sub } from 'date-fns';
 
 
 
-export default function Home({ newsList, course }) {
+export default function Home({ newsList, course, hasOpenProcess, title, acceptingSubscription, subscriptionDate }) {
+
+  const infoRef = useRef(null)
+  const scrollToInfo = () => infoRef.current.scrollIntoView();
+
   return (
     <>
       <Head>
@@ -39,7 +47,7 @@ export default function Home({ newsList, course }) {
                 <h1 className="d-inline text-primary fw-bold title-sm-font-size" >IFBA</h1>
                 <h1 className="text-primary-dark mt-4 title-font-size">Lato Sensu em</h1>
                 <h1 className="text-primary-dark title-font-size">Desenvolvimento Web</h1>
-                <button type="button" className="btn btn-primary btn-round py-2 px-4 cta-font-size mt-4">Saiba Mais</button>
+                <button type="button" className="btn btn-primary btn-round py-2 px-4 cta-font-size mt-4" onClick={scrollToInfo}>Saiba Mais</button>
 
               </div>
             </div>
@@ -48,26 +56,69 @@ export default function Home({ newsList, course }) {
             </div>
           </div>
         </section>
-        <section className={homeStyle.sectionPadding}>
-          <div className="row justify-content-center">
+        <section className={homeStyle.sectionPadding} ref={infoRef}>
+          {!hasOpenProcess &&
+            <div className="row justify-content-center">
+              <div className="col-12">
+                <h1 className="d-inline text-primary-dark heading-font-size">Processo Seletivo</h1>
+              </div>
+              <div className="col-11 col-md-8 col-lg-6 mt-5">
+                <div className="card  btn-round bg-color border-0">
+                  <div className="card-body d-flex ">
+                    <img src="/images/home/unavailable.svg" alt="Nenhum processo seletivo" className={homeStyle.cardImg} width={180} height={180} ></img>
+                    <div className="d-flex ms-3 flex-column my-auto">
+                      <h5 className="card-title text-primary-dark">Olá,</h5>
+                      <p className="card-text text-primary-dark">Infelizmente não estamos com nenhum processo seletivo aberto no momento, quando  um novo processo for iniciado, todas as informações serão divulgadas nesse site.</p>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          }
+          {hasOpenProcess && <div className="row justify-content-center">
             <div className="col-12">
-              <h1 className="d-inline text-primary-dark heading-font-size">Processo Seletivo</h1>
+              <h1 className="d-inline text-primary-dark heading-font-size">Processo Seletivo {acceptingSubscription && 'Aberto'}</h1>
             </div>
             <div className="col-11 col-md-8 col-lg-6 mt-5">
               <div className="card  btn-round bg-color border-0">
                 <div className="card-body d-flex ">
-                  <img src="/images/home/unavailable.svg" alt="Nenhum processo seletivo" className={homeStyle.cardImg} width={180} height={180} ></img>
+                  <img src="/images/home/available.svg" alt="Processo seletivo aberto" className={homeStyle.cardImg} width={180} height={180} ></img>
                   <div className="d-flex ms-3 flex-column my-auto">
-                    <h5 className="card-title text-primary-dark">Olá,</h5>
-                    <p className="card-text text-primary-dark">Infelizmente não estamos com nenhum processo seletivo aberto no momento, quando  um novo processo for iniciado, todas as informações serão divulgadas nesse site.</p>
+                    <h3 className="card-title text-primary-dark mb-3">{title}</h3>
+                    {!acceptingSubscription &&
+                      <p className="card-text text-primary-dark">
+                        Estamos com nosso processo seletivo em andamento, acompanhe todas as informações na nossa seção de notícias. Se você é inscrito faça login na plataforma para mais detalhes.
+                      </p>}
+                    {acceptingSubscription &&
+                      <>
+                        <p className="card-text text-primary-dark">
+                          <b>Anteção. </b> Inscrições abertas para nosso processo seletivo, fique atento para não perder o prazo (Incrições até <b>{subscriptionDate}</b>). Você pode se inscrever clicando no botão abaixo.
+                        </p>
+                        <div className="row">
+                          <div className="col-auto">
+                            <Link href="/login">
+                              <button type="button" className="btn btn-primary btn-round px-5 py-2 mt-3">Inscreva-se</button>
+                            </Link>
+
+                          </div>
+                        </div>
+                      </>
+                    }
                   </div>
+                  {/* {acceptingSubscription &&
+                    <div className="d-flex ms-3 flex-column my-auto">
+
+                    </div>
+                  } */}
                 </div>
 
               </div>
             </div>
           </div>
+          }
         </section>
-        <section className={homeStyle.sectionPadding +' '+ homeStyle.newsSection}>
+        <section className={homeStyle.sectionPadding + ' ' + homeStyle.newsSection}>
           <div className="row justify-content-center">
             <div className="col-12">
               <h1 className="d-inline text-primary-dark heading-font-size">Últimas Notícias</h1>
@@ -84,37 +135,8 @@ export default function Home({ newsList, course }) {
           </div>
 
         </section>
-  
-        <footer className={homeStyle.sectionPadding+' bg-footer'}>
-            <div className="row">
-              <div className="col-md-9 text-white">
-                <div className="row">
-                  <div className="col-12">
-                    <h4>{course.name}</h4>
-                  </div>
-                </div>
-                <br />
-                <div className="row">
-                  <div className="col-6">
-                      <p>Coordenação:</p>
-                      <p>
-                        {course.coordName}<br /> 
-                        {course.coordMail}
-                      </p>
-                  </div>
-                  <div className="col-6">
-                    <p>Campus Viória da Conquista</p>
-                    <p>Av. Sérgio Vieira de Mello, 3150 - Zabelê,<br />
-                    Vitória da Conquista - BA, 45078-300
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-3 text-center">
-                <Image src="/images/ifba-logo-footer.png" alt="logo"width="124" height="147" />
-              </div>
-            </div>
-        </footer>
+
+        <SiteFooter course={course}></SiteFooter>
       </main>
 
     </>
@@ -122,21 +144,21 @@ export default function Home({ newsList, course }) {
 }
 
 export const getStaticProps: GetStaticProps = async () => {
+
+  //News Info
   const newsService = NewsService();
-  // const newsList = await newsService.getPage(0);
-  const newsList = await newsService.getAll();
+  const newsList = await newsService.getFirstResults();
   for (let news of newsList) {
     const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
     news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
 
-  const courseService = CourseService();
-  
-  let courseData = await courseService.getFirstCourse();
 
-  //mockup de dados quando não houver cadastro do curso 
-  //TODO melhor retornar um componente vazio e não renderizar a seção "Sobre"?
-  let course : Course ={
+  //Course Infor
+  const courseService = CourseService();
+
+  let courseData = await courseService.getFirstCourse();
+  let course: Course = {
     name: '<Nome do Curso>',
     description: '<Descrição do Curso>',
     coordName: '<Nome do Coordenador>',
@@ -144,14 +166,42 @@ export const getStaticProps: GetStaticProps = async () => {
     coordPhone: '<Telefone da Coordenação>'
   }
 
-  if (courseData){
+  if (courseData) {
     course = courseData
   }
+
+  //Process Info
+
+  const processService = SelectiveProcessService();
+
+  const process = await processService.getOpen();
+  let hasOpenProcess = false;
+  let title = "";
+  let acceptingSubscription = false;
+  let subscriptionDate = "";
+
+  if (process) {
+    if (process.state == ProcessStepsState.OPEN) {
+      hasOpenProcess = true;
+      title = process.title;
+      const currentStep = process.steps[process.currentStep];
+      if (currentStep.type == ProcessStepsTypes.INSCRICAO) {
+        acceptingSubscription = true;
+        const date = new Date(currentStep.finishDate);
+        subscriptionDate = format(date, 'dd/MM/yyyy');
+      }
+    }
+  }
+
 
   return {
     props: {
       newsList,
       course,
+      hasOpenProcess,
+      title,
+      acceptingSubscription,
+      subscriptionDate
     },
     revalidate: 1800
 

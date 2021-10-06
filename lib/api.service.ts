@@ -11,14 +11,18 @@ export default function API(setLoading?: Function) {
             if (setLoading) setLoading(true);
 
             let data = new FormData();
-            
-            if(file?.length){
-                for (let i = 0; i < file.length; i++){
-                    data.append('file', file[i]);
+            console.log(file)
+            if (file) {
+                console.log("ué")
+                if (file.length) {
+                    for (let i = 0; i < file.length; i++) {
+                        data.append('file', file[i]);
+                    }
+                } else {
+                    data.append('file', file);
                 }
-            }else if (file) {
-                data.append('file', file);
             }
+
 
             for (let key in body) {
                 data.append(key, body[key]);
@@ -52,7 +56,7 @@ export default function API(setLoading?: Function) {
 
             if (setLoading) setLoading(true);
             (body);
-            const res = await fetch(url, {          
+            const res = await fetch(url, {
                 body: JSON.stringify(body),
                 headers: await buildHeaders(),
                 method: 'POST',
@@ -60,20 +64,20 @@ export default function API(setLoading?: Function) {
 
             const result: APIResponse = await res.json();
 
-            if(result.error){                
-                showNotify(result.msg, "error","Erro");                
+            if (result.error) {
+                showNotify(result.msg, "error", "Erro");
                 if (setLoading) setLoading(false);
                 return;
             }
-            
+
             if (setLoading) setLoading(false);
-            
-            showNotify(result.msg, "success","Notificação");
+
+            showNotify(result.msg, "success", "Notificação");
 
             return result;
         } catch (error) {
             (error)
-            showNotify(error.msg, "error","Erro");
+            showNotify(error.msg, "error", "Erro");
 
             if (setLoading) setLoading(false);
 
@@ -83,7 +87,7 @@ export default function API(setLoading?: Function) {
     }
 
     async function get(url: string, params?) {
-        try {     
+        try {
             if (setLoading) setLoading(true);
 
             if (params) {
@@ -100,7 +104,7 @@ export default function API(setLoading?: Function) {
             const result: APIResponse = await res.json();
             console.log(result);
 
-            if(result.error){                              
+            if (result.error) {
                 if (setLoading) setLoading(false);
                 return null;
             }
@@ -123,7 +127,7 @@ export default function API(setLoading?: Function) {
     }
 
     async function getWithContext(ctx: GetServerSidePropsContext, url: string, params?) {
-        try {     
+        try {
             if (setLoading) setLoading(true);
 
             if (params) {
@@ -139,7 +143,7 @@ export default function API(setLoading?: Function) {
 
             const result: APIResponse = await res.json();
 
-            if(result.error){                              
+            if (result.error) {
                 if (setLoading) setLoading(false);
                 return false;
             }
@@ -162,7 +166,7 @@ export default function API(setLoading?: Function) {
 
 
     async function exclude(url: string, params?) {
-        try {           
+        try {
 
             if (setLoading) setLoading(true);
 
@@ -206,9 +210,9 @@ export default function API(setLoading?: Function) {
 
             let data = new FormData();
             for (let key in body) {
-                if(typeof body[key] == "object"){
+                if (typeof body[key] == "object") {
                     data.append(key, JSON.stringify(body[key]));
-                }else{
+                } else {
                     data.append(key, body[key]);
                 }
             }
@@ -254,7 +258,7 @@ export default function API(setLoading?: Function) {
         });
     }
 
-    async function buildHeaders(){
+    async function buildHeaders() {
         const token = await cookies.getTokenClient();
         return {
             'Content-Type': 'application/json',
@@ -262,14 +266,14 @@ export default function API(setLoading?: Function) {
         };
     }
 
-    async function buildHeadersFormData(){
+    async function buildHeadersFormData() {
         const token = await cookies.getTokenClient();
         return {
             'Authorization': token,
         };
     }
 
-    async function buildHeadersWithContext(ctx: GetServerSidePropsContext){
+    async function buildHeadersWithContext(ctx: GetServerSidePropsContext) {
         const token = await cookies.getTokenServer(ctx);
         return {
             'Content-Type': 'application/json',

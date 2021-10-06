@@ -221,6 +221,10 @@ tr{
     border-radius: 9999px;
 }
 
+.nav-item:hover .nav-link{
+    color: var(--primary) !important;
+}
+
 .nav-fill .nav-item .active{
     color: var(--primary);
 }
@@ -251,4 +255,9 @@ legend {
 
 label>span {
     color: red!important;
+}
+
+.title-section{
+    padding-top: 5rem;
+    padding-bottom: 2rem;
 }

@@ -8,8 +8,11 @@ import { Teacher } from '../models/teacher'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPhoneAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import TeacherService from '../lib/teacher.service'
+import CourseService from '../lib/course.service'
+import { Course } from '../models/course'
+import SiteFooter from '../components/site-footer'
 
-export default function Docentes({ docentes }) {
+export default function Docentes({ docentes,course }) {
 
   const listaDocentes: Teacher[] = docentes;
 
@@ -20,8 +23,8 @@ export default function Docentes({ docentes }) {
       </Head>
       <SiteHeader></SiteHeader>
       <main className={style.main}>
-        <section>
-          <div className="row h-100 justify-content-center">
+      <section  className="title-section">
+          <div className="row w-100 h-100 justify-content-center">
             <div className="col-md-5 col-xl-4 col-xxl-3 d-flex justify-content-center align-items-center">
               <div className="p-4">
                 <h1 className="text-primary-dark mt-4 title-sm-font-size">Nossa</h1>
@@ -37,9 +40,9 @@ export default function Docentes({ docentes }) {
         </section>
 
         <section>
-          <div className="row h-100 justify-content-center mt-5 pb-5">
+          <div className="row w-100 h-100 justify-content-center mt-5 pb-5 ">
             <div className="col-11 col-md-10 col-xl-8 col-xxl-7">
-              <div className="row justify-content-center">
+              <div className="row w-100 justify-content-center">
                 {listaDocentes.map((docente, i) => {
                   return (
                     <div className="col-sm-6 col-md-4 col-xl-4" key={i}>
@@ -72,6 +75,7 @@ export default function Docentes({ docentes }) {
           </div>
         </section>
       </main>
+      <SiteFooter course={course}></SiteFooter>
 
     </>
   )
@@ -84,9 +88,25 @@ export const getStaticProps: GetStaticProps = async () => {
   const docenteList = await teacherService.getAll();
 
 
+  const courseService = CourseService();
+
+  let courseData = await courseService.getFirstCourse();
+
+  let course: Course = {
+    name: '<Nome do Curso>',
+    description: '<Descrição do Curso>',
+    coordName: '<Nome do Coordenador>',
+    coordMail: '<E-mail da Coordenação>',
+    coordPhone: '<Telefone da Coordenação>'
+  }
+
+  if (courseData) {
+    course = courseData
+  }
   return {
     props: {
-      docentes: docenteList
+      docentes: docenteList,
+      course:course
     },
     revalidate: 86400
   }

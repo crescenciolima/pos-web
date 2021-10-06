@@ -12,6 +12,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
+import PDFButtons from '../pdfs/pdf-buttons';
+import PDFBaremaResult from '../pdfs/pdf-barema-result';
 
 interface Props {
     process: SelectiveProcess;
@@ -39,13 +41,11 @@ export default function SelectiveBaremaResults(props: Props) {
         const list: Subscription[] = props.subscriptionList;
         const finalList: Subscription[] = [];
 
-
         for (let sub of list) {
             if (sub.status == SubscriptionStatus.DEFERIDA) {
                 sub['formatedDate'] = format(new Date(sub.subscriptionDate), 'dd/MM/yyyy');
-                //
+                processUtil.setSubscriptionPlaceName(sub, props.process);
                 let aproved = processUtil.isSubscriberApproved(sub, props.process);
-
                 if (aproved) {
                     sub['baremaGrade'] = processUtil.calculateBaremaGrade(sub, props.process);
                     finalList.push(sub);
@@ -54,11 +54,12 @@ export default function SelectiveBaremaResults(props: Props) {
             }
         }
 
-        finalList.sort((a, b) => b['baremaGrade'] - a['baremaGrade'] );
+        finalList.sort((a, b) => b['baremaGrade'] - a['baremaGrade']);
         setSubscriptionList(finalList);
 
     }, []);
 
+    const PDF =  PDFBaremaResult({ process: selectiveProcess, currentStep: currentStep, subscriptionList: subscriptionList });
 
 
     return (
@@ -68,6 +69,9 @@ export default function SelectiveBaremaResults(props: Props) {
                 <div className="col-6">
                     <h5 className="text-primary-dark">Inscritos</h5>
                 </div>
+                {currentStep.type != ProcessStepsTypes.INSCRICAO && <div className="col-6 text-right">
+                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()}></PDFButtons>
+                </div>}
             </div>
             <div className="row mt-3">
                 <div className="col-12 table-responsive">
@@ -90,7 +94,7 @@ export default function SelectiveBaremaResults(props: Props) {
                                             <td>{sub.name}</td>
                                             <td>{sub.age}</td>
                                             <td>{sub['formatedDate']}</td>
-                                            <td>{sub.reservedPlace}</td>
+                                            <td>{sub.placeName}</td>
                                             <td>{sub['baremaGrade']}</td>
                                         </tr>
                                     </Link>

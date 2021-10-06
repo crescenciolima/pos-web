@@ -8,8 +8,11 @@ import NewsService from '../../lib/news.service'
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons'
+import CourseService from '../../lib/course.service'
+import { Course } from '../../models/course'
+import SiteFooter from '../../components/site-footer'
 
-export default function Docentes({ news }) {
+export default function Docentes({ news,course }) {
 
 
   return (
@@ -20,7 +23,7 @@ export default function Docentes({ news }) {
       <SiteHeader></SiteHeader>
       <main className={style.detailNewsMain}>
         <section className="w-100">
-          <div className="row h-100 justify-content-center">
+          <div className="row w-100 h-100 justify-content-center">
             <div className="col-md-5 col-xl-6  d-flex justify-content-center align-items-center">
               <div className={style.detailNewsCard + " card p-4"}>
                 <div className="card-body d-relative">
@@ -49,6 +52,7 @@ export default function Docentes({ news }) {
 
 
       </main>
+      <SiteFooter course={course}></SiteFooter>
 
     </>
   )
@@ -70,11 +74,25 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   const news = await newsService.getBySlug(newsSlug);
 
-  console.log(news)
+  const courseService = CourseService();
 
+  let courseData = await courseService.getFirstCourse();
+
+  let course: Course = {
+    name: '<Nome do Curso>',
+    description: '<Descrição do Curso>',
+    coordName: '<Nome do Coordenador>',
+    coordMail: '<E-mail da Coordenação>',
+    coordPhone: '<Telefone da Coordenação>'
+  }
+
+  if (courseData) {
+    course = courseData
+  }
   return {
     props: {
-      news: news
+      news: news,
+      course:course
     },
     revalidate: 86400
   }
