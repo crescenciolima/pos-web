@@ -1,26 +1,26 @@
-import { GetServerSidePropsContext, GetStaticProps, InferGetServerSidePropsType } from 'next'
-import React, {useEffect, useState, useRef} from 'react'
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import React, {useEffect, useState } from 'react'
 import * as Yup from 'yup'
 import {ErrorMessage, Field, FieldArray, Form, Formik} from 'formik'
 import ClipLoader from "react-spinners/ClipLoader";
 import { css } from "@emotion/core";
 import MaskedInput from 'react-input-mask';
-import DatePicker, { registerLocale, setDefaultLocale }  from "react-datepicker";
+import DatePicker, { registerLocale }  from "react-datepicker";
 import ptBR from 'date-fns/locale/pt-BR';
 import "react-datepicker/dist/react-datepicker.css";
+import { useRouter } from 'next/router';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFile } from '@fortawesome/free-solid-svg-icons';
 import style from '../../../styles/subscription.module.css';
-import { Subscription, SubscriptionFile, SubscriptionTypeFile } from "../../../models/subscription";
+import { Subscription, SubscriptionTypeFile } from "../../../models/subscription";
 import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
 import { UserType } from '../../../enum/type-user.enum';
 import StudentBase from '../../../components/student/student-base';
 import { APIResponse } from '../../../models/api-response';
-import { BaremaCategory, BaremaSubCategory, SelectiveProcess } from '../../../models/selective-process';
+import { SelectiveProcess } from '../../../models/selective-process';
 import { MaskHelper } from '../../../helpers/mask-helper';
-import { useRouter } from 'next/router';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFile } from '@fortawesome/free-solid-svg-icons';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {

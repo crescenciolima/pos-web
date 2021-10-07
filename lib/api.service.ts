@@ -13,7 +13,6 @@ export default function API(setLoading?: Function) {
             let data = new FormData();
             console.log(file)
             if (file) {
-                console.log("ué")
                 if (file.length) {
                     for (let i = 0; i < file.length; i++) {
                         data.append('file', file[i]);
@@ -102,6 +101,7 @@ export default function API(setLoading?: Function) {
             });
 
             const result: APIResponse = await res.json();
+            console.log(result);
 
             if (result.error) {
                 if (setLoading) setLoading(false);
@@ -113,6 +113,7 @@ export default function API(setLoading?: Function) {
 
         } catch (error) {
             console.error(error);
+            console.log(error);
             toast.notify("Ocorreu um erro ao buscar os dados", {
                 duration: 3,
                 type: "error",

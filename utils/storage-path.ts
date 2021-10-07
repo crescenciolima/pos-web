@@ -7,5 +7,6 @@ export class StoragePaths {
     static SELECTIVE_PROCESS_RESULTS: string = "selectiveprocess/results/";
 
     static SUBSCRIPTION: string = "subscription/";
+    static RESOURCE: string = "resource/";
 
 }

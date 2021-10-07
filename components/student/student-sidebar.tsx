@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChartLine, faBookReader, faChalkboardTeacher, faFile, faFileAlt, faFileInvoice, faFolder, faCopy, faUser, faHome } from '@fortawesome/free-solid-svg-icons'
+import { faChartLine, faBookReader, faChalkboardTeacher, faFile, faFileAlt, faFileInvoice, faFolder, faCopy, faUser, faHome, faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 import adminStyle from '../../styles/admin.module.css';
 
 export default function StudentSidebar() {
@@ -26,6 +26,14 @@ export default function StudentSidebar() {
                                 <FontAwesomeIcon icon={faBookReader} className="sm-icon" />
                             </i>
                             <label className={adminStyle.sidebarLabel}>Inscrição</label>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/student/resource" className="nav-link text-primary">
+                            <i className={adminStyle.icon}>
+                                <FontAwesomeIcon icon={faQuestionCircle} className="sm-icon" />
+                            </i>
+                            <label className={adminStyle.sidebarLabel}>Recurso</label>
                         </a>
                     </li>
                 </ul>

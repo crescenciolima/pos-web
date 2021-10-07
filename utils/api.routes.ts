@@ -33,6 +33,8 @@ export class APIRoutes {
     static FILE_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-subscription"
 
     static CURRENT_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/current-subscription"
+    
+    static RESOURCES:string = APIRoutes.API_URL + "/api/resource"
 
     static SELECTIVE_PROCESS:string = APIRoutes.API_URL + "/api/selectiveprocess"
 

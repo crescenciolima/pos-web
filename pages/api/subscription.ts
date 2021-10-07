@@ -68,9 +68,8 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
       let getResponse: APIResponse = {
         msg: "",
       };
-      if (req.query.processID) {
 
-        result: null
+      if (req.query.processID) {
         const subs = await subscriptionService.getAllByProcessID(req.query.processID.toString());
         getResponse.result = subs;
       } else if (req.query.id) {
