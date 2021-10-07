@@ -13,7 +13,6 @@ export default function API(setLoading?: Function) {
             let data = new FormData();
             console.log(file)
             if (file) {
-                console.log("ué")
                 if (file.length) {
                     for (let i = 0; i < file.length; i++) {
                         data.append('file', file[i]);

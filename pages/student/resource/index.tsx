@@ -15,7 +15,7 @@ import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
 export default function ResourceLayout() {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [currentSubscription, setCurrentSubscription] = useState<Subscription>();
-  const [canAddResource, setCanAddResource] = useState<boolean>(true);
+  const [canAddResource, setCanAddResource] = useState<boolean>(false);
   const resourceSteps = ResourceStepsHelper.steps();
   const api = API(setLoading);
 

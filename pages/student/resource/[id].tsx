@@ -6,7 +6,6 @@ import { useRouter } from 'next/router'
 import Link from 'next/link';
 import * as Yup from 'yup'
 import { ErrorMessage, Field, FieldArray, Formik } from 'formik'
-import { toast } from 'react-nextjs-toast'
 import API from '../../../lib/api.service';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
@@ -31,7 +30,7 @@ export default function SaveResourceLayout() {
     const [resource, setResource] = useState<SubscriptionResource>();
     const [files, setFiles] = useState<any>([]);
     const resourceSteps = ResourceStepsHelper.steps();
-    const decodeStep = atob(step as string);
+    const decodeStep = step ? atob(step as string) : null;
 
     useEffect(() => {   
         const loadData = async () => {
