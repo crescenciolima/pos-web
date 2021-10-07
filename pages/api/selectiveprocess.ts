@@ -4,9 +4,19 @@ import { APIResponse } from '../../models/api-response';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
 import { SelectiveProcess } from '../../models/selective-process';
 import { v4 as uuidv4 } from 'uuid';
+import Cors from 'cors'
+import initMiddleware from '../../utils/init-middleware';
 
+const cors = initMiddleware(
+  Cors({
+      methods: ['GET', 'POST', 'OPTIONS'],
+  })
+)
 
 async function endpoint(req: NextApiRequest, res: NextApiResponse) {
+
+  await cors(req, res);
+
 
   const selectiveProcessService = SelectiveProcessService();
 
@@ -112,4 +122,5 @@ export const config = {
 }
 
 export default endpoint;
+
 

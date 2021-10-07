@@ -170,7 +170,6 @@ export default function SelectiveProcessDocuments(props: Props) {
                     <table className="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Nome</th>
                                 <th>Arquivo</th>
                                 <th>Excluir</th>
                             </tr>
@@ -179,8 +178,7 @@ export default function SelectiveProcessDocuments(props: Props) {
                             {processNotices.map((docs, i) => {
                                 return (
                                     <tr key={i}>
-                                        <td>{docs.name}</td>
-                                        <td></td>
+                                        <td><a href={docs.url} target="_blank">{docs.name}</a></td>
                                         <td><button className="btn btn-sm btn-danger" onClick={(e) => { handleDeleteNotice(docs, i) }} >
                                             <FontAwesomeIcon icon={faTrash} className="sm-icon" />
                                         </button></td>
@@ -205,7 +203,6 @@ export default function SelectiveProcessDocuments(props: Props) {
                     <table className="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th>Nome</th>
                                 <th>Arquivo</th>
                                 <th>Excluir</th>
                             </tr>
@@ -214,8 +211,7 @@ export default function SelectiveProcessDocuments(props: Props) {
                             {processForms.map((docs, i) => {
                                 return (
                                     <tr key={i}>
-                                        <td>{docs.name}</td>
-                                        <td></td>
+                                        <td><a href={docs.url} target="_blank">{docs.name}</a></td>
                                         <td><button className="btn btn-sm btn-danger" onClick={(e) => { handleDeleteForm(docs, i) }} >
                                             <FontAwesomeIcon icon={faTrash} className="sm-icon" />
                                         </button></td>

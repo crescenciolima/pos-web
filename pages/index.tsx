@@ -82,7 +82,7 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
             </div>
             <div className="col-11 col-md-8 col-lg-6 mt-5">
               <div className="card  btn-round bg-color border-0">
-                <div className="card-body d-flex ">
+                <div className="card-body d-flex flex-column flex-md-row">
                   <img src="/images/home/available.svg" alt="Processo seletivo aberto" className={homeStyle.cardImg} width={180} height={180} ></img>
                   <div className="d-flex ms-3 flex-column my-auto">
                     <h3 className="card-title text-primary-dark mb-3">{title}</h3>
@@ -106,13 +106,7 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
                       </>
                     }
                   </div>
-                  {/* {acceptingSubscription &&
-                    <div className="d-flex ms-3 flex-column my-auto">
-
-                    </div>
-                  } */}
                 </div>
-
               </div>
             </div>
           </div>
