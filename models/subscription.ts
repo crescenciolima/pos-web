@@ -1,4 +1,4 @@
-import { ProcessStepsTypes, SelectiveProcess } from "./selective-process";
+import { ProcessDocument, ProcessStepsTypes, SelectiveProcess } from "./selective-process";
 import { User } from "./user";
 
 export interface Subscription {
@@ -50,6 +50,7 @@ export interface Subscription {
     files?: SubscriptionFileCategory[];
     selectiveProcessID?: string;
     reservedPlace?: string;
+    processForms?: ProcessDocument[]; 
 
     age?: number;
     subscriptionDate: number;
@@ -80,9 +81,8 @@ export enum SubscriptionTypeFile {
     BAREMA = "barema",
     DOCUMENT = "document",
     GRADUATION = "graduation",
+    FORM = "form",
 }
-
-
 
 export interface SubscriptionResource {
 

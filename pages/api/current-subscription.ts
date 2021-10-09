@@ -40,8 +40,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         const selectiveProcessService = SelectiveProcessService();
         
         const process = await selectiveProcessService.getOpen();
-        console.log(currentUserId);
-        console.log(process.id);
+        
         const subs = await subscriptionService.getByUserAndProcess(currentUserId, process.id);
 
         let response: APIResponse = {

@@ -35,9 +35,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [stageThreeValues, setStageThreeValues] = useState(null);
     const [stageFourValues, setStageFourValues] = useState(null);
     const [stageFiveValues, setStageFiveValues] = useState(null);
-    const [inConstruction, setInConstruction] = useState<boolean>(null);
+    const [selectiveProcessOpen, setSelectiveProcessOpen] = useState<boolean>(null);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
     const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>([]);
+    const [formFiles, setFormFiles] = useState<any>([]);
     const [baremaCategories, setBaremaCategories] = useState<any>(null);
     const [documentFile, setDocumentFile] = useState<FileList>();
     const [graduationProofFile, setGraduationProofFile] = useState<FileList>();
@@ -52,6 +53,20 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         { name: "Auxílio para Transcrição", value: 'auxilio_transcricao' },
         { name: "Mesa e Cadeiras sem Braço", value : 'mesa_sem_braco' },
     ];
+
+    const getRouteFile = (type) => {
+        switch (type) {
+            case SubscriptionTypeFile.BAREMA:
+                return APIRoutes.FILE_BAREMA_SUBSCRIPTION;
+            case SubscriptionTypeFile.DOCUMENT:
+            case SubscriptionTypeFile.GRADUATION:
+                return APIRoutes.FILE_SUBSCRIPTION;
+            case SubscriptionTypeFile.FORM:
+                return APIRoutes.FILE_FORM_SUBSCRIPTION;
+            default:
+                return '';
+        }
+    }
 
     const saveSubscription = async (values: Subscription) => {
         try {
@@ -73,7 +88,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const saveFileSubscription = async (values, files, type) => {
         console.log(values);
         try {
-            const route = type === SubscriptionTypeFile.BAREMA ? APIRoutes.FILE_BAREMA_SUBSCRIPTION : APIRoutes.FILE_SUBSCRIPTION;
+            const route = getRouteFile(type);
             const result = await api.postFile(route, values, files);
             console.log(result);
         } catch (error) {
@@ -113,6 +128,39 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
 
         console.log(subCategoriesFilesUpdated)
         setSubCategoriesFiles(subCategoriesFilesUpdated)
+    }
+
+    const handleFileForm = async (name, file) => {
+        console.log(name, file);
+        const formFileFound = formFiles.find((formFile) => formFile.name === name);
+
+        if(!formFileFound){
+            formFiles.push({name: name, file: file});
+            setFormFiles(formFiles)
+            return;
+        }
+
+        const formFilesUpdated = await formFiles.map((formFile) => {            
+            if(formFile.name !== name){
+                return formFile;
+            }
+            formFile.file = file;
+            return formFile;
+        });
+
+        console.log(formFilesUpdated)
+        setFormFiles(formFilesUpdated)
+    }
+
+    const getFileNameForm = (name) => {
+        const formFileFound = formFiles.find((formFile) => formFile.name === name);
+        if(formFileFound){
+            console.log(formFileFound);
+            const file = formFileFound.file;
+            return file ? file[0]?.name : 'Nenhum arquivo selecionado';
+        }
+
+        return 'Nenhum arquivo selecionado';
     }
 
     const getFileName = (subcategoryUuid, position) => {
@@ -201,6 +249,23 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         return arrayFiles;
     }
 
+    const processFormFiles = async (subscriptionId) => {
+        console.log(subCategoriesFiles);
+        const arrayFormFiles = []
+
+        for (let i = 0; i < formFiles.length; i++){
+            const formFile = formFiles[i];
+            const file = formFile.file;            
+            arrayFormFiles.push({subscriptionID: subscriptionId, name: formFile.name, files: [file[0]], type: SubscriptionTypeFile.FORM});
+        }
+
+        console.log(arrayFormFiles);
+
+        for (let i = 0; i < arrayFormFiles.length; i++){
+            await saveFileSubscription({subscriptionID: arrayFormFiles[i].subscriptionID, name: arrayFormFiles[i].name}, arrayFormFiles[i].files, SubscriptionTypeFile.FORM);
+        }
+    }
+
     const processDocumentFiles = async (subscriptionId) => {
         console.log(documentFile);
 
@@ -213,7 +278,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.DOCUMENT);
     }
 
-    const processGraduationFiles = async (subscriptionId) => {
+    const processGraduationFile = async (subscriptionId) => {
         console.log(graduationProofFile);
 
         const arrayFiles = [graduationProofFile[0]];
@@ -251,7 +316,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             const result = await saveSubscription(subscription);
             await processFiles(result.id);
             await processDocumentFiles(result.id);
-            await processGraduationFiles(result.id);   
+            await processGraduationFile(result.id);   
+            await processFormFiles(result.id);
             setCurrentStage(currentStage + 2);    
             //router.push("/student");
         } catch (e) {
@@ -395,9 +461,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
 
     useEffect(() => {   
         const loadData = async () => {
-            const resultProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'inconstruction': "true" });
+            const resultProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'open': "true" });
             if (resultProcess.result) {
-                setInConstruction(true);
+                setSelectiveProcessOpen(true);
                 setSelectiveProcess(resultProcess.result);
                 let cloneCategories = JSON.parse(JSON.stringify(resultProcess.result.baremaCategories))
                 cloneCategories.map((baremaCategory) => (
@@ -407,7 +473,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 ))
                 setBaremaCategories(cloneCategories);
             } else {
-                setInConstruction(false);
+                setSelectiveProcessOpen(false);
             }
 
             const resultSubscription: APIResponse = await api.get(APIRoutes.CURRENT_SUBSCRIPTION);
@@ -435,7 +501,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             );
     }
 
-    if(inConstruction === false){        
+    if(selectiveProcessOpen === false){        
         return (
             <StudentBase>
                 <div>
@@ -444,16 +510,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             </StudentBase>
         );
     }
-
-    /*if(currentSubscription){        
-        return (
-            <StudentBase>
-                <div>
-                    <p>Incrição já realizada.</p>
-                </div>
-            </StudentBase>
-        );
-    }*/
 
     return (    
         <StudentBase>
@@ -1328,6 +1384,39 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     </>
                                 ))}
                             </div>
+                            <div>
+                                <label htmlFor="processForms" className="form-label mt-5 text-bold">Formulários</label>                                            
+                                {selectiveProcess.processForms.map((form, index) => (
+                                    <>
+                                    <label className="form-label row mt-2" key={index}>{form.name}</label>                                
+                                    <a href={form.url} className={style.titleFile} target="_blank">
+                                        <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Baixar formulário
+                                    </a>
+                                    <div className="row">
+                                        <label htmlFor={`form.${index}`} className={`${style.fileButton} col-3`}>
+                                            Escolher arquivo
+                                        </label>
+                                        <div className={`${style.fileName} col-9`}>
+                                            {getFileNameForm(form.name)}
+                                        </div>
+                                        <input 
+                                            type="file"
+                                            className="form-control"
+                                            id={`form.${index}`}
+                                            name={`form.${index}`}
+                                            onChange={(event) => {
+                                                actions.handleChange(event);
+                                                console.log(event.currentTarget.files);
+                                                const files = event.currentTarget.files;
+                                                handleFileForm(form.name, files);
+                                            }}
+                                            value={undefined}
+                                            style={{display:'none'}}
+                                        />
+                                    </div>      
+                                    </>                                             
+                                ))}
+                            </div>
                         </div>
                         <br />
                         <div className="text-center">
@@ -1390,6 +1479,15 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             ))}
                                         </div> 
                                     </>
+                                ))}
+                            </div>                            
+                            <div className="col-12 mt-5">   
+                                {currentSubscription && currentSubscription?.processForms && currentSubscription?.processForms.map((formFile, index) => (  
+                                    <div>    
+                                        <a href={formFile.url} className={style.titleFile} target="_blank" key={index}>
+                                            <FontAwesomeIcon icon={faFile} className={style.iconFile}/> {formFile.name}
+                                        </a>  
+                                    </div>
                                 ))}
                             </div>
                         </div>
