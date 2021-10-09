@@ -31,7 +31,9 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
     case "POST":
       try {
-        const subscriptionList: Subscription[] = req.body.subscriptionList;
+        const subscriptionList = req.body.subscriptionList;
+        const {isTest, isInterview} = req.body;
+
 
         if (subscriptionList) {
           for (let subscription of subscriptionList) {
@@ -46,6 +48,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
         res.status(200).json(response);
       } catch (e) {
+        console.log(e)
         return res.status(400).json(treatError.general("Erro ao salvar usuário"));
       }
 

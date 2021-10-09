@@ -80,7 +80,6 @@ export default function SelectiveBaremaResults(props: Props) {
                         <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Idade</th>
                                 <th>Data de Inscrição</th>
                                 <th>Vaga</th>
                                 <th>Pontuação</th>
@@ -92,7 +91,6 @@ export default function SelectiveBaremaResults(props: Props) {
                                     <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} key={sub.id}>
                                         <tr>
                                             <td>{sub.name}</td>
-                                            <td>{sub.age}</td>
                                             <td>{sub['formatedDate']}</td>
                                             <td>{sub.placeName}</td>
                                             <td>{sub['baremaGrade']}</td>

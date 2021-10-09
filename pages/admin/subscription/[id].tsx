@@ -163,10 +163,7 @@ export default function ProcessSubscriprionLayout() {
                                     <label className="form-label">Nome</label>
                                     <input type="text" id="nome" className="form-control form-control-sm" value={subscription.name} readOnly></input>
                                 </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Idade</label>
-                                    <input type="number" id="idade" className="form-control form-control-sm" value={subscription.age} readOnly></input>
-                                </div>
+                               
                                 <div className="mb-3">
                                     <label className="form-label">RG</label>
                                     <input type="text" id="rg" className="form-control form-control-sm" value={subscription.identityDocument} readOnly></input>

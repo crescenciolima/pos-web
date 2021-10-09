@@ -51,7 +51,7 @@ export default function SelectiveProcessLayout() {
     const process: SelectiveProcess = {
       title: newProcessTitle,
       state: ProcessStepsState.IN_CONSTRUCTION,
-      creationDate: fire.firestore.Timestamp.now().seconds
+      creationDate: Date.now()
     }
     api.post(APIRoutes.SELECTIVE_PROCESS, process).then(
       (result: APIResponse) => {

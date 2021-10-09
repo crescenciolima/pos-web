@@ -93,14 +93,14 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
                     {acceptingSubscription &&
                       <>
                         <p className="card-text text-primary-dark">
-                          <b>Anteção. </b> Inscrições abertas para nosso processo seletivo, fique atento para não perder o prazo (Incrições até <b>{subscriptionDate}</b>). Você pode se inscrever clicando no botão abaixo.
+                          <b>Anteção. </b> Inscrições abertas para nosso processo seletivo, fique atento para não perder o prazo (Incrições até <b>{subscriptionDate}</b>). Você pode se inscrever clicando no botão abaixo. <a href={editalURL} target="_blank" className="link-primary ms-1">Confira o <b>EDITAL</b> clicando aqui!</a>
                         </p>
                         <div className="row">
-                          <div className="col-auto">
+                          <div className="col-auto mt-3">
                             <Link href="/login">
-                              <button type="button" className="btn btn-primary btn-round px-5 py-2 mt-3">Inscreva-se</button>
+                              <button type="button" className="btn btn-primary btn-round px-5 py-2 my-auto">Inscreva-se</button>
                             </Link>
-                            <a href={editalURL} target="_blank" className="link-primary">Confira o edital!</a>
+                            
                           </div>
                         </div>
                       </>

@@ -85,7 +85,6 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
     }
 
     const handleGradeChange = (index, evt) => {
-        console.log(evt.target.value.length > 0)
         const newSubscriptionList = subscriptionList.map((sub, i) => {
             if (index !== i) return sub;
             if (isTest) {
@@ -119,10 +118,23 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
 
     const saveGradings = () => {
         if (!isLoading) {
-            api.post(APIRoutes.SELECTIVE_PROCESS_SUBSCRIPTION_GRADING, { subscriptionList: subscriptionList });
+            let subList = [];
+            for (let subscription of subscriptionList) {
+                let sub = {};
+                sub['id'] = subscription.id
+                if (isTest) {
+                    sub['testGrade'] = subscription.testGrade;
+                    sub['testObs'] = subscription.testObs;
+                } else if (isInterview) {
+                    sub['interviewGrade'] = subscription.interviewGrade;
+                    sub['interviewObs'] = subscription.interviewObs;
+                }
+                subList.push(sub);
+            }
+            api.post(APIRoutes.SELECTIVE_PROCESS_SUBSCRIPTION_GRADING, { subscriptionList: subList, isInterview, isTest });
         }
     }
-    const PDF =  PDFTestResult({ process: selectiveProcess, currentStep: currentStep, subscriptionList: subscriptionList, isTest });
+    const PDF = PDFTestResult({ process: selectiveProcess, currentStep: currentStep, subscriptionList: subscriptionList, isTest });
 
     return (
         <>
@@ -148,51 +160,56 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
                                 <th>Parecer</th>
                                 <th>Pontuação (0-100)</th>
                                 <th>Observações</th>
+                                <th>Ver Dados</th>
                             </tr>
                         </thead>
                         <tbody>
                             {subscriptionList.map((sub, i) => {
                                 return (
-                                    <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} key={sub.id}>
-                                        <tr className={
-                                            (isTest && !processUtil.hasPassedTest(sub, currentStep)) || (isInterview && !processUtil.hasPassedInterview(sub, currentStep))
-                                                ? 'table-danger' : ''}>
-                                            <td>{sub.name}</td>
-                                            <td>{sub.placeName}</td>
-                                            <td>
-                                                {sub.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon me-1" />}
-                                                {sub.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon me-1" />}
-                                                {sub.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon me-1" />}
-                                                {sub.status}
-                                            </td>
-                                            <td>
-                                                <input
-                                                    disabled={!canEdit}
-                                                    type="number"
-                                                    className="form-control"
-                                                    name={i + 'grade'}
-                                                    id={i + 'grade'}
-                                                    placeholder="-"
-                                                    value={(isTest ? sub.testGrade : sub.interviewGrade) != undefined ? (isTest ? sub.testGrade : sub.interviewGrade) : ""}
-                                                    onClick={(e) => { e.preventDefault() }}
-                                                    onChange={(e) => { handleGradeChange(i, e) }}>
-                                                </input>
-                                            </td>
-                                            <td>
-                                                <input
-                                                    disabled={!canEdit}
-                                                    type="text"
-                                                    className="form-control"
-                                                    name={i + 'obs'}
-                                                    id={i + 'obs'}
-                                                    placeholder=""
-                                                    value={isTest ? sub.testObs : sub.interviewObs}
-                                                    onClick={(e) => { e.preventDefault() }}
-                                                    onChange={(e) => { handleObservationChange(i, e) }}>
-                                                </input>
-                                            </td>
-                                        </tr>
-                                    </Link>
+
+                                    <tr  key={sub.id} className={
+                                        (isTest && !processUtil.hasPassedTest(sub, currentStep)) || (isInterview && !processUtil.hasPassedInterview(sub, currentStep))
+                                            ? 'table-danger' : ''}>
+                                        <td className="align-middle">{sub.name}</td>
+                                        <td className="align-middle">{sub.placeName}</td>
+                                        <td className="align-middle">
+                                            {sub.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon me-1" />}
+                                            {sub.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon me-1" />}
+                                            {sub.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon me-1" />}
+                                            {sub.status}
+                                        </td>
+                                        <td className="align-middle">
+                                            <input
+                                                disabled={!canEdit}
+                                                type="number"
+                                                className="form-control form-control-sm"
+                                                name={i + 'grade'}
+                                                id={i + 'grade'}
+                                                placeholder="-"
+                                                value={(isTest ? sub.testGrade : sub.interviewGrade) != undefined ? (isTest ? sub.testGrade : sub.interviewGrade) : ""}
+                                                onClick={(e) => { e.preventDefault() }}
+                                                onChange={(e) => { handleGradeChange(i, e) }}>
+                                            </input>
+                                        </td>
+                                        <td className="align-middle">
+                                            <input
+                                                disabled={!canEdit}
+                                                type="text"
+                                                className="form-control form-control-sm"
+                                                name={i + 'obs'}
+                                                id={i + 'obs'}
+                                                placeholder=""
+                                                value={isTest ? sub.testObs : sub.interviewObs}
+                                                onClick={(e) => { e.preventDefault() }}
+                                                onChange={(e) => { handleObservationChange(i, e) }}>
+                                            </input>
+                                        </td>
+                                        <td className="align-middle">
+                                            <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} >
+                                               <b className="link-primary"> Acessar</b>
+                                            </Link>
+                                        </td>
+                                    </tr>
                                 )
                             })}
 

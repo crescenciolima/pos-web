@@ -36,7 +36,7 @@ export default function ResourceLayout() {
         let resourceFound: SubscriptionResource = subscription.resources.find((resource) => currentStep.type === resource.step);
         console.log(resourceFound);
         
-        if(resourceSteps.includes(currentStep.type) && !resourceFound) {
+        if(!resourceSteps.includes(currentStep.type) || resourceFound) {
           setCanAddResource(true);
         }
 

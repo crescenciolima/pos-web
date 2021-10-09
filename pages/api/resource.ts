@@ -71,7 +71,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
         const resource: SubscriptionResource = {
           justification,
-          date: fire.firestore.Timestamp.now().seconds,
+          date: Date.now(),
           status: SubscriptionStatus.AGUARDANDO_ANALISE,
           step: currentStep.type
         }
