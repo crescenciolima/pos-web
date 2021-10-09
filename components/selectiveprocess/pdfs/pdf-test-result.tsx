@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import ReactPDF, { Page, Text, View, Document, StyleSheet, PDFDownloadLink, Font, usePDF, pdf } from '@react-pdf/renderer';
-import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
+import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
 import PDFHeader from './components/pdf-header';
 import PDFTable, { PDFTableInfo } from './components/pdf-table';
 import { FinalListGroup } from '../dashboard/final-result';
-import { Subscription } from '../../../models/subscription';
+import { Subscription, SubscriptionStatus } from '../../../models/subscription';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 
 interface Props {
@@ -46,15 +46,10 @@ export default function PDFTestResult(props: Props) {
   let resourceLines: PDFTableInfo[][] = [];
   let lines: PDFTableInfo[][] = [];
   for (let sub of subscriptionList) {
-    let subInfo: PDFTableInfo[] = [
-      { value: sub.name, width: "30%", textAlign: "left" },
-      { value: (isTest ? sub.testGrade || '-' : sub.interviewGrade || '-').toString() || "-", width: "20%", textAlign: "center" },
-      { value: ((isTest && processUtil.hasPassedTest(sub, currentStep)) || (!isTest && !processUtil.hasPassedInterview(sub, currentStep))) ? "Desclassificado" : "Classificado", width: "20%", textAlign: "center" },
-      { value: isTest ? sub.testObs : sub.interviewObs, width: "30%", textAlign: "left" },
-    ];
-    lines.push(subInfo);
 
     let resource = sub?.resources?.find(res => res.step == (isTest ? ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA : ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA));
+    let observation = isTest ? sub.testObs : sub.interviewObs
+
     if (resource) {
       let resourceInfo: PDFTableInfo[] = [
         { value: sub.name, width: "30%", textAlign: "left" },
@@ -62,7 +57,21 @@ export default function PDFTestResult(props: Props) {
         { value: resource.statusObservation, width: "50%", textAlign: "left" },
       ];
       resourceLines.push(resourceInfo);
+      if (resource.status == SubscriptionStatus.DEFERIDA) {
+        observation = resource.statusObservation;
+      }
     }
+
+    let subInfo: PDFTableInfo[] = [
+      { value: sub.name, width: "30%", textAlign: "left" },
+      { value: (isTest ? sub.testGrade || '-' : sub.interviewGrade || '-').toString() || "-", width: "20%", textAlign: "center" },
+      { value: ((isTest && processUtil.hasPassedTest(sub, currentStep)) || (!isTest && !processUtil.hasPassedInterview(sub, currentStep))) ? "Desclassificado" : "Classificado", width: "20%", textAlign: "center" },
+      { value: observation, width: "30%", textAlign: "left" },
+    ];
+    lines.push(subInfo);
+
+
+
   }
 
   // Create Document Component

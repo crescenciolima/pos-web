@@ -49,7 +49,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
             ]
           }
 
-          await selectiveProcessService.save(newProcess);
+          newProcess.id = (await selectiveProcessService.save(newProcess)).id;
 
           response.result = newProcess;
         } else {

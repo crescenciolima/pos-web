@@ -28,10 +28,11 @@ export default function Admin() {
   const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0, passingScore: 0, weight: 0, order: 0 });
   const [startDate, setStartDate] = useState<string>();
   const [finishDate, setFinishDate] = useState<string>();
-  const [open, setOpen] = useState<boolean>(false);
+  const [isSelectiveProcessOpen, setSelectiveProcessOpen] = useState<boolean>(false);
   const [subscriptionList, setSubscriptionList] = useState<Subscription[]>([]);
-  const [allResourcesChecked, setAllResourcesChecked] = useState<boolean>(true);
-  const [openModal, setOpenModal] = useState<boolean>(false);
+  // const [allResourcesChecked, setAllResourcesChecked] = useState<boolean>(true);
+  const [isStepModalOpen, setStepModalOpen] = useState<boolean>(false);
+  const [isFinishModalOpen, setFinishModalOpen] = useState<boolean>(false);
   const [reservedPlacesMap, setReservedPlacesMap] = useState<any>({});
 
 
@@ -54,7 +55,7 @@ export default function Admin() {
 
           let placesMap = {};
           //Mapa de vagas
-          for(let place of process.reservedPlaces){
+          for (let place of process.reservedPlaces) {
             placesMap[place.uuid] = place.name;
           }
           setReservedPlacesMap(placesMap);
@@ -62,11 +63,11 @@ export default function Admin() {
 
           getCurrentStep(process, subsList);
 
-          setOpen(true);
+          setSelectiveProcessOpen(true);
 
-        
+
         } else {
-          setOpen(false);
+          setSelectiveProcessOpen(false);
         }
       }
     )
@@ -84,24 +85,29 @@ export default function Admin() {
 
     //Verificando se todos os recursos foram julgados para homologação definitiva
     //Se algum recurso de inscrição ainda não foi julgado a homologação definitiva ainda não está completa
-    if (step.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
-      for (let subscription of subsList) {
-        if (subscription.resources) {
-          for (let resource of subscription.resources) {
-            if (resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO && resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
-              setAllResourcesChecked(false);
-              break;
-            }
-          }
-        }
+    // if (step.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
+    //   for (let subscription of subsList) {
+    //     if (subscription.resources) {
+    //       for (let resource of subscription.resources) {
+    //         if (resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO && resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
+    //           setAllResourcesChecked(false);
+    //           break;
+    //         }
+    //       }
+    //     }
 
-      }
-    }
+    //   }
+    // }
   };
+
+  function finishProcess(event) {
+    event.stopPropagation();
+    setFinishModalOpen(true);
+  }
 
   function advanceStep(event) {
     event.stopPropagation();
-    setOpenModal(true);
+    setStepModalOpen(true);
   }
 
   async function confirmAdvanceStep() {
@@ -116,15 +122,28 @@ export default function Admin() {
 
   }
 
+  async function confirmFinishProcess() {
+
+    selectiveProcess.state = ProcessStepsState.FINISHED;
+    let response = await api.post(APIRoutes.SELECTIVE_PROCESS, selectiveProcess);
+    if (!response.error) {
+      setSelectiveProcess(response.result);
+      setSelectiveProcessOpen(false);
+    }
+    closeModal();
+
+  }
+
   function closeModal() {
-    setOpenModal(false);
+    setStepModalOpen(false);
+    setFinishModalOpen(false);
   }
 
 
   return (
     <AdminBase >
       {loading && <Loading />}
-      {!open && !loading ?
+      {!isSelectiveProcessOpen && !loading ?
         <>
           <div className="row mt-5 justify-content-center">
             <div className="col-10 col-md-4 col-lg-3">
@@ -139,7 +158,7 @@ export default function Admin() {
         </>
         : null}
 
-      {open && !loading ?
+      {isSelectiveProcessOpen && !loading ?
         <>
           <div className="row">
             <div className="col-12">
@@ -182,11 +201,11 @@ export default function Admin() {
                 || currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_PROVA
               )
                 && <SelectiveProcessSubscriptionGrading process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveProcessSubscriptionGrading>}
-              {(currentStep.type == ProcessStepsTypes.AVALIACAO_CURRICULAR)             
+              {(currentStep.type == ProcessStepsTypes.AVALIACAO_CURRICULAR)
                 && <SelectiveBaremaAnalysisList process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveBaremaAnalysisList>
               }
               {((currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_AVALIACAO_CURRICULAR)
-               || (currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR))
+                || (currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR))
                 && <SelectiveBaremaResults process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveBaremaResults>
               }
               {(currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_PROCESSO_SELETIVO)
@@ -198,15 +217,20 @@ export default function Admin() {
 
           <div className="row mt-5">
             <div className="col-12 text-center">
-              <button className="btn btn-primary" onClick={advanceStep}>Avançar para próxima etapa</button>
+              {(selectiveProcess.steps.length - 1 > selectiveProcess.currentStep) && <button className="btn btn-primary" onClick={advanceStep}>Avançar para próxima etapa</button>}
+              {(selectiveProcess.steps.length - 1 == selectiveProcess.currentStep) && <button className="btn btn-primary" onClick={finishProcess}>Encerrar Processo Seletivo</button>}
             </div>
           </div>
         </>
         : null}
 
-      <ConfirmDialog open={openModal}
+      <ConfirmDialog open={isStepModalOpen}
         actionButtonText="Avançar Etapa" title="Avançar Etapa"
         text={"Tem certeza que deseja avançar para a próxima etapa do processo seletivo?"} onClose={closeModal} onConfirm={confirmAdvanceStep} />
+
+      <ConfirmDialog open={isFinishModalOpen}
+        actionButtonText="Encerrar Processo" title="Encerrar Processo"
+        text={"Tem certeza que deseja encerrar esse processo seletivo?"} onClose={closeModal} onConfirm={confirmFinishProcess} />
 
     </AdminBase>
   )
