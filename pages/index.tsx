@@ -18,7 +18,7 @@ import { format, sub } from 'date-fns';
 
 
 
-export default function Home({ newsList, course, hasOpenProcess, title, acceptingSubscription, subscriptionDate }) {
+export default function Home({ newsList, course, hasOpenProcess, title, acceptingSubscription, subscriptionDate, editalURL }) {
 
   const infoRef = useRef(null)
   const scrollToInfo = () => infoRef.current.scrollIntoView();
@@ -82,7 +82,7 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
             </div>
             <div className="col-11 col-md-8 col-lg-6 mt-5">
               <div className="card  btn-round bg-color border-0">
-                <div className="card-body d-flex ">
+                <div className="card-body d-flex flex-column flex-md-row">
                   <img src="/images/home/available.svg" alt="Processo seletivo aberto" className={homeStyle.cardImg} width={180} height={180} ></img>
                   <div className="d-flex ms-3 flex-column my-auto">
                     <h3 className="card-title text-primary-dark mb-3">{title}</h3>
@@ -100,19 +100,13 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
                             <Link href="/login">
                               <button type="button" className="btn btn-primary btn-round px-5 py-2 mt-3">Inscreva-se</button>
                             </Link>
-
+                            <a href={editalURL} target="_blank" className="link-primary">Confira o edital!</a>
                           </div>
                         </div>
                       </>
                     }
                   </div>
-                  {/* {acceptingSubscription &&
-                    <div className="d-flex ms-3 flex-column my-auto">
-
-                    </div>
-                  } */}
                 </div>
-
               </div>
             </div>
           </div>
@@ -179,6 +173,7 @@ export const getStaticProps: GetStaticProps = async () => {
   let title = "";
   let acceptingSubscription = false;
   let subscriptionDate = "";
+  let editalURL = "";
 
   if (process) {
     if (process.state == ProcessStepsState.OPEN) {
@@ -190,6 +185,9 @@ export const getStaticProps: GetStaticProps = async () => {
         const date = new Date(currentStep.finishDate);
         subscriptionDate = format(date, 'dd/MM/yyyy');
       }
+
+      //Edital
+      editalURL = process.processNotices[process.processNotices.length -1].url;
     }
   }
 
@@ -201,7 +199,8 @@ export const getStaticProps: GetStaticProps = async () => {
       hasOpenProcess,
       title,
       acceptingSubscription,
-      subscriptionDate
+      subscriptionDate,
+      editalURL
     },
     revalidate: 1800
 
