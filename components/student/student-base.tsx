@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { GetServerSidePropsContext, GetStaticProps } from 'next';
-import React from 'react';
-import AdminSidebar from './student-sidebar';
+import React, { useEffect, useState } from 'react';
+import StudentSidebar from './student-sidebar';
 import adminStyle from '../../styles/admin.module.css';
 import AdminContent from './student-content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -43,7 +43,7 @@ export default function StudentBase(props: any) {
       <main className={adminStyle.main}>
         <div className="container-fluid">
           <div className='row'>
-            <AdminSidebar />
+            <StudentSidebar />
             <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
               <div className="text-right p-3 text-primary">
                 <i className={adminStyle.icon}>
