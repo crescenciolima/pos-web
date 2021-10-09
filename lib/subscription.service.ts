@@ -53,7 +53,7 @@ export default function SubscriptionService() {
         .where('userID', "==", userID)
         .where('selectiveProcessID', "==", selectiveProcessID)
         .get();
-
+        console.log(snapshot.size)
         if (snapshot.size > 0) {                  
             let subs = [];
             snapshot.forEach(
@@ -76,7 +76,7 @@ export default function SubscriptionService() {
     }
 
     async function update(sub: Subscription) {
-        subscriptionRef.doc(sub.id).set(sub);
+        subscriptionRef.doc(sub.id).update(sub);
     }
 
     function buildSubscription(id, doc) {

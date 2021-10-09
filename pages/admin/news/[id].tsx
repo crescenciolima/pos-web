@@ -19,7 +19,7 @@ export default function SaveNewsLayout() {
     const api = API();
 
     const [news, setNews] = useState<News>({
-        title: "", text: "", coverURL: "", date: fire.firestore.Timestamp.now().seconds, slug:""
+        title: "", text: "", coverURL: "", date: Date.now(), slug:""
     });
     const [file, setFile] = useState<FileList>();
     const [newsContent, setNewsContent] = useState('');
@@ -48,7 +48,7 @@ export default function SaveNewsLayout() {
             values = { ...values, coverURL: news.coverURL };
         }
         values.text = newsContent;
-        values.date = fire.firestore.Timestamp.now().seconds;
+        values.date = Date.now();
         api.postFile(APIRoutes.NEWS, values, file && file.length > 0 ? file[0] : null);
     };
 

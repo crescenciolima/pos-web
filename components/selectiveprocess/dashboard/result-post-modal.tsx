@@ -32,7 +32,7 @@ export default function ResultPostModal(props: Props) {
     const [selectedFile, setSelectedFile] = useState<SubscriptionFile>({ status: SubscriptionStatus.AGUARDANDO_ANALISE, uuid: "", url: "", observation: "" });
 
     const [news, setNews] = useState<News>({
-        title: "", text: "", coverURL: "", date: fire.firestore.Timestamp.now().seconds, slug: ""
+        title: "", text: "", coverURL: "", date: Date.now(), slug: ""
     });
     const [newsContent, setNewsContent] = useState('');
     const [file, setFile] = useState<FileList>();
@@ -87,7 +87,7 @@ export default function ResultPostModal(props: Props) {
             values = { ...values, coverURL: news.coverURL };
         }
         values.text = newsContent;
-        values.date = fire.firestore.Timestamp.now().seconds;
+        values.date = Date.now();
         await api.postFile(APIRoutes.NEWS, values, file ? (file.length > 0 ? file[0] : null) : null);
         close();
     };

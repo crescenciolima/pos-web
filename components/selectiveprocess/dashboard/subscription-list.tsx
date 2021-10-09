@@ -33,6 +33,7 @@ export default function SelectiveProcessSubscriptionList(props: Props) {
 
     const api = API(setLoading);
     const processUtil = SelectiveProcessUtil();
+    const PDF =  PDFSubscriptionResult({ process: selectiveProcess, currentStep: currentStep, subscriptionList: subscriptionList });
 
 
     useEffect(() => {
@@ -51,9 +52,8 @@ export default function SelectiveProcessSubscriptionList(props: Props) {
         setAllChecked(checked);
         setSubscriptionList(list);
 
-    }, []);
+    }, [props]);
 
-    const PDF =  PDFSubscriptionResult({ process: selectiveProcess, currentStep: currentStep, subscriptionList: subscriptionList });
 
     return (
         <>

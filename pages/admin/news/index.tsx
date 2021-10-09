@@ -16,7 +16,7 @@ import fire from '../../../utils/firebase-util';
 export default function NewsLayout() {
 
   const [newsList, setNewsList] = useState<News[]>([]);
-  const [selectedNews, setSelectedNews] = useState<News>({ title: "", text: "", coverURL: "", date: fire.firestore.Timestamp.now().seconds, slug: "" });
+  const [selectedNews, setSelectedNews] = useState<News>({ title: "", text: "", coverURL: "", date: Date.now(), slug: "" });
   const [isLoading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState<boolean>(false);
 

@@ -45,10 +45,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
             reservedPlaces: [
               { name: "Servidores do IFBA", numberPlaces: 0, uuid: uuidv4() },
               { name: "Pessoas com Deficiência", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Negros (Pretos e Pardos) ", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Indígenas", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Quilombolas", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Pessoas Trans (Transexuais, Transgêneros e Travestis)", numberPlaces: 0, uuid: uuidv4() },
+              { name: "Políticas de Ações Afirmativas", numberPlaces: 0, uuid: uuidv4() },
             ]
           }
 

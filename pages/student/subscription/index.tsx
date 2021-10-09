@@ -1499,7 +1499,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 </Formik>
             }
             {currentStage === 6 && 
-                <div className="col-md-12 d-flex justify-content-center align-items-center mh-100">
+                <div className="col-md-12 d-flex justify-content-center align-items-center mh-100 p-5">
                     <div>
                         <h1 className="text-primary-dark title-sm-font-size">
                             A sua inscrição está sendo processada.
@@ -1512,7 +1512,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 </div>
             }
             {currentStage === 7 && 
-                <div className="col-md-12 d-flex justify-content-center align-items-center mh-100">
+                <div className="col-md-12 d-flex justify-content-center align-items-center mh-100 p-5">
                     <img src="/images/subscription/completed.svg" className="img-fluid w-50" alt="..."></img>
                     <div>                    
                         <h1 className="text-primary-dark title-sm-font-size">

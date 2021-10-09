@@ -26,7 +26,8 @@ export default function BaremaModal(props: Props) {
 
     useEffect(() => {
         if (props.file) {
-            setIsPDF(props.file.url.indexOf(".pdf") != -1);
+            // setIsPDF(props.file.url.indexOf(".pdf") != -1);
+            setIsPDF(true);
             setSelectedFile(props.file);
         }
     }, [props]);
@@ -41,6 +42,10 @@ export default function BaremaModal(props: Props) {
             }
             setPageList(pagesList);
         }
+    }
+
+    function onPDFErro() {
+        setIsPDF(false)
     }
 
     function close() {
@@ -78,11 +83,13 @@ export default function BaremaModal(props: Props) {
                         <div className="row">
                             <div className="col-12 text-center">
                                 {(selectedFile?.url != undefined && isPDF) &&
-                                    <Document onLoadError={console.error}
+                                    <Document 
                                         file={selectedFile.url}
                                         onLoadSuccess={onDocumentLoadSuccess}
                                         className={"w-100 d-flex flex-column"}
                                         noData={"Infelizmente não foi possível carregar esse documento"}
+                                        error={"Infelizmente não foi possível carregar esse documento"}
+                                        onLoadError={onPDFErro}
                                     >
                                         {pagesList.map((page, index) => {
                                             return <Page pageNumber={page} key={page} className={"w-100 d-flex"} />

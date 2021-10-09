@@ -46,7 +46,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
                   ...subscription,
                    userID: currentUserId as string, 
                    protocol: uuidv4(),
-                   subscriptionDate: fire.firestore.Timestamp.now().seconds,
+                   subscriptionDate: Date.now(),
                    status: SubscriptionStatus.AGUARDANDO_ANALISE,
                 };
 
