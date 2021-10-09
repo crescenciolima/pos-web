@@ -132,6 +132,7 @@ export default function SubscriptionService() {
 
             graduationProofFile: validateField(doc['graduationProofFile']),
             documentFile: validateField(doc['documentFile']),
+            processForms: validateField(doc['processForms'], 'array'),
 
             testGrade: validateField(doc['testGrade']),
             interviewGrade: validateField(doc['interviewGrade']),

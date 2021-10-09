@@ -32,6 +32,8 @@ export class APIRoutes {
 
     static FILE_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-subscription"
 
+    static FILE_FORM_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-form-subscription"
+
     static CURRENT_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/current-subscription"
     
     static RESOURCES:string = APIRoutes.API_URL + "/api/resource"
