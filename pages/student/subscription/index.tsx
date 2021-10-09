@@ -19,8 +19,10 @@ import Permission from '../../../lib/permission.service';
 import { UserType } from '../../../enum/type-user.enum';
 import StudentBase from '../../../components/student/student-base';
 import { APIResponse } from '../../../models/api-response';
-import { SelectiveProcess } from '../../../models/selective-process';
+import { User } from '../../../models/user';
+import { ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
 import { MaskHelper } from '../../../helpers/mask-helper';
+import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -44,7 +46,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [graduationProofFile, setGraduationProofFile] = useState<FileList>();
     const [invalidDocumentFile, setInvalidDocumentFile] = useState<any>(false);
     const [invalidGraduationProofFile, setInvalidGraduationProofFile] = useState<any>(false);
-    const router = useRouter();
+    const router = useRouter();    
+    const processUtil = SelectiveProcessUtil();
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
         { name: "Auxílio de Leitor/Ledor", value: 'auxilio_leitor' },
@@ -462,25 +465,38 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     useEffect(() => {   
         const loadData = async () => {
             const resultProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'open': "true" });
+            
             if (resultProcess.result) {
-                setSelectiveProcessOpen(true);
-                setSelectiveProcess(resultProcess.result);
-                let cloneCategories = JSON.parse(JSON.stringify(resultProcess.result.baremaCategories))
-                cloneCategories.map((baremaCategory) => (
-                    baremaCategory.subcategories.map((subcategory) => {
-                        subcategory.files = [{position: 1, file: ''}]
-                    })
-                ))
-                setBaremaCategories(cloneCategories);
+                const selectiveProcess = resultProcess.result;  
+                const currentStep = processUtil.getCurrentStep(selectiveProcess);
+
+                if(currentStep.type === ProcessStepsTypes.INSCRICAO){
+                    setSelectiveProcessOpen(true);
+                    setSelectiveProcess(selectiveProcess);
+                    let cloneCategories = JSON.parse(JSON.stringify(selectiveProcess.baremaCategories))
+                    cloneCategories.map((baremaCategory) => (
+                        baremaCategory.subcategories.map((subcategory) => {
+                            subcategory.files = [{position: 1, file: ''}]
+                        })
+                    ));
+                    setBaremaCategories(cloneCategories);
+                } else {                    
+                    setSelectiveProcessOpen(false);
+                }
             } else {
                 setSelectiveProcessOpen(false);
             }
 
             const resultSubscription: APIResponse = await api.get(APIRoutes.CURRENT_SUBSCRIPTION);
-            if (resultSubscription.result) {
+            if (resultSubscription?.result) {
                 setCurrentSubscription(resultSubscription.result);
                 await loadForm(resultSubscription.result);
+            } else {
+                const resultCurrentUser: APIResponse = await api.get(APIRoutes.CURRENT_USER);                
+                const user: User = (resultCurrentUser as APIResponse).result;
+                setStageOneValues({name: user.name});
             }
+            
             setLoading(false);
         };      
         loadData();

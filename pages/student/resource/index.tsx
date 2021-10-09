@@ -11,12 +11,14 @@ import { Subscription, SubscriptionResource } from '../../../models/subscription
 import { UserType } from '../../../enum/type-user.enum';
 import { ProcessStep, SelectiveProcess } from '../../../models/selective-process';
 import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
+import ResourceUtil from '../../../lib/resource.util';
 
 export default function ResourceLayout() {
   const [isLoading, setLoading] = useState<boolean>(false);
   const [currentSubscription, setCurrentSubscription] = useState<Subscription>();
   const [canAddResource, setCanAddResource] = useState<boolean>(false);
   const resourceSteps = ResourceStepsHelper.steps();
+  const resourceUtil = ResourceUtil();
   const api = API(setLoading);
 
   useEffect(() => {   
@@ -31,12 +33,7 @@ export default function ResourceLayout() {
         const resultSelectiveProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'id': subscription.selectiveProcessID });
         const selectiveProcess: SelectiveProcess = resultSelectiveProcess.result;
        
-        let currentStep: ProcessStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
-        
-        let resourceFound: SubscriptionResource = subscription.resources.find((resource) => currentStep.type === resource.step);
-        console.log(resourceFound);
-        
-        if(!resourceSteps.includes(currentStep.type) || resourceFound) {
+        if(resourceUtil.canRequestResource(subscription, selectiveProcess)) {
           setCanAddResource(true);
         }
 

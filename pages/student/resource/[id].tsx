@@ -10,22 +10,26 @@ import API from '../../../lib/api.service';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
-import { Subscription, SubscriptionResource } from '../../../models/subscription';
+import { Subscription, SubscriptionResource, SubscriptionStatus } from '../../../models/subscription';
 import StudentBase from '../../../components/student/student-base';
 import { APIResponse } from '../../../models/api-response';
-import { ProcessStep, SelectiveProcess } from '../../../models/selective-process';
+import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
 import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import Loading from '../../../components/loading';
+import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
+import ResourceUtil from '../../../lib/resource.util';
+
 
 export default function SaveResourceLayout() {
     const [isLoading, setLoading] = useState<boolean>(true);
     const router = useRouter();
+    const api = API();
+    const resourceUtil = ResourceUtil();
     const {
       query: { subscriptionID, step },
     } = router;
-    const api = API();
 
     const [resource, setResource] = useState<SubscriptionResource>();
     const [files, setFiles] = useState<any>([]);
@@ -48,15 +52,11 @@ export default function SaveResourceLayout() {
                 setResource(resourceFound);
             } else {
                 const resultSelectiveProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'id': subscription.selectiveProcessID });
-                const selectiveProcess: SelectiveProcess = resultSelectiveProcess.result;
-               
-                let currentStep: ProcessStep = selectiveProcess.steps.find((_step) => selectiveProcess.currentStep === _step.order);
-                
-                let resourceFound: SubscriptionResource = subscription.resources.find((resource) => currentStep.type === resource.step);
-                console.log(resourceFound);
-                
-                if(!resourceSteps.includes(currentStep.type) || resourceFound) {
+                const selectiveProcess: SelectiveProcess = resultSelectiveProcess.result;                            
+
+                if(!resourceUtil.canRequestResource(subscription, selectiveProcess)) {
                     router.push("/student/resource");
+                    return;
                 }
             }
 
