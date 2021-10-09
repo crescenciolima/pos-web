@@ -29,7 +29,9 @@ export default function SubscriptionService() {
                         resources: doc['resources'],
                         testGrade: doc['testGrade'],
                         interviewGrade: doc['interviewGrade'],
-                        files:doc['files']
+                        files:doc['files'],
+                        testObs:doc['testObs'],
+                        interviewObs:doc['interviewObs'],
                     }
                     subs.push(sub);
                 });
@@ -51,7 +53,7 @@ export default function SubscriptionService() {
         .where('userID', "==", userID)
         .where('selectiveProcessID', "==", selectiveProcessID)
         .get();
-
+        console.log(snapshot.size)
         if (snapshot.size > 0) {                  
             let subs = [];
             snapshot.forEach(
@@ -74,7 +76,7 @@ export default function SubscriptionService() {
     }
 
     async function update(sub: Subscription) {
-        subscriptionRef.doc(sub.id).set(sub);
+        subscriptionRef.doc(sub.id).update(sub);
     }
 
     function buildSubscription(id, doc) {
@@ -130,12 +132,15 @@ export default function SubscriptionService() {
 
             graduationProofFile: validateField(doc['graduationProofFile']),
             documentFile: validateField(doc['documentFile']),
+            processForms: validateField(doc['processForms'], 'array'),
 
             testGrade: validateField(doc['testGrade']),
             interviewGrade: validateField(doc['interviewGrade']),
+            testObs:validateField(doc['testObs']),
+            interviewObs:validateField(doc['interviewObs']),
             statusObservation: validateField(doc['statusObservation']),
             observation: validateField(doc['observation']),
-            resources: validateField(doc['resources']),
+            resources: validateField(doc['resources'], 'array'),
 
             age: validateField(doc['age']),
 
@@ -143,8 +148,8 @@ export default function SubscriptionService() {
 
         return sub;
     }
-    function validateField(field) {
-        return field ? field : '';
+    function validateField(field, defaultValue = 'string') {
+        return field ? field : (defaultValue === 'string' ? '' : []);
     }
 
     return {

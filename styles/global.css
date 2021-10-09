@@ -221,6 +221,10 @@ tr{
     border-radius: 9999px;
 }
 
+.nav-item:hover .nav-link{
+    color: var(--primary) !important;
+}
+
 .nav-fill .nav-item .active{
     color: var(--primary);
 }
@@ -253,7 +257,6 @@ label>span {
     color: red!important;
 }
 
-
 #selective-process {
   font-family: Arial, Helvetica, sans-serif;
   border-collapse: collapse;
@@ -281,4 +284,9 @@ label>span {
     text-align: left;
     background-color: #1e5c2e !important;
     color: white;
+}
+
+.title-section{
+    padding-top: 5rem;
+    padding-bottom: 2rem;
 }

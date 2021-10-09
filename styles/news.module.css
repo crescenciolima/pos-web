@@ -26,3 +26,8 @@
     width: 100%;
     height: auto;
 }
+
+.main {
+    background-color: var(--background-color);
+    min-height: 80vh;
+}

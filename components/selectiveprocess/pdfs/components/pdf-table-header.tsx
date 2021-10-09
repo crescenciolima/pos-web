@@ -21,9 +21,8 @@ export default function PDFTableHeader(props: Props) {
             borderBottomWidth: 1,
             alignItems: 'center',
             flexGrow: 1,
-            fontSize: 12,
-            textAlign:"left",
-            paddingVertical:"5"
+            fontSize: 11,
+            paddingVertical:"3"
             
 
         },
@@ -37,7 +36,7 @@ export default function PDFTableHeader(props: Props) {
         <View style={styles.container}>
             {headerList.map((header, index) => {
                 return (
-                    <Text  key={index} style={{ width: header.width, borderRightWidth: index+1 == headerList.length ? 0 : 1, marginHorizontal:"5" }}>{header.value} </Text>
+                    <Text  key={index} style={{ width: header.width, borderRightWidth: index+1 == headerList.length ? 0 : 1, marginHorizontal:"5", textAlign: header.textAlign }}>{header.value} </Text>
                 )
             })}
 

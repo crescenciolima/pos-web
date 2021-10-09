@@ -32,7 +32,11 @@ export class APIRoutes {
 
     static FILE_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-subscription"
 
+    static FILE_FORM_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-form-subscription"
+
     static CURRENT_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/current-subscription"
+    
+    static RESOURCES:string = APIRoutes.API_URL + "/api/resource"
 
     static SELECTIVE_PROCESS:string = APIRoutes.API_URL + "/api/selectiveprocess"
 
@@ -41,5 +45,7 @@ export class APIRoutes {
     static SELECTIVE_PROCESS_SUBSCRIPTION_GRADING:string = APIRoutes.API_URL + "/api/subscriptiongrading"
     
     static SELECTIVE_PROCESS_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/selectiveprocesssubscription"
+    
+    static SELECTIVE_PROCESS_RESULTS_SUBMISSION:string = APIRoutes.API_URL + "/api/selectiveprocessresult"
 
 }

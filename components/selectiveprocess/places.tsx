@@ -170,7 +170,7 @@ export default function SelectiveProcessPlaces(props: Props) {
                                                 />
                                             </td>
                                             <td>
-                                                <button className="btn btn-sm btn-danger" onClick={handleRemoveReservedPlace(i)}>
+                                                <button type="button" className="btn btn-sm btn-danger" onClick={handleRemoveReservedPlace(i)}>
                                                     <FontAwesomeIcon icon={faTrash} className="sm-icon" />
                                                 </button></td>
                                         </tr>
@@ -178,7 +178,7 @@ export default function SelectiveProcessPlaces(props: Props) {
                                 })}
                                 <tr>
                                     <td colSpan={3} className="text-center">
-                                        <button className="btn btn-sm btn-success" onClick={handleAddNewReservedPlace}>
+                                        <button type="button" className="btn btn-sm btn-success" onClick={handleAddNewReservedPlace}>
                                             <FontAwesomeIcon icon={faPlus} className="sm-icon me-2" />
                                             Adicionar nova vaga reservada
                                         </button>

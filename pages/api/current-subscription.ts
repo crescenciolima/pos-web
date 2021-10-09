@@ -39,7 +39,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
         const selectiveProcessService = SelectiveProcessService();
         
-        const process = await selectiveProcessService.getInConstruction();
+        const process = await selectiveProcessService.getOpen();
         
         const subs = await subscriptionService.getByUserAndProcess(currentUserId, process.id);
 

@@ -6,26 +6,28 @@ import PDFTableLine from './pdf-table-line';
 export interface PDFTableInfo {
     value: string;
     width: string;
+    textAlign: 'left' | 'right' | 'center' | 'justify';
 }
 
 interface Props {
     title: string;
     headerList: PDFTableInfo[];
     lines: PDFTableInfo[][];
+    marginTop?:number;
 }
 
 export default function PDFTable(props: Props) {
 
 
+    const { headerList, title, lines, marginTop } = props;
 
     const styles = StyleSheet.create({
 
         tableContainer: {
             flexDirection: 'column',
-            marginTop: 24,
+            marginTop: marginTop || 4,
             justifyContent: 'center',
             textAlign: 'center',
-            padding: 20
         },
         title: {
             color: 'black',
@@ -38,7 +40,6 @@ export default function PDFTable(props: Props) {
 
     });
 
-    const { headerList, title, lines } = props;
 
 
     return (

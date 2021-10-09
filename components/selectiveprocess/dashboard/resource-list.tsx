@@ -11,6 +11,7 @@ import { faTrash, faClock, faCheck, faTimes } from '@fortawesome/free-solid-svg-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 
 interface Props {
     process: SelectiveProcess;
@@ -30,6 +31,7 @@ export default function SelectiveProcessResourceList(props: Props) {
     const [currentStep, setCurrentStep] = useState<ProcessStep>({ type: ProcessStepsTypes.INSCRICAO, startDate: 0, finishDate: 0,  passingScore: 0, weight: 0, order: 0 });
 
     const api = API(setLoading);
+    const processUtil = SelectiveProcessUtil();
 
 
     useEffect(() => {
@@ -40,6 +42,7 @@ export default function SelectiveProcessResourceList(props: Props) {
         let checked = true;
 
         for (let sub of list) {
+            processUtil.setSubscriptionPlaceName(sub, props.process);
             if (sub.resources?.length > 0) {
                 for (let resource of sub.resources) {
                     if (resource.step == props.currentStep.type || 
@@ -76,7 +79,6 @@ export default function SelectiveProcessResourceList(props: Props) {
                         <thead>
                             <tr>
                                 <th>Nome</th>
-                                <th>Idade</th>
                                 <th>Data de Inscrição</th>
                                 <th>Vaga</th>
                                 <th>Parecer do Recurso</th>
@@ -88,9 +90,8 @@ export default function SelectiveProcessResourceList(props: Props) {
                                     <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} key={sub.id}>
                                         <tr>
                                             <td>{sub.name}</td>
-                                            <td>{sub.age}</td>
                                             <td>{sub['formatedDate']}</td>
-                                            <td>{sub.reservedPlace}</td>
+                                            <td>{sub.placeName}</td>
                                             <td>
                                                 {sub.currentResource.status == SubscriptionStatus.AGUARDANDO_ANALISE && <FontAwesomeIcon icon={faClock} className="sm-icon me-1" />}
                                                 {sub.currentResource.status == SubscriptionStatus.DEFERIDA && <FontAwesomeIcon icon={faCheck} className="sm-icon me-1" />}

@@ -4,9 +4,19 @@ import { APIResponse } from '../../models/api-response';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
 import { SelectiveProcess } from '../../models/selective-process';
 import { v4 as uuidv4 } from 'uuid';
+import Cors from 'cors'
+import initMiddleware from '../../utils/init-middleware';
 
+const cors = initMiddleware(
+  Cors({
+      methods: ['GET', 'POST', 'OPTIONS'],
+  })
+)
 
 async function endpoint(req: NextApiRequest, res: NextApiResponse) {
+
+  await cors(req, res);
+
 
   const selectiveProcessService = SelectiveProcessService();
 
@@ -35,10 +45,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
             reservedPlaces: [
               { name: "Servidores do IFBA", numberPlaces: 0, uuid: uuidv4() },
               { name: "Pessoas com Deficiência", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Negros (Pretos e Pardos) ", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Indígenas", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Quilombolas", numberPlaces: 0, uuid: uuidv4() },
-              { name: "Pessoas Trans (Transexuais, Transgêneros e Travestis)", numberPlaces: 0, uuid: uuidv4() },
+              { name: "Políticas de Ações Afirmativas", numberPlaces: 0, uuid: uuidv4() },
             ]
           }
 
@@ -112,4 +119,5 @@ export const config = {
 }
 
 export default endpoint;
+
 
