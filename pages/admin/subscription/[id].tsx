@@ -27,6 +27,8 @@ export default function ProcessSubscriprionLayout() {
     const [subscription, setSubscription] = useState<Subscription>({
         name: "", age: 0, protocol: "", reservedPlace: "", status: SubscriptionStatus.AGUARDANDO_ANALISE, selectiveProcessID: "", id: "", graduationProofFile: "", subscriptionDate: 0
     });
+
+    console.log("Subscription apos state:"+subscription.name)
     const [stepType, setStepType] = useState<ProcessStepsTypes>(ProcessStepsTypes.INSCRICAO);
     const [menuSelection, setMenuSelection] = useState<string>("dadosbasicos");
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
@@ -185,12 +187,7 @@ export default function ProcessSubscriprionLayout() {
                                     <label className="form-label">Infomações Adicionais</label>
                                     <textarea className="form-control" id="obs" rows={3} readOnly value={subscription.observation}></textarea>
                                 </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Comprovante de Graduação</label>
-                                    <a target="blank" href={subscription.graduationProofFile} className="link-primary">
-                                        <b><FontAwesomeIcon icon={faFile} className="sm-icon mx-1" />Arquivo </b>
-                                    </a>
-                                </div>
+                                
                                 <div>
                                     <label className="form-label">Endereço Residencial</label>
                                     <br />
@@ -213,7 +210,7 @@ export default function ProcessSubscriprionLayout() {
                         </div>
                     </div>
                     <div className="row mt-3">
-    <div className="col-12 ">
+    <div className="col-12">
         <fieldset>
             <legend>Dados Profissionais</legend>
             <div className="mb-3">
@@ -242,6 +239,23 @@ export default function ProcessSubscriprionLayout() {
                         <label className="form-label">Complemento</label>
                         <input className="form-control form-control-sm" type="text" id="" value={subscription.complementCompany} readOnly/>
                     </div>
+                </div>
+            </fieldset>
+        </div>
+        <div className="col-12">
+            <fieldset>
+                <legend>Dados Acadêmicos</legend>
+                <div className="mb-3">
+                    <label className="form-label">Graduação</label>
+                    <input className="form-control form-control-sm" type="text" id="" value={subscription.graduation} readOnly/>
+                    <label className="form-label">Instituição</label>
+                    <input className="form-control form-control-sm" type="text" id="" value={subscription.graduationInstitution} readOnly/>
+                    <div className="mb-3">
+                                    <label className="form-label">Comprovante de Graduação</label>
+                                    <a target="blank" href={subscription.graduationProofFile} className="link-primary">
+                                        <b><FontAwesomeIcon icon={faFile} className="sm-icon mx-1" />Arquivo </b>
+                                    </a>
+                                </div>
                 </div>
             </fieldset>
         </div>
