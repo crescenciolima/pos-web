@@ -6,22 +6,29 @@
     user-select: none;
   }
 
-  @media (min-width: 768px) {
-    .bd-placeholder-img-lg {
-      font-size: 3.5rem;
-    }
-  }
+
   
   .formSignin {
     text-align: center;
     width: 100%;
     max-width: 400px;
-    padding: 3.2rem;
+    padding: 2rem;
     margin: auto;
     background-color: var(--background-light);
     border-radius: 1rem;
+    margin: 1.3rem;
   }
   
+  @media (min-width: 768px) {
+    .bd-placeholder-img-lg {
+      font-size: 3.5rem;
+    }
+    .formSignin {
+      padding: 3.2rem;
+      margin: auto;
+    }
+  }
+
   .form-signin .checkbox {
     font-weight: 400;
   }

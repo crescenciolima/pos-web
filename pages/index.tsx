@@ -62,11 +62,11 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
               <div className="col-12">
                 <h1 className="d-inline text-primary-dark heading-font-size">Processo Seletivo</h1>
               </div>
-              <div className="col-11 col-md-8 col-lg-6 mt-5">
+              <div className="col-11 col-md-10 col-xxl-6 mt-5">
                 <div className="card  btn-round bg-color border-0">
-                  <div className="card-body d-flex ">
+                <div className="card-body d-flex flex-column flex-md-row">
                     <img src="/images/home/unavailable.svg" alt="Nenhum processo seletivo" className={homeStyle.cardImg} width={180} height={180} ></img>
-                    <div className="d-flex ms-3 flex-column my-auto">
+                    <div className="d-flex ms-3 flex-column mt-3 my-md-auto">
                       <h5 className="card-title text-primary-dark">Olá,</h5>
                       <p className="card-text text-primary-dark">Infelizmente não estamos com nenhum processo seletivo aberto no momento, quando  um novo processo for iniciado, todas as informações serão divulgadas nesse site.</p>
                     </div>
@@ -80,11 +80,11 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
             <div className="col-12">
               <h1 className="d-inline text-primary-dark heading-font-size">Processo Seletivo {acceptingSubscription && 'Aberto'}</h1>
             </div>
-            <div className="col-11 col-md-8 col-lg-6 mt-5">
+            <div className="col-11 col-md-10 col-xxl-6 mt-5">
               <div className="card  btn-round bg-color border-0">
                 <div className="card-body d-flex flex-column flex-md-row">
                   <img src="/images/home/available.svg" alt="Processo seletivo aberto" className={homeStyle.cardImg} width={180} height={180} ></img>
-                  <div className="d-flex ms-3 flex-column my-auto">
+                  <div className="d-flex ms-3 flex-column mt-3 my-md-auto">
                     <h3 className="card-title text-primary-dark mb-3">{title}</h3>
                     {!acceptingSubscription &&
                       <p className="card-text text-primary-dark">

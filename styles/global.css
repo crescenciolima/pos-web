@@ -25,6 +25,9 @@ a {
 * {
     box-sizing: border-box;
 }
+.row{
+    --bs-gutter-x: 0
+}
 
 .text-primary-dark {
     color: var(--primary-dark);
@@ -258,6 +261,13 @@ label>span {
 }
 
 .title-section{
-    padding-top: 5rem;
-    padding-bottom: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .title-section{
+        padding-top: 5rem;
+        padding-bottom: 2rem;
+    }
 }

@@ -24,7 +24,7 @@ export default function Docentes({ news,course }) {
       <main className={style.detailNewsMain}>
         <section className="w-100">
           <div className="row w-100 h-100 justify-content-center">
-            <div className="col-md-5 col-xl-6  d-flex justify-content-center align-items-center">
+            <div className="col-11 col-md-5 col-xl-6  d-flex justify-content-center align-items-center">
               <div className={style.detailNewsCard + " card p-4"}>
                 <div className="card-body d-relative">
                   <div className="text-center">
