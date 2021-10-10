@@ -48,7 +48,9 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
 
             <p>{selectiveProcess.description}</p>
 
-            {/* <p>Iniciado em: {new Date(selectiveProcess.currentStep).toLocaleDateString()}</p> */}
+            <p>Estado do processo seletivo: {selectiveProcess.state=="open"?"aberto":"fechado"}</p>
+
+            <p>Iniciado em: {new Date(selectiveProcess.currentStep).toLocaleDateString()}</p>
 
           </div>
         </fieldset>
@@ -67,9 +69,9 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
               {selectiveProcess.steps.map((step,key)=>(
                 <tr id="{key}" className={selectiveProcess.currentStep === key?"current-sel-proc":""} 
                 title={selectiveProcess.currentStep === key?"Etapa Atual":""}>
+                  <td>{step.type}</td>
                   <td>{new Date(step.startDate).toLocaleDateString()}</td>
                   <td>{new Date(step.finishDate).toLocaleDateString()}</td>
-                  <td>{step.type}</td>
                 </tr>
               ))}
             </tbody>
