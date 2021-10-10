@@ -29,6 +29,10 @@ a {
     --bs-gutter-x: 0
 }
 
+.bg-light{
+    background-color: var(--background-light) !important;
+}
+
 .text-primary-dark {
     color: var(--primary-dark);
 }
@@ -168,7 +172,7 @@ a {
 }
 
 .sm-icon{
-    height: 15px;
+    height: 18px;
 }
 
 .sidebar {
