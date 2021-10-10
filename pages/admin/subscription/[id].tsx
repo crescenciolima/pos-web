@@ -29,7 +29,6 @@ export default function ProcessSubscriprionLayout() {
         name: "", age: 0, protocol: "", reservedPlace: "", status: SubscriptionStatus.AGUARDANDO_ANALISE, selectiveProcessID: "", id: "", graduationProofFile: "", subscriptionDate: 0
     });
 
-    console.log("Subscription apos state:"+subscription.name)
     const [stepType, setStepType] = useState<ProcessStepsTypes>(ProcessStepsTypes.INSCRICAO);
     const [menuSelection, setMenuSelection] = useState<string>("dadosbasicos");
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
