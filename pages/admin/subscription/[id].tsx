@@ -314,7 +314,7 @@ export default function ProcessSubscriprionLayout() {
         </div>
     </div>
     
-    {subscription.disability && subscription.disabilityType !== "" &&
+    {subscription.disability==="1" && subscription.disabilityType !== "" &&
         <>
         <div className="col-12">
         <fieldset>
