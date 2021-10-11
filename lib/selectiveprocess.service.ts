@@ -58,8 +58,8 @@ export default function SelectiveProcessService() {
     }
 
   
-    async function save(process: SelectiveProcess) {
-        selectiveProcessRef.add(process);
+    async function save(process: SelectiveProcess): Promise<any> {
+       return selectiveProcessRef.add(process);
     }
 
     async function update(process: SelectiveProcess) {

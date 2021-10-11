@@ -18,6 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
 import { format } from 'date-fns';
 import SelectiveBaremaAnalysis from '../../../components/selectiveprocess/subscription/subscription-barema-analysis';
+import ImgThumbnail from '../../../components/selectiveprocess/dashboard/img-thumbnail';
 
 export default function ProcessSubscriprionLayout() {
 
@@ -27,6 +28,7 @@ export default function ProcessSubscriprionLayout() {
     const [subscription, setSubscription] = useState<Subscription>({
         name: "", age: 0, protocol: "", reservedPlace: "", status: SubscriptionStatus.AGUARDANDO_ANALISE, selectiveProcessID: "", id: "", graduationProofFile: "", subscriptionDate: 0
     });
+
     const [stepType, setStepType] = useState<ProcessStepsTypes>(ProcessStepsTypes.INSCRICAO);
     const [menuSelection, setMenuSelection] = useState<string>("dadosbasicos");
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
@@ -113,14 +115,35 @@ export default function ProcessSubscriprionLayout() {
         }
     }
 
-
-
     const handleStatusObsChange = (e) => {
         setSubscription({ ...subscription, statusObservation: e.target.value });
     }
 
     const handleResouceStatusObsChange = (e) => {
         setSubscription({ ...subscription, currentResource: { ...subscription.currentResource, statusObservation: e.target.value } });
+    }
+
+    const checkSpecialTreatment = (specialTreatmentType) => {
+        switch (specialTreatmentType) {
+            case 'prova_braille': 
+            return "Prova em Braille";
+            break;
+        case 'auxilio_leitor': 
+            return "Auxílio de Leitor/Ledor";
+            break;
+        case 'interprete_libras': 
+            return "Intérprete de Libras";
+            break;
+        case 'sala_mais_acesso': 
+            return "Sala de Mais Acesso";
+            break;
+        case 'auxilio_transcricao': 
+            return "Auxílio para Transcrição";
+            break;
+        case 'mesa_sem_braco': 
+            return "Mesa e Cadeiras sem Braço";
+            break;
+        }
     }
 
     return (
@@ -173,21 +196,21 @@ export default function ProcessSubscriprionLayout() {
                                     <input type="text" id="orgao-emissor-rg" className="form-control form-control-sm" value={subscription.issuingAgency} readOnly></input>
                                     <label className="form-label">CPF</label>
                                     <input type="text" id="cpf" className="form-control form-control-sm" value={subscription.document} readOnly></input>
+                                    <label className="form-label">Telefone</label>
+                                    <input type="text" id="cpf" className="form-control form-control-sm" value={subscription.phoneNumber} readOnly></input>
+                                    <label className="form-label">Telefone alternativo</label>
+                                    <input type="text" id="cpf" className="form-control form-control-sm" value={subscription.alternativePhoneNumber} readOnly></input>
                                 </div>
                                 <div className="mb-3">
-                                    <label className="form-label">Vaga Selecionada</label>
-                                    <input type="text" id="vaga" className="form-control form-control-sm" value={subscription.reservedPlace} readOnly></input>
+                                    <label className="form-label">Documento com Foto</label>
+                                    <br />
+                                    <ImgThumbnail imgUrl={subscription.documentFile}/>
                                 </div>
                                 <div className="mb-3">
                                     <label className="form-label">Infomações Adicionais</label>
                                     <textarea className="form-control" id="obs" rows={3} readOnly value={subscription.observation}></textarea>
                                 </div>
-                                <div className="mb-3">
-                                    <label className="form-label">Comprovante de Graduação</label>
-                                    <a target="blank" href={subscription.graduationProofFile} className="link-primary">
-                                        <b><FontAwesomeIcon icon={faFile} className="sm-icon mx-1" />Arquivo </b>
-                                    </a>
-                                </div>
+                                
                                 <div>
                                     <label className="form-label">Endereço Residencial</label>
                                     <br />
@@ -201,8 +224,13 @@ export default function ProcessSubscriprionLayout() {
                                     <input className="form-control form-control-sm" type="text" id="" value={subscription.street} readOnly/>
                                     <label className="form-label">CEP</label>
                                     <input className="form-control form-control-sm" type="text" id="" value={subscription.postalCode} readOnly/>
-                                    <label className="form-label">Complemento</label>
-                                    <input className="form-control form-control-sm" type="text" id="" value={subscription.complement} readOnly/>
+                                    {subscription.complement!=="" &&
+                                    <>
+                                        <label className="form-label">Complemento</label>
+                                        <input className="form-control form-control-sm" type="text" id="" value={subscription.complement} readOnly/>
+                                    </>
+                                    }
+                                    
                                     <label className="form-label">Número</label>
                                     <input className="form-control form-control-sm" type="text" id="" value={subscription.houseNumber} readOnly/>
                                 </div>
@@ -210,7 +238,8 @@ export default function ProcessSubscriprionLayout() {
                         </div>
                     </div>
                     <div className="row mt-3">
-    <div className="col-12 ">
+
+    <div className="col-12">
         <fieldset>
             <legend>Dados Profissionais</legend>
             <div className="mb-3">
@@ -236,13 +265,100 @@ export default function ProcessSubscriprionLayout() {
                         <input className="form-control form-control-sm" type="text" id="" value={subscription.streetCompany} readOnly/>
                         <label className="form-label">CEP</label>
                         <input className="form-control form-control-sm" type="text" id="" value={subscription.postalCodeCompany} readOnly/>
-                        <label className="form-label">Complemento</label>
-                        <input className="form-control form-control-sm" type="text" id="" value={subscription.complementCompany} readOnly/>
+                        {subscription.complementCompany!=="" &&
+                        <>
+                            <label className="form-label">Complemento</label>
+                            <input className="form-control form-control-sm" type="text" id="" value={subscription.complementCompany} readOnly/>
+                        </>
+                        }
                     </div>
                 </div>
             </fieldset>
         </div>
+
+        <div className="col-12">
+            <fieldset>
+                <legend>Dados Acadêmicos</legend>
+                <div className="mb-3">
+                    <label className="form-label">Graduação</label>
+                    <input className="form-control form-control-sm" type="text" id="" value={subscription.graduation} readOnly/>
+                    <label className="form-label">Instituição</label>
+                    <input className="form-control form-control-sm" type="text" id="" value={subscription.graduationInstitution} readOnly/>
+                    <div className="mb-3">
+                        <label className="form-label">Comprovante de Graduação: </label>
+                        <br />
+                        <ImgThumbnail imgUrl={subscription.graduationProofFile}/>
+                    </div>
+                </div>
+                {subscription.postgraduateLatoSensu!=="" && 
+                    <>
+                    <div className="mb-3">
+                        <label className="form-label">Pós-Graduação Lato Sensu</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.postgraduateLatoSensu} readOnly/>
+                        <label className="form-label">Instituição</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.postgraduateLatoSensuInstitution} readOnly/>
+                    </div>
+                    </>
+                }
+                {subscription.postgraduateStrictoSensu!=="" && 
+                    <>
+                    <div className="mb-3">
+                        <label className="form-label">Pós-Graduação Stricto Sensu</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.postgraduateStrictoSensu} readOnly/>
+                        <label className="form-label">Instituição</label>
+                        <input className="form-control form-control-sm" type="text" id="" value={subscription.postgraduateStrictoSensuInstitution} readOnly/>
+                    </div>
+                    </>
+                }
+            </fieldset>
+        </div>
     </div>
+    
+    {subscription.disability && subscription.disabilityType !== "" &&
+        <>
+        <div className="col-12">
+        <fieldset>
+                <legend>Deficiência</legend>
+                <div className="mb-3">
+                    <div>
+                    <label className="form-label">Tipo de Deficiência</label>
+                    <input className="form-control form-control-sm" type="text" id="" value={subscription.disabilityType} readOnly/>
+                    </div>
+                    <br />
+                    <div>
+                    <label className="form-label">Auxílios Solicitados para a Prova</label>
+                    </div>
+
+                    <div>
+                    {subscription.specialTreatmentTypes?.map((treatment) => (
+                        <li>{checkSpecialTreatment(treatment)}</li>
+                    ))}
+                    </div>
+                </div>
+        </fieldset>
+        </div>
+        </>
+    }
+    
+    <div className="col-12">
+        <fieldset>
+            <legend>Formulários de Inscrição</legend>
+            <div className="mb-3">
+                {subscription.processForms?.map((form,key) => (
+                <>
+                    <div>
+                        <label className="form-label">{form.name}</label>
+                    </div>               
+                    <div>
+                        <ImgThumbnail imgUrl={form.url} />
+                    </div>
+                    <br />
+                </>
+                ))}
+            </div>
+        </fieldset>
+    </div>
+    
                     {subscription.currentResource &&
                         <>
                             <div className="row justify-content-center">

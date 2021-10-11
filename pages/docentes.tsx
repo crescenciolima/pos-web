@@ -26,13 +26,13 @@ export default function Docentes({ docentes,course }) {
       <section  className="title-section">
           <div className="row w-100 h-100 justify-content-center">
             <div className="col-md-5 col-xl-4 col-xxl-3 d-flex justify-content-center align-items-center">
-              <div className="p-4">
+            <div className="px-5 py-2 py-md-4">
                 <h1 className="text-primary-dark mt-4 title-sm-font-size">Nossa</h1>
                 <h1 className="text-primary-dark title-sm-font-size">Equipe</h1>
               </div>
             </div>
             <div className="col-md-5 col-xl-4 col-xxl-3 d-flex justify-content-center align-items-center">
-              <div className="p-4">
+              <div className="px-5 py-2 py-md-4">
                 <h5 className="text-primary-dark mt-4">Conheça a equipe de docentes por trás da nossa pós graduação Lato Sensu em Desenvolvimento Web do IFBA - Vitória da Conquista.</h5>
               </div>
             </div>
@@ -45,9 +45,9 @@ export default function Docentes({ docentes,course }) {
               <div className="row w-100 justify-content-center">
                 {listaDocentes.map((docente, i) => {
                   return (
-                    <div className="col-sm-6 col-md-4 col-xl-4" key={i}>
-                      <div className={style.card + ' card mt-3 mt-md-2'}>
-                        <div className="card-body text-center mb-3">
+                    <div className="col-sm-6 col-md-5 col-xl-4 " key={i}>
+                      <div className={style.card + ' card mt-4 mx-3'}>
+                        <div className="card-body text-center mb-3 ">
                           {docente.photo ? 
                             <Image src={docente.photo} className={style.avatar + ''} alt="Foto do docente" width={150} height={150} /> : <></>
                           }

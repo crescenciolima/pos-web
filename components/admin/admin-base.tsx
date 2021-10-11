@@ -41,11 +41,10 @@ export default function AdminBase(props: any) {
         <meta name="author" content="" />
       </Head>
       <main className={adminStyle.main}>
-        <div className="container-fluid">
           <div className='row'>
             <AdminSidebar />
-            <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-              <div className="text-right p-3 text-primary">
+            <div className="col">
+              <nav className="text-right p-3 text-primary bg-light">
                 <i className={adminStyle.icon}>
                   <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
                 </i>
@@ -54,13 +53,15 @@ export default function AdminBase(props: any) {
                   <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
                 </i>
                 <label className={adminStyle.sidebarLabel} onClick={() => logout()}>Sair</label>
+              </nav>
+              <div className="ms-sm-auto px-md-4 my-4 mx-1">
+                <AdminContent>
+                  {props.children}
+                </AdminContent>
               </div>
-              <AdminContent>
-                {props.children}
-              </AdminContent>
+
             </div>
           </div>
-        </div>
       </main>
       <ToastContainer align={"right"} position={"bottom"} />
 

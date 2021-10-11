@@ -1,7 +1,8 @@
 .main {
     background-color: #FCFCFC;
-    min-height: 600px;
+    min-height: 100vh;
     position: relative;
+
 }
 
 .icon{
@@ -21,3 +22,14 @@
     border-radius: 40px;
 }
 
+.navLink{
+    padding: 1rem .2rem;
+    text-align: center;
+}
+
+@media (min-width: 768px) {
+    .navLink {
+        padding: .5rem 1rem;
+        text-align: left;
+    }
+}

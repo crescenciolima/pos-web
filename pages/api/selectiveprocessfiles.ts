@@ -75,7 +75,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
         let response: APIResponse = {
           msg: "Processo seletivo salvo com sucesso!",
-          result: process
+          result: updateProcess
         }
 
 

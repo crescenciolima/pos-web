@@ -25,6 +25,13 @@ a {
 * {
     box-sizing: border-box;
 }
+.row{
+    --bs-gutter-x: 0
+}
+
+.bg-light{
+    background-color: var(--background-light) !important;
+}
 
 .text-primary-dark {
     color: var(--primary-dark);
@@ -165,7 +172,7 @@ a {
 }
 
 .sm-icon{
-    height: 15px;
+    height: 18px;
 }
 
 .sidebar {
@@ -257,7 +264,43 @@ label>span {
     color: red!important;
 }
 
+#selective-process {
+  font-family: Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+#selective-process thead tr td{
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #34a853;
+    color: white;
+}
+
+#selective-process td, #selective-process th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#selective-process tr:nth-child(even){background-color: #f2f2f2;}
+
+.current-sel-proc {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #1e5c2e !important;
+    color: white;
+}
+
 .title-section{
-    padding-top: 5rem;
-    padding-bottom: 2rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+    .title-section{
+        padding-top: 5rem;
+        padding-bottom: 2rem;
+    }
 }

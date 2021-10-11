@@ -10,93 +10,98 @@ import { UserType } from '../../enum/type-user.enum'
 export default function AdminSidebar() {
     //const { userType } = props; 
     return (
-        <nav className="col-md-3 col-lg-2 d-md-block sidebar">
-            <div className="d-flex flex-column p-3 text-primary">
-                <a className="navbar-brand text-center" href="/">
-                    <Image src="/images/ifbavca.png" className="d-inline-block align-text-top" alt="Logo" width={140} height={40} priority={true} />
+        <nav className="col-2 col-lg-2 d-md-block sidebar">
+            <div className="d-flex flex-column p-1 p-md-3 text-primary">
+                <a className="navbar-brand text-center d-none d-md-inline-block" href="/">
+                    <Image src="/images/ifbavca.png" className=" align-text-top" alt="Logo" width={140} height={40} priority={true} />
                 </a>
-                <ul className="nav nav-pills flex-column mb-auto text-primary mt-5">
+                <a className="navbar-brand text-center mx-0 d-inline-block d-md-none" href="/">
+                    <Image src="/images/logo-mobile.png" className=" align-text-top" alt="Logo" width={50} height={55} priority={true} />
+                </a>
+                <ul className="nav nav-pills flex-column mb-auto text-primary mt-2 mt-md-5 ">
                     <li>
-                        <a href="/admin" className="nav-link text-primary sidebar-item">
+                        <a href="/admin" className={adminStyle.navLink+" nav-link text-primary sidebar-item"}>
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faChartLine} className="sm-icon" />
                             </i>
-                            <label className={adminStyle.sidebarLabel}>Dashboard</label>
+                            <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Dashboard</label>
                         </a>
                     </li>
                     <li>
-                        <a href="/admin/course" className="nav-link text-primary">
+                        <a href="/admin/course" className={adminStyle.navLink+" nav-link text-primary"}>
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faBookReader} className="sm-icon" />
                             </i>
-                            <label className={adminStyle.sidebarLabel}>Curso</label>
+                            <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Curso</label>
                         </a>
                     </li>
                     <li>
                         <Link href="/admin/teacher">
-                            <a className="nav-link text-primary">
+                            <a className={adminStyle.navLink+" nav-link text-primary"}>
                                 <i className={adminStyle.icon}>
                                     <FontAwesomeIcon icon={faChalkboardTeacher} className="sm-icon" />
                                 </i>
-                                <label className={adminStyle.sidebarLabel}>Docentes</label>
+                                <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Docentes</label>
                             </a>
                         </Link>
                     </li>
                     <li>
                         <Link href="/admin/news">
-                            <a className="nav-link text-primary ">
+                            <a className={adminStyle.navLink+" nav-link text-primary"}>
                                 <i className={adminStyle.icon}>
                                     <FontAwesomeIcon icon={faFile} className="sm-icon" />
                                 </i>
-                                <label className={adminStyle.sidebarLabel}>Posts</label>
+                                <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Posts</label>
                             </a>
                         </Link>
                     </li>
                     <li>
-                        <a href="#" className="nav-link text-primary ">
+                        <a href="#" className={adminStyle.navLink+" nav-link text-primary"}>
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faFileAlt} className="sm-icon" />
                             </i>
-                            <label className={adminStyle.sidebarLabel}>Trabalhos</label>
+                            <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Trabalhos</label>
                         </a>
                     </li>
                     <li>
-                        <a href="#" className="nav-link text-primary ">
+                        <a href="#" className={adminStyle.navLink+" nav-link text-primary"}>
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faFileInvoice} className="sm-icon" />
                             </i>
-                            <label className={adminStyle.sidebarLabel}>Baremas</label>
+                            <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Baremas</label>
                         </a>
                     </li>
                     <li>
                         <Link href="/admin/selectiveprocess">
-                            <a href="#" className="nav-link text-primary ">
+                            <a href="#" className={adminStyle.navLink+" nav-link text-primary"}>
                                 <i className={adminStyle.icon}>
                                     <FontAwesomeIcon icon={faFolder} className="sm-icon" />
                                 </i>
-                                <label className={adminStyle.sidebarLabel}>Processo Seletivo</label>
+                                <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Processo Seletivo</label>
                             </a>
                         </Link>
 
                     </li>
                     <li>
-                        <a href="#" className="nav-link text-primary ">
+                        <a href="#" className={adminStyle.navLink+" nav-link text-primary"}>
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faCopy} className="sm-icon" />
                             </i>
-                            <label className={adminStyle.sidebarLabel}>Relatórios</label>
+                            <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Relatórios</label>
                         </a>
                     </li>
                     <li>
-                        <a href="/admin/user" className="nav-link text-primary ">
+                        <a href="/admin/user" className={adminStyle.navLink+" nav-link text-primary"}>
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faUser} className="sm-icon" />
                             </i>
-                            <label className={adminStyle.sidebarLabel}>Usuários</label>
+                            <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Usuários</label>
                         </a>
                     </li>
                 </ul>
             </div>
         </nav>
+
+      
     )
 }

@@ -4,7 +4,7 @@ import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../../model
 import PDFHeader from './components/pdf-header';
 import PDFTable, { PDFTableInfo } from './components/pdf-table';
 import { FinalListGroup } from '../dashboard/final-result';
-import { Subscription } from '../../../models/subscription';
+import { Subscription, SubscriptionStatus } from '../../../models/subscription';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 
 interface Props {
@@ -46,15 +46,9 @@ export default function PDFSubscriptionResult(props: Props) {
   let resourceLines: PDFTableInfo[][] = [];
 
   for (let sub of subscriptionList) {
-    let subInfo: PDFTableInfo[] = [
-      { value: sub.name, width: "25%", textAlign: "left" },
-      { value: sub.placeName, width: "30%", textAlign: "center" },
-      { value: sub.status, width: "15%", textAlign: "center" },
-      { value: sub.statusObservation, width: "30%", textAlign: "left" },
-    ];
-    lines.push(subInfo);
 
     let resource = sub?.resources?.find(res => res.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO);
+    let observation = sub.statusObservation;
     if (resource) {
       let resourceInfo: PDFTableInfo[] = [
         { value: sub.name, width: "30%", textAlign: "left" },
@@ -62,8 +56,20 @@ export default function PDFSubscriptionResult(props: Props) {
         { value: resource.statusObservation, width: "50%", textAlign: "left" },
       ];
       resourceLines.push(resourceInfo);
-
+      if (resource.status == SubscriptionStatus.DEFERIDA) {
+        observation = resource.statusObservation;
+      }
     }
+
+    let subInfo: PDFTableInfo[] = [
+      { value: sub.name, width: "25%", textAlign: "left" },
+      { value: sub.placeName, width: "30%", textAlign: "center" },
+      { value: sub.status, width: "15%", textAlign: "center" },
+      { value: observation, width: "30%", textAlign: "left" },
+    ];
+    lines.push(subInfo);
+
+
   }
 
 

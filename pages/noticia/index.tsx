@@ -27,12 +27,12 @@ export default function Noticias({ newsList, course }) {
         <section  className="title-section">
           <div className="row h-100 justify-content-center w-100">
             <div className="col-md-5 col-xl-4 col-xxl-3 d-flex justify-content-center align-items-center">
-              <div className="p-4">
+            <div className="px-5 py-2 py-md-4">
                 <h1 className="text-primary-dark mt-4 title-sm-font-size">Notícias</h1>
               </div>
             </div>
             <div className="col-md-5 col-xl-4 col-xxl-3 d-flex justify-content-center align-items-center">
-              <div className="p-4">
+            <div className="px-5 py-2 py-md-4">
                 <h5 className="text-primary-dark mt-4">Acompanhe aqui os resultados, editais e informações sobre o processo seletivo.</h5>
               </div>
             </div>
@@ -43,7 +43,7 @@ export default function Noticias({ newsList, course }) {
           <div className="row justify-content-center pb-5 w-100">
             {newsList && newsList.map((news: News, i) => {
               return (
-                <div className="col-lg-8 mt-5" key={news.id}>
+                <div className="col-11 col-lg-8 mt-5" key={news.id}>
                   <NewsCard title={news.title} coverURL={news.coverURL} text={news.text} date={news.date} dateString={news.dateString} slug={news.slug}></NewsCard>
                 </div>
               )

@@ -16,14 +16,14 @@ export default function SiteFooter({course}) {
                 </div>
                 <br />
                 <div className="row">
-                  <div className="col-6">
+                  <div className="col-md-6">
                       <p>Coordenação:</p>
                       <p>
                         {course.coordName}<br /> 
                         {course.coordMail}
                       </p>
                   </div>
-                  <div className="col-6">
+                  <div className="col-md-6">
                     <p>Campus Viória da Conquista</p>
                     <p>Av. Sérgio Vieira de Mello, 3150 - Zabelê,<br />
                     Vitória da Conquista - BA, 45078-300
@@ -31,8 +31,8 @@ export default function SiteFooter({course}) {
                   </div>
                 </div>
               </div>
-              <div className="col-md-3 text-center">
-                <Image src="/images/ifba-logo-footer.png" alt="logo"width="124" height="124" />
+              <div className="col-md-3 text-center align-items-center d-flex justify-content-center">
+                <Image src="/images/ifba-logo-footer.png" layout="fixed" alt="logo"width="124" height="124" />
               </div>
             </div>
         </footer>
