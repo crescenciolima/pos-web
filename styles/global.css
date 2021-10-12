@@ -188,9 +188,20 @@ a {
     text-align: center;
 }
 
+.italic {
+    font-style: italic;
+}
+
 .input-error{
     font-size: 12px;
     color: #d00e00;
+    text-align: left;
+    margin-top: 3px;
+}
+
+.input-info{
+    font-size: 12px;
+    color: #5f5f5f;
     text-align: left;
     margin-top: 3px;
 }
@@ -265,7 +276,7 @@ label>span {
 }
 
 #selective-process {
-  font-family: Arial, Helvetica, sans-serif;
+  font-size: 14px;
   border-collapse: collapse;
   width: 100%;
 }
@@ -303,4 +314,16 @@ label>span {
         padding-top: 5rem;
         padding-bottom: 2rem;
     }
+}
+
+.show{
+    display: unset;
+}
+
+.hide{
+    display: none;
+}
+
+.mt-15{
+    margin-top: 15em;
 }

@@ -44,10 +44,10 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
                 subscription = { 
                   ...subscription,
-                   userID: currentUserId as string, 
-                   protocol: uuidv4(),
-                   subscriptionDate: Date.now(),
-                   status: SubscriptionStatus.AGUARDANDO_ANALISE,
+                  userID: currentUserId as string, 
+                  protocol: uuidv4(),
+                  subscriptionDate: (new Date()).toISOString(),
+                  status: SubscriptionStatus.AGUARDANDO_ANALISE,
                 };
 
                 const _subscription = await subscriptionService.save(subscription); 

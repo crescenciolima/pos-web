@@ -53,7 +53,7 @@ export interface Subscription {
     processForms?: ProcessDocument[]; 
 
     age?: number;
-    subscriptionDate: number;
+    subscriptionDate?: string|Date;
     statusObservation?: string;
     observation?: string;
     graduationProofFile?: string;
@@ -87,7 +87,7 @@ export enum SubscriptionTypeFile {
 export interface SubscriptionResource {
 
     justification: string;
-    date: number;
+    date: string|Date;
     step: ProcessStepsTypes;
     status: SubscriptionStatus;
     statusObservation?: string;

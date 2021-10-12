@@ -48,4 +48,6 @@ export class APIRoutes {
     
     static SELECTIVE_PROCESS_RESULTS_SUBMISSION:string = APIRoutes.API_URL + "/api/selectiveprocessresult"
 
+    static VIA_CEP = "https://viacep.com.br/ws/{cep}/json/"
+
 }

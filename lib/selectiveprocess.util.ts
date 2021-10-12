@@ -10,6 +10,10 @@ export default function SelectiveProcessUtil() {
         return currentStep;
     }
 
+    function getStepByType(process: SelectiveProcess, type): ProcessStep {
+        return process.steps.find(step => step.type === type);
+    }
+
     function setSubscriptionPlaceName(sub: Subscription, process: SelectiveProcess): void {
         sub.placeName = process?.reservedPlaces.find(place => place.uuid == sub.reservedPlace)?.name || "Ampla Concorrência";
     }
@@ -127,7 +131,8 @@ export default function SelectiveProcessUtil() {
         calculateFinalGrade,
         hasPassedInterview,
         hasPassedTest,
-        setSubscriptionPlaceName
+        setSubscriptionPlaceName,
+        getStepByType
     }
 
 }

@@ -16,6 +16,7 @@ import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
 import { ResourceStepsHelper } from '../../helpers/resource-steps-helper';
+import ResourceUtil from '../../lib/resource.util';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer();
@@ -37,6 +38,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
   const treatError = TreatError();
   const resourceSteps = ResourceStepsHelper.steps();
   const authService = AuthService();
+  const resourceUtil = ResourceUtil();
 
   await cors(req, res);
 
@@ -53,7 +55,6 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         const { subscriptionID, justification } = req.body;        
 
         const subscription = await subscriptionService.getById(subscriptionID);
-
         
         if(!subscription) {
           return res.status(404).json(await treatError.general("Inscrição não encontrada."));
@@ -61,17 +62,15 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
         const selectiveProcess = await selectiveProcessService.getById(subscription.selectiveProcessID)
 
-        let currentStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
-        
-        let resourceFound: SubscriptionResource = subscription.resources?.find((resource) => currentStep.type === resource.step);
-
-        if(!resourceSteps.includes(currentStep.type) || resourceFound) {
+        if(!resourceUtil.canRequestResource(subscription, selectiveProcess)){
           return res.status(400).json(await treatError.general("A etapa atual não permite recurso."));
         }
+        
+        let currentStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
 
         const resource: SubscriptionResource = {
           justification,
-          date: Date.now(),
+          date: (new Date()).toISOString(),
           status: SubscriptionStatus.AGUARDANDO_ANALISE,
           step: currentStep.type
         }

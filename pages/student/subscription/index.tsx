@@ -19,24 +19,30 @@ import Permission from '../../../lib/permission.service';
 import { UserType } from '../../../enum/type-user.enum';
 import StudentBase from '../../../components/student/student-base';
 import { APIResponse } from '../../../models/api-response';
-import { SelectiveProcess } from '../../../models/selective-process';
+import { User } from '../../../models/user';
+import { ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
 import { MaskHelper } from '../../../helpers/mask-helper';
+import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
+import { DocumentValidateHelper } from '../../../helpers/document-validate-helper';
+import { MathHelper } from '../../../helpers/math-helper';
+import { PostalCodeField } from '../../../components/postal-code-field';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    const [loading, setLoading] = useState(true);
-    const [reload, setReload] = useState(true);
     const api = API();
+    const processUtil = SelectiveProcessUtil();
+    const [loading, setLoading] = useState(true);
     const [subscription, setSubscription] = useState<Subscription>();
     const [currentSubscription, setCurrentSubscription] = useState<Subscription>();
+    const [currentUser, setCurrentUser] = useState<User>(null);
+    const [selectiveProcessOpen, setSelectiveProcessOpen] = useState<boolean>(false);
+    const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
     const [currentStage, setCurrentStage] = useState(1);
     const [stageOneValues, setStageOneValues] = useState(null);
     const [stageTwoValues, setStageTwoValues] = useState(null);
     const [stageThreeValues, setStageThreeValues] = useState(null);
     const [stageFourValues, setStageFourValues] = useState(null);
     const [stageFiveValues, setStageFiveValues] = useState(null);
-    const [selectiveProcessOpen, setSelectiveProcessOpen] = useState<boolean>(null);
-    const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
     const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>([]);
     const [formFiles, setFormFiles] = useState<any>([]);
     const [baremaCategories, setBaremaCategories] = useState<any>(null);
@@ -44,7 +50,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [graduationProofFile, setGraduationProofFile] = useState<FileList>();
     const [invalidDocumentFile, setInvalidDocumentFile] = useState<any>(false);
     const [invalidGraduationProofFile, setInvalidGraduationProofFile] = useState<any>(false);
-    const router = useRouter();
+    const [countFiles, setCountFiles] = useState<number>(0);
+    const [weightFile, setWeightFile] = useState<number>(0);
+    const [percentage, setPercentage] = useState<number>(0);
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
         { name: "Auxílio de Leitor/Ledor", value: 'auxilio_leitor' },
@@ -85,11 +93,17 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }
     };
 
-    const saveFileSubscription = async (values, files, type) => {
+    const saveFileSubscription = async (values, files, type, roundWeight) => {
         console.log(values);
         try {
             const route = getRouteFile(type);
             const result = await api.postFile(route, values, files);
+            console.log(percentage, weightFile, files.length);
+            const fileLength = files.length ? files.length : 1;
+            console.log(percentage, roundWeight, files.length, fileLength);
+            const newPercentage = percentage + (roundWeight * fileLength);
+            console.log(percentage, weightFile, files.length, fileLength, newPercentage);
+            setPercentage(newPercentage > 100 ? 100 : newPercentage);
             console.log(result);
         } catch (error) {
             console.error(error);
@@ -101,6 +115,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         const subcategoryFound = subCategoriesFiles.find((subcategory) => subcategory.uuid === subcategoryUuid);
 
         if(!subcategoryFound){
+            setCountFiles((prev) => prev + 1);
             subCategoriesFiles.push({uuid: subcategoryUuid, files: [{position: position, file: file}]});
             setSubCategoriesFiles(subCategoriesFiles)
             return;
@@ -120,6 +135,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             });
 
             if(newPosition){
+                setCountFiles((prev) => prev + 1);
                 subcategory.files.push({position: position, file: file})
             }
             
@@ -135,6 +151,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         const formFileFound = formFiles.find((formFile) => formFile.name === name);
 
         if(!formFileFound){
+            setCountFiles((prev) => prev + 1);
             formFiles.push({name: name, file: file});
             setFormFiles(formFiles)
             return;
@@ -185,7 +202,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 element.position = index;
             });
             return subcategory;
-        });
+        });        
+        setCountFiles((prev) => prev - 1);
         setSubCategoriesFiles(subCategoriesFilesUpdated)
         console.log(subCategoriesFilesUpdated)
     }
@@ -217,7 +235,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         
             profession: stageThreeValues.profession,
             company: stageThreeValues.company,
-            postalCodeCompany: stageThreeValues.postalCodeCompany,
+            postalCodeCompany: stageThreeValues.postalCode,
             streetCompany: stageThreeValues.streetCompany,
             houseNumberCompany: stageThreeValues.houseNumberCompany,
             complementCompany: stageThreeValues.complementCompany,
@@ -233,8 +251,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             specialTreatmentTypes: stageFourValues.specialTreatmentTypes,
             reservedPlace: stageFourValues.reservedPlace !== 'ampla_concorrencia' ? stageFourValues.reservedPlace : null,  
             selectiveProcessID: currentSubscription ? currentSubscription.selectiveProcessID : selectiveProcess.id,
-
-            subscriptionDate: Date.now()
         }
 
         return subscription;
@@ -249,7 +265,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         return arrayFiles;
     }
 
-    const processFormFiles = async (subscriptionId) => {
+    const processFormFiles = async (subscriptionId, roundWeight) => {
         console.log(subCategoriesFiles);
         const arrayFormFiles = []
 
@@ -262,11 +278,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         console.log(arrayFormFiles);
 
         for (let i = 0; i < arrayFormFiles.length; i++){
-            await saveFileSubscription({subscriptionID: arrayFormFiles[i].subscriptionID, name: arrayFormFiles[i].name}, arrayFormFiles[i].files, SubscriptionTypeFile.FORM);
+            await saveFileSubscription({subscriptionID: arrayFormFiles[i].subscriptionID, name: arrayFormFiles[i].name}, arrayFormFiles[i].files, SubscriptionTypeFile.FORM, roundWeight);
         }
     }
 
-    const processDocumentFiles = async (subscriptionId) => {
+    const processDocumentFiles = async (subscriptionId, roundWeight) => {
         console.log(documentFile);
 
         const arrayFiles = [documentFile[0]];
@@ -275,10 +291,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
 
         console.log(values);
 
-        await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.DOCUMENT);
+        await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.DOCUMENT, roundWeight);
     }
 
-    const processGraduationFile = async (subscriptionId) => {
+    const processGraduationFile = async (subscriptionId, roundWeight) => {
         console.log(graduationProofFile);
 
         const arrayFiles = [graduationProofFile[0]];
@@ -286,10 +302,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
 
         console.log(values);
 
-        await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.GRADUATION);
+        await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.GRADUATION, roundWeight);
     }
 
-    const processFiles = async (subscriptionId) => {
+    const processFiles = async (subscriptionId, roundWeight) => {
         console.log(subCategoriesFiles);
         const arraySubcategories = []
 
@@ -303,23 +319,27 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         console.log(arraySubcategories);
 
         for (let i = 0; i < arraySubcategories.length; i++){
-            await saveFileSubscription({subcategoryID: arraySubcategories[i].subcategoryID, subscriptionID: arraySubcategories[i].subscriptionID}, arraySubcategories[i].files, SubscriptionTypeFile.BAREMA);
+            await saveFileSubscription({subcategoryID: arraySubcategories[i].subcategoryID, subscriptionID: arraySubcategories[i].subscriptionID}, arraySubcategories[i].files, SubscriptionTypeFile.BAREMA, roundWeight);
         }
     }
 
     const processSubscription = async (values) => {
         try {
             setCurrentStage(currentStage + 1);    
-            console.log(values);
+            console.log(values, countFiles);
             setStageFiveValues(values);
+            const weight = 100 / countFiles;
+            console.log(weight);
+            const roundWeight = MathHelper.roundNumber(weight, 2);
+            console.log(roundWeight);
+            setWeightFile(roundWeight);
             const subscription: Subscription = await buildForm(values);
             const result = await saveSubscription(subscription);
-            await processFiles(result.id);
-            await processDocumentFiles(result.id);
-            await processGraduationFile(result.id);   
-            await processFormFiles(result.id);
+            await processFiles(result.id, roundWeight);
+            await processDocumentFiles(result.id, roundWeight);
+            await processGraduationFile(result.id, roundWeight);   
+            await processFormFiles(result.id, roundWeight);
             setCurrentStage(currentStage + 2);    
-            //router.push("/student");
         } catch (e) {
             setCurrentStage(5);     
         }
@@ -422,7 +442,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         const stageThreeData = {         
             profession: subscriptionData.profession,
             company: subscriptionData.company,
-            postalCodeCompany: subscriptionData.postalCodeCompany,
+            postalCode: subscriptionData.postalCode,
             streetCompany: subscriptionData.streetCompany,
             houseNumberCompany: subscriptionData.houseNumberCompany,
             complementCompany: subscriptionData.complementCompany,
@@ -462,25 +482,36 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     useEffect(() => {   
         const loadData = async () => {
             const resultProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'open': "true" });
+            
             if (resultProcess.result) {
-                setSelectiveProcessOpen(true);
-                setSelectiveProcess(resultProcess.result);
-                let cloneCategories = JSON.parse(JSON.stringify(resultProcess.result.baremaCategories))
-                cloneCategories.map((baremaCategory) => (
-                    baremaCategory.subcategories.map((subcategory) => {
-                        subcategory.files = [{position: 1, file: ''}]
-                    })
-                ))
-                setBaremaCategories(cloneCategories);
+                const selectiveProcess = resultProcess.result;  
+                const currentStep = processUtil.getCurrentStep(selectiveProcess);
+                setSelectiveProcess(selectiveProcess);
+
+                if(currentStep.type === ProcessStepsTypes.INSCRICAO){
+                    setSelectiveProcessOpen(true);
+                    let cloneCategories = JSON.parse(JSON.stringify(selectiveProcess.baremaCategories))
+                    cloneCategories.map((baremaCategory) => (
+                        baremaCategory.subcategories.map((subcategory) => {
+                            subcategory.files = [{position: 1, file: ''}]
+                        })
+                    ));
+                    setBaremaCategories(cloneCategories);
+                }
             } else {
                 setSelectiveProcessOpen(false);
             }
 
             const resultSubscription: APIResponse = await api.get(APIRoutes.CURRENT_SUBSCRIPTION);
-            if (resultSubscription.result) {
+            if (resultSubscription?.result) {
                 setCurrentSubscription(resultSubscription.result);
                 await loadForm(resultSubscription.result);
+            } else {
+                const resultCurrentUser: APIResponse = await api.get(APIRoutes.CURRENT_USER);                
+                const user: User = (resultCurrentUser as APIResponse)?.result;
+                setCurrentUser(user);
             }
+            
             setLoading(false);
         };      
         loadData();
@@ -501,11 +532,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             );
     }
 
-    if(selectiveProcessOpen === false){        
+    if(!selectiveProcessOpen && !currentSubscription){        
         return (
             <StudentBase>
                 <div>
-                    <p>Não existe processo seletivo aberto.</p>
+                    <p>Não existe Processo Seletivo com inscrições abertas.</p>
                 </div>
             </StudentBase>
         );
@@ -533,7 +564,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         enableReinitialize
                         initialValues={
                             stageOneValues ? stageOneValues : {
-                                name: '',
+                                name: currentUser ? currentUser.name : '',
                                 birthdate: new Date(),
                                 postalCode: '',
                                 street: '',
@@ -560,7 +591,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             city: Yup.string().required('Preencha este campo.'),
                             state: Yup.string().required('Preencha este campo.'),
                             phoneNumber: Yup.string().required('Preencha este campo.'),
-                            document: Yup.string().required('Preencha este campo.'),
+                            document: Yup.string().required('Preencha este campo.').min(14, 'CPF inválido.'),
                             identityDocument: Yup.string().required('Preencha este campo.'),
                             issuingAgency: Yup.string().required('Preencha este campo.'),
                             issuanceDate: Yup.date().required('Preencha este campo.').nullable(),
@@ -606,7 +637,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <Field 
                                             name="document"
                                             value={actions.values.document}                
-                                            onChange={actions.handleChange} >
+                                            onChange={actions.handleChange} 
+                                            validate={DocumentValidateHelper.documentValidate}>
                                                 {({field}) => {
                                                     return (
                                                     <MaskedInput
@@ -713,23 +745,15 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 </div>        
                                 <div className="col-2">
                                     <div className="mb-3">
-                                        <label htmlFor="postalCode" className="form-label">CEP<span>*</span></label>    
-                                        <Field 
-                                            name="postalCode"
-                                            value={actions.values.postalCode}                
-                                            onChange={actions.handleChange}  >
-                                                {({field}) => {
-                                                    return (
-                                                    <MaskedInput
-                                                        {...field}  
-                                                        disabled={!!currentSubscription}                                   
-                                                        className="form-control"
-                                                        maskChar=""
-                                                        mask={MaskHelper.makeMask(field.value, '', 'cep')}
-                                                    />
-                                                    );
-                                                }}
-                                        </Field>            
+                                        <label htmlFor="postalCode" className="form-label">CEP<span>*</span></label>  
+                                        <PostalCodeField 
+                                            className="form-control" 
+                                            name="postalCode" 
+                                            disabled={!!currentSubscription} 
+                                            value={actions.values.postalCode}                  
+                                            onChange={actions.handleChange}
+                                            type=""
+                                        />          
                                         <p className="input-error"><ErrorMessage name="postalCode" className="input-error" /></p>
                                     </div>
                                 </div>
@@ -949,7 +973,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         stageThreeValues ? stageThreeValues : {
                             profession: '',
                             company: '',
-                            postalCodeCompany: '',
+                            postalCode: '',
                             streetCompany: '',
                             houseNumberCompany: '',
                             complementCompany: '',
@@ -996,24 +1020,16 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         <div className="row justify-content-center">
                             <div className="col-2">
                                 <div className="mb-3">
-                                    <label htmlFor="postalCodeCompany" className="form-label">CEP</label>       
-                                    <Field 
-                                        name="postalCodeCompany"
-                                        value={actions.values.postalCodeCompany}                
-                                        onChange={actions.handleChange}  >
-                                            {({field}) => {
-                                                return (
-                                                <MaskedInput
-                                                    {...field}    
-                                                    disabled={!!currentSubscription}                                
-                                                    className="form-control"
-                                                    maskChar=""
-                                                    mask={MaskHelper.makeMask(field.value, '', 'cep')}
-                                                />
-                                                );
-                                            }}
-                                    </Field>      
-                                    <p className="input-error"><ErrorMessage name="postalCodeCompany" className="input-error" /></p>
+                                    <label htmlFor="postalCode" className="form-label">CEP</label>  
+                                    <PostalCodeField 
+                                        className="form-control" 
+                                        name="postalCode" 
+                                        disabled={!!currentSubscription} 
+                                        value={actions.values.postalCode}                  
+                                        onChange={actions.handleChange}
+                                        type='Company'
+                                    />          
+                                    <p className="input-error"><ErrorMessage name="postalCode" className="input-error" /></p>
                                 </div>
                             </div>
                             <div className="col-3">
@@ -1275,6 +1291,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 actions.handleChange(event);
                                                 console.log(event.currentTarget.files);
                                                 const files = event.currentTarget.files;
+                                                setCountFiles((prev) => !documentFile && files.length > 0 ? prev + 1 : (documentFile && files.length === 0 ? prev - 1 : prev));
                                                 setDocumentFile(files.length > 0 ? files : null);
                                                 setInvalidDocumentFile(files.length === 0);
                                             }}
@@ -1310,6 +1327,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 actions.handleChange(event);
                                                 console.log(event.currentTarget.files);
                                                 const files = event.currentTarget.files;
+                                                setCountFiles((prev) => !graduationProofFile && files.length > 0 ? prev + 1 : (graduationProofFile && files.length === 0 ? prev - 1 : prev));
                                                 setGraduationProofFile(files.length > 0 ? files : null);
                                                 setInvalidGraduationProofFile(files.length === 0);
                                             }}
@@ -1506,6 +1524,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         </h1>                   
                         <h1 className="text-primary fw-bold title-sm-font-size" >
                             Aguarde...
+                        </h1>                  
+                        <h1 className="text-primary fw-bold title-sm-font-size" >
+                            {percentage} %
                         </h1>
                     </div>
                     <img src="/images/subscription/processing.svg" className="img-fluid w-50" alt="..."></img>
@@ -1522,6 +1543,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             <a href="/student/subscription" className={style.completedLink}>Acompanhe aqui</a>                    
                         </h1>
                     </div>
+                </div>
+            }
+            {currentSubscription && 
+                <div className="text-right">
+                    Data de Inscrição: {(new Date(currentSubscription.subscriptionDate)).toLocaleString()}
                 </div>
             }
         </StudentBase>

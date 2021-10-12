@@ -41,6 +41,10 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         
         const process = await selectiveProcessService.getOpen();
         
+        if(!process){            
+          return res.status(404).json(await treatError.general('Processo seletivo não encontrado.'));
+        }
+
         const subs = await subscriptionService.getByUserAndProcess(currentUserId, process.id);
 
         let response: APIResponse = {
