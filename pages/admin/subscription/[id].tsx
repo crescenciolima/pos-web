@@ -318,7 +318,7 @@ export default function ProcessSubscriprionLayout() {
         <>
         <div className="col-12">
         <fieldset>
-                <legend>Deficiência</legend>
+                <legend>Pessoa com Deficiência</legend>
                 <div className="mb-3">
                     <div>
                     <label className="form-label">Tipo de Deficiência</label>
