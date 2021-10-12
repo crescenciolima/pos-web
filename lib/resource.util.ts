@@ -8,8 +8,12 @@ export default function ResourceUtil() {
     const processUtil = SelectiveProcessUtil();
     const resourceSteps = ResourceStepsHelper.steps();
 
-    const resultAllowResource = (step, subscription: Subscription, selectiveProcess: SelectiveProcess) => {
-        switch (step) {
+    const stepTypeAllowResource = (type) => {
+        return resourceSteps.includes(type);
+    }
+
+    const resultAllowResource = (stepType, subscription: Subscription, selectiveProcess: SelectiveProcess) => {
+        switch (stepType) {
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO:
                 return subscription.status === SubscriptionStatus.INDEFERIDA;
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA:
@@ -25,19 +29,28 @@ export default function ResourceUtil() {
 
     function canRequestResource(subscription: Subscription, selectiveProcess: SelectiveProcess): boolean {                      
         const currentStep: ProcessStep = processUtil.getCurrentStep(selectiveProcess);
-        console.log(currentStep);
+        console.log(subscription, currentStep, selectiveProcess);
         let resourceFound: SubscriptionResource = subscription.resources.find((resource) => currentStep.type === resource.step);
-        console.log(resourceFound);
+        console.log(stepTypeAllowResource(currentStep.type), resourceFound, resultAllowResource(currentStep.type, subscription, selectiveProcess));
         
-        if(!resourceSteps.includes(currentStep.type) || resourceFound || !resultAllowResource(currentStep, subscription, selectiveProcess)) {
+        if(!stepTypeAllowResource(currentStep.type) || resourceFound || !resultAllowResource(currentStep.type, subscription, selectiveProcess)) {
            return false;
         }
 
         return true;
     }
 
+    function currentStepIdGranThanFirstResourceStep(selectiveProcess: SelectiveProcess): boolean {
+        const currentStep: ProcessStep = processUtil.getCurrentStep(selectiveProcess);
+        const firstResourceStep = processUtil.getStepByType(selectiveProcess, ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO);
+
+        return currentStep.order >= firstResourceStep.order;
+    }
+
     return {
-        canRequestResource
+        canRequestResource,
+        stepTypeAllowResource,
+        currentStepIdGranThanFirstResourceStep
     }
 
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import btoa from 'btoa';
 import Link from 'next/link';
 import { GetServerSidePropsContext } from 'next';
 import StudentBase from '../../../components/student/student-base';
@@ -79,7 +80,7 @@ export default function ResourceLayout() {
                   }} key={i}>
                     <tr>
                       <td>{resource.step}</td>
-                      <td>{(new Date(resource.date)).toISOString()}</td>
+                      <td>{(new Date(resource.date)).toLocaleString()}</td>
                       <td>{resource.status}</td>
                     </tr>
                   </Link>

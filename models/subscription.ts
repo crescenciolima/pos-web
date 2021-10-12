@@ -11,8 +11,8 @@ export interface Subscription {
     document?: string,
     identityDocument?: string,
     issuingAgency?: string,
-    issuanceDate?: Date,
-    birthdate?: Date,
+    issuanceDate?: string,
+    birthdate?: string,
     postalCode?: string,
     street?: string,
     houseNumber?: string,
@@ -53,7 +53,7 @@ export interface Subscription {
     processForms?: ProcessDocument[]; 
 
     age?: number;
-    subscriptionDate: number;
+    subscriptionDate: string;
     statusObservation?: string;
     observation?: string;
     graduationProofFile?: string;
@@ -87,7 +87,7 @@ export enum SubscriptionTypeFile {
 export interface SubscriptionResource {
 
     justification: string;
-    date: number;
+    date: string;
     step: ProcessStepsTypes;
     status: SubscriptionStatus;
     statusObservation?: string;

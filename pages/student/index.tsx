@@ -36,7 +36,7 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
 
   //return a null component before StudentBase si rendered
   if (selectiveProcess === null){
-    return null
+    return (<StudentBase></StudentBase>)
   }
     
   return (
@@ -44,11 +44,11 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
       <div>
         <fieldset>
           <div>
-            <h4>Você está Participando do Processo Seletivo: {selectiveProcess.title}</h4>
+            <h4>Processo Seletivo: {selectiveProcess.title}</h4>
 
             <p>{selectiveProcess.description}</p>
 
-            <p>Estado do processo seletivo: {selectiveProcess.state=="open"?"aberto":"fechado"}</p>
+            <p>Estado do processo seletivo: {selectiveProcess.state=="open"? "Aberto" : "Fechado"}</p>
 
             <p>Iniciado em: {new Date(selectiveProcess.currentStep).toLocaleDateString()}</p>
 

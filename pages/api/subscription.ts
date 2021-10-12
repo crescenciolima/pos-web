@@ -46,7 +46,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
                   ...subscription,
                    userID: currentUserId as string, 
                    protocol: uuidv4(),
-                   subscriptionDate: Date.now(),
+                   subscriptionDate: new Date().toUTCString(),
                    status: SubscriptionStatus.AGUARDANDO_ANALISE,
                 };
 

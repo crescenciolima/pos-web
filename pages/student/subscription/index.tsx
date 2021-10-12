@@ -37,7 +37,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [stageThreeValues, setStageThreeValues] = useState(null);
     const [stageFourValues, setStageFourValues] = useState(null);
     const [stageFiveValues, setStageFiveValues] = useState(null);
-    const [selectiveProcessOpen, setSelectiveProcessOpen] = useState<boolean>(null);
+    const [selectiveProcessOpen, setSelectiveProcessOpen] = useState<boolean>(false);
     const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
     const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>([]);
     const [formFiles, setFormFiles] = useState<any>([]);
@@ -237,7 +237,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             reservedPlace: stageFourValues.reservedPlace !== 'ampla_concorrencia' ? stageFourValues.reservedPlace : null,  
             selectiveProcessID: currentSubscription ? currentSubscription.selectiveProcessID : selectiveProcess.id,
 
-            subscriptionDate: Date.now()
+            subscriptionDate: (new Date()).toISOString()
         }
 
         return subscription;
@@ -469,10 +469,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             if (resultProcess.result) {
                 const selectiveProcess = resultProcess.result;  
                 const currentStep = processUtil.getCurrentStep(selectiveProcess);
+                setSelectiveProcess(selectiveProcess);
 
                 if(currentStep.type === ProcessStepsTypes.INSCRICAO){
                     setSelectiveProcessOpen(true);
-                    setSelectiveProcess(selectiveProcess);
                     let cloneCategories = JSON.parse(JSON.stringify(selectiveProcess.baremaCategories))
                     cloneCategories.map((baremaCategory) => (
                         baremaCategory.subcategories.map((subcategory) => {
@@ -480,8 +480,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         })
                     ));
                     setBaremaCategories(cloneCategories);
-                } else {                    
-                    setSelectiveProcessOpen(false);
                 }
             } else {
                 setSelectiveProcessOpen(false);
@@ -517,11 +515,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             );
     }
 
-    if(selectiveProcessOpen === false){        
+    if(!selectiveProcessOpen && !currentSubscription){        
         return (
             <StudentBase>
                 <div>
-                    <p>Não existe processo seletivo aberto.</p>
+                    <p>Não existe Processo Seletivo com inscrições abertas.</p>
                 </div>
             </StudentBase>
         );

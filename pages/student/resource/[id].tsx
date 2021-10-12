@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import atob from 'atob';
 
 import { APIRoutes } from '../../../utils/api.routes'
 import style from '../../../styles/subscription.module.css';
@@ -77,7 +78,7 @@ export default function SaveResourceLayout() {
 
     const saveResource = async (values) => {
         const arrayFiles = await buildArrayFiles(files);
-        api.postFile(APIRoutes.RESOURCES, { ...values, subscriptionID }, arrayFiles);
+        await api.postFile(APIRoutes.RESOURCES, { ...values, subscriptionID }, arrayFiles);
     };
 
     const onSubmit = async (values, actions) => {
@@ -154,7 +155,9 @@ export default function SaveResourceLayout() {
                 <>
                     <b>Etapa:</b> {resource?.step}
                     <br />  
-                    <b>Data:</b> {resource?.date}
+                    <b>Data:</b> {(new Date(resource?.date)).toLocaleString()}
+                    <br />  
+                    <b>Status:</b> {resource?.status}
                 </>
             )}  
             <Formik

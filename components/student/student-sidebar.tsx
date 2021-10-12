@@ -10,13 +10,18 @@ import { APIRoutes } from '../../utils/api.routes';
 import { css } from "@emotion/core";
 import API from '../../lib/api.service';
 import { ClipLoader } from 'react-spinners';
+import ResourceUtil from '../../lib/resource.util';
+import SelectiveProcessUtil from '../../lib/selectiveprocess.util';
 
 export default function StudentSidebar() {
     //const { userType } = props; 
   const api = API();
+  const resourceUtil = ResourceUtil();
+  const selectiveProcessUtil = SelectiveProcessUtil();
   const [loading, setLoading] = useState(true);
   const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
   const [currentSubscription, setCurrentSubscription] = useState<Subscription>();
+  const [allowResource, setAllowResource] = useState<boolean>(false);
 
     useEffect(() => {   
         const loadData = async () => {
@@ -25,6 +30,8 @@ export default function StudentSidebar() {
             if (resultProcess.result) {
                 const selectiveProcess = resultProcess.result;  
                 setSelectiveProcess(selectiveProcess);
+                const currentStep = selectiveProcessUtil.getCurrentStep(selectiveProcess);
+                setAllowResource(resourceUtil.currentStepIdGranThanFirstResourceStep(selectiveProcess));
             }
     
             const resultSubscription: APIResponse = await api.get(APIRoutes.CURRENT_SUBSCRIPTION);
@@ -70,7 +77,7 @@ export default function StudentSidebar() {
                             <label className={adminStyle.sidebarLabel}>Inscrição</label>
                         </a>
                     </li>}
-                    {currentSubscription && <li>
+                    {currentSubscription && allowResource && <li>
                         <a href="/student/resource" className="nav-link text-primary">
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faQuestionCircle} className="sm-icon" />
