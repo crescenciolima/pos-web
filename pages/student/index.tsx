@@ -13,6 +13,7 @@ import { APIResponse } from '../../models/api-response';
 import { SelectiveProcess } from '../../models/selective-process';
 import { sub } from 'date-fns';
 import { setgroups } from 'process';
+import ImgThumbnail from '../../components/selectiveprocess/dashboard/img-thumbnail';
 
 
 export default function Admin(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -42,18 +43,57 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
   return (
     <StudentBase>
       <div>
-        <fieldset>
-          <div>
-            <h4>Você está Participando do Processo Seletivo: {selectiveProcess.title}</h4>
+        <div>
+          <fieldset>
+            <div>
+              <h4>Você está Participando do Processo Seletivo: {selectiveProcess.title}</h4>
 
-            <p>{selectiveProcess.description}</p>
+              <p>{selectiveProcess.description}</p>
 
-            <p>Estado do processo seletivo: {selectiveProcess.state=="open"?"aberto":"fechado"}</p>
+              <p>Etapa atual: <b>{selectiveProcess.steps[selectiveProcess.currentStep].type}</b></p>
 
-            <p>Iniciado em: {new Date(selectiveProcess.currentStep).toLocaleDateString()}</p>
+              <p>Estado do processo seletivo: {selectiveProcess.state=="open"?"aberto":"fechado"}</p>
 
-          </div>
-        </fieldset>
+              <p>Iniciado em: {new Date(selectiveProcess.currentStep).toLocaleDateString()}</p>
+
+            </div>
+          </fieldset>
+        </div>
+        <div className="col-12">
+          <fieldset>
+              <legend>Editais</legend>
+              <div className="mb-3">
+                {selectiveProcess.processNotices?.map((notice) => (
+                  <>
+                    <div>
+                      <label className="form-label">{notice.name}</label>
+                    </div>
+                    <div>
+                      <ImgThumbnail imgUrl={notice.url} />
+                    </div>
+                  </>
+                ))}                
+              </div>
+          </fieldset>
+        </div>
+        <div className="col-12">
+          <fieldset>
+              <legend>Formulários de Inscrição</legend>
+              <div className="mb-3">
+                  {selectiveProcess.processForms?.map((form,key) => (
+                  <>
+                      <div>
+                          <label className="form-label">{form.name}</label>
+                      </div>               
+                      <div>
+                          <ImgThumbnail imgUrl={form.url} />
+                      </div>
+                      <br />
+                  </>
+                  ))}
+              </div>
+          </fieldset>
+        </div>
         <div>
           <fieldset>
           <label className="form-label">Etapas do Processo Seletivo</label>

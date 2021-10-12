@@ -143,7 +143,8 @@ export const getStaticProps: GetStaticProps = async () => {
   const newsService = NewsService();
   const newsList = await newsService.getFirstResults();
   for (let news of newsList) {
-    const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
+    //const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
+    const date = fire.firestore.Timestamp.fromMillis(news.date).toDate();
     news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
   }
 
