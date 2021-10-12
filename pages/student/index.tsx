@@ -67,7 +67,7 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
             </thead>
             <tbody>
               {selectiveProcess.steps.map((step,key)=>(
-                <tr id="{key}" className={selectiveProcess.currentStep === key?"current-sel-proc":""} 
+                <tr key={key} className={selectiveProcess.currentStep === key?"current-sel-proc":""} 
                 title={selectiveProcess.currentStep === key?"Etapa Atual":""}>
                   <td>{step.type}</td>
                   <td>{new Date(step.startDate).toLocaleDateString()}</td>

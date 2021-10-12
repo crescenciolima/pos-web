@@ -188,6 +188,10 @@ a {
     text-align: center;
 }
 
+.italic {
+    font-style: italic;
+}
+
 .input-error{
     font-size: 12px;
     color: #d00e00;
@@ -303,4 +307,16 @@ label>span {
         padding-top: 5rem;
         padding-bottom: 2rem;
     }
+}
+
+.show{
+    display: unset;
+}
+
+.hide{
+    display: none;
+}
+
+.mt-15{
+    margin-top: 15em;
 }

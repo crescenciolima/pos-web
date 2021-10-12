@@ -70,7 +70,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
         const resource: SubscriptionResource = {
           justification,
-          date: new Date().toUTCString(),
+          date: (new Date()).toISOString(),
           status: SubscriptionStatus.AGUARDANDO_ANALISE,
           step: currentStep.type
         }

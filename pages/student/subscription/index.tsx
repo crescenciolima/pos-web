@@ -31,6 +31,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const api = API();
     const [subscription, setSubscription] = useState<Subscription>();
     const [currentSubscription, setCurrentSubscription] = useState<Subscription>();
+    const [currentUser, setCurrentUser] = useState<User>(null);
     const [currentStage, setCurrentStage] = useState(1);
     const [stageOneValues, setStageOneValues] = useState(null);
     const [stageTwoValues, setStageTwoValues] = useState(null);
@@ -236,8 +237,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             specialTreatmentTypes: stageFourValues.specialTreatmentTypes,
             reservedPlace: stageFourValues.reservedPlace !== 'ampla_concorrencia' ? stageFourValues.reservedPlace : null,  
             selectiveProcessID: currentSubscription ? currentSubscription.selectiveProcessID : selectiveProcess.id,
-
-            subscriptionDate: (new Date()).toISOString()
         }
 
         return subscription;
@@ -492,7 +491,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             } else {
                 const resultCurrentUser: APIResponse = await api.get(APIRoutes.CURRENT_USER);                
                 const user: User = (resultCurrentUser as APIResponse).result;
-                setStageOneValues({name: user.name});
+                setCurrentUser(user);
             }
             
             setLoading(false);
@@ -547,7 +546,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         enableReinitialize
                         initialValues={
                             stageOneValues ? stageOneValues : {
-                                name: '',
+                                name: currentUser ? currentUser.name : '',
                                 birthdate: new Date(),
                                 postalCode: '',
                                 street: '',
@@ -1536,6 +1535,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             <a href="/student/subscription" className={style.completedLink}>Acompanhe aqui</a>                    
                         </h1>
                     </div>
+                </div>
+            }
+            {currentSubscription && 
+                <div className="text-right">
+                    Data de Inscrição: {(new Date(currentSubscription.subscriptionDate)).toLocaleString()}
                 </div>
             }
         </StudentBase>

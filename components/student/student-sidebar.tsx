@@ -13,11 +13,9 @@ import { ClipLoader } from 'react-spinners';
 import ResourceUtil from '../../lib/resource.util';
 import SelectiveProcessUtil from '../../lib/selectiveprocess.util';
 
-export default function StudentSidebar() {
-    //const { userType } = props; 
+export default function StudentSidebar({toogleLoading}) {
   const api = API();
   const resourceUtil = ResourceUtil();
-  const selectiveProcessUtil = SelectiveProcessUtil();
   const [loading, setLoading] = useState(true);
   const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null);
   const [currentSubscription, setCurrentSubscription] = useState<Subscription>();
@@ -26,11 +24,9 @@ export default function StudentSidebar() {
     useEffect(() => {   
         const loadData = async () => {
             const resultProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'open': "true" });
-            
             if (resultProcess.result) {
                 const selectiveProcess = resultProcess.result;  
                 setSelectiveProcess(selectiveProcess);
-                const currentStep = selectiveProcessUtil.getCurrentStep(selectiveProcess);
                 setAllowResource(resourceUtil.currentStepIdGranThanFirstResourceStep(selectiveProcess));
             }
     
@@ -40,6 +36,7 @@ export default function StudentSidebar() {
             }
             
             setLoading(false);
+            toogleLoading();
         };      
         loadData();
     }, []);
@@ -61,7 +58,7 @@ export default function StudentSidebar() {
                     </div>
                 }
                 {!loading && <ul className="nav nav-pills flex-column mb-auto text-primary mt-5">
-                    <li>
+                    <li key={1}>
                         <a href="/student" className="nav-link text-primary sidebar-item">
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faHome} className="sm-icon" />
@@ -69,7 +66,7 @@ export default function StudentSidebar() {
                             <label className={adminStyle.sidebarLabel}>Início</label>
                         </a>
                     </li>
-                    {selectiveProcess && <li>
+                    {selectiveProcess && <li key={2}>
                         <a href="/student/subscription" className="nav-link text-primary">
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faBookReader} className="sm-icon" />
@@ -77,7 +74,7 @@ export default function StudentSidebar() {
                             <label className={adminStyle.sidebarLabel}>Inscrição</label>
                         </a>
                     </li>}
-                    {currentSubscription && allowResource && <li>
+                    {currentSubscription && allowResource && <li key={3}>
                         <a href="/student/resource" className="nav-link text-primary">
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faQuestionCircle} className="sm-icon" />
