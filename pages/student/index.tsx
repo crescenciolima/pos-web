@@ -73,24 +73,6 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
               </div>
           </fieldset>
         </div>
-        <div className="col-12">
-          <fieldset>
-              <legend>Formulários de Inscrição</legend>
-              <div className="mb-3">
-                  {selectiveProcess.processForms?.map((form,key) => (
-                  <>
-                      <div>
-                          <label className="form-label">{form.name}</label>
-                      </div>               
-                      <div>
-                          <ImgThumbnail imgUrl={form.url} />
-                      </div>
-                      <br />
-                  </>
-                  ))}
-              </div>
-          </fieldset>
-        </div>
         <div>
           <fieldset>
           <label className="form-label">Etapas do Processo Seletivo</label>
