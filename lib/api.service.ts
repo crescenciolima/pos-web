@@ -2,6 +2,8 @@ import { toast } from 'react-nextjs-toast'
 import { APIResponse } from '../models/api-response';
 import Cookies from '../lib/cookies.service';
 import { GetServerSidePropsContext } from 'next';
+import { APIRoutes } from '../utils/api.routes';
+import { useRouter } from 'next/router';
 
 export default function API(setLoading?: Function) {
     const cookies = Cookies();
@@ -100,6 +102,7 @@ export default function API(setLoading?: Function) {
                 headers: await buildHeaders(),
             });
 
+            console.log(res);
             const result: APIResponse = await res.json();
             console.log(result);
 
@@ -163,7 +166,6 @@ export default function API(setLoading?: Function) {
 
     }
 
-
     async function exclude(url: string, params?) {
         try {
 
@@ -201,7 +203,6 @@ export default function API(setLoading?: Function) {
             if (setLoading) setLoading(false);
         }
     }
-
 
     async function excludeFormData(url: string, body?) {
         try {
@@ -280,6 +281,35 @@ export default function API(setLoading?: Function) {
         };
     }
 
+    async function getViaCep(postalCode) {
+        try {
+            if (setLoading) setLoading(true);
+
+            const url = (APIRoutes.VIA_CEP).replace('{cep}', postalCode);
+
+            const res = await fetch(url, {
+                method: 'GET',
+            });
+
+            const result = await res.json();
+            console.log(result);
+
+            return result;
+
+        } catch (error) {
+            console.error(error);
+            console.log(error);
+            toast.notify("Ocorreu um erro ao buscar os dados", {
+                duration: 3,
+                type: "error",
+                title: "Erro"
+            });
+            if (setLoading) setLoading(false);
+
+        }
+
+    }
+
     return {
         postFile,
         post,
@@ -287,6 +317,7 @@ export default function API(setLoading?: Function) {
         exclude,
         excludeFormData,
         getWithContext,
+        getViaCep,
     }
 
 }
