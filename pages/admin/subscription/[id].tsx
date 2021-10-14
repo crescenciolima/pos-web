@@ -372,6 +372,15 @@ export default function ProcessSubscriprionLayout() {
                                         <textarea className="form-control" readOnly disabled={true} id="justification" name="justification" rows={4} value={subscription.currentResource.justification} ></textarea>
                                     </div>
                                 </div>
+
+                                <div className="col-12">
+                                    <div className="mb-3">
+                                        <label className="form-label">Anexos do Recurso:</label>
+                                        <div>
+                                            {subscription.currentResource.files?.map((file) => (<ImgThumbnail imgUrl={file} />))} 
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="col-12">
                                     <div className="mb-3">
                                         <label className="form-label">Parecer do recurso</label>
