@@ -19,6 +19,7 @@ import SelectiveProcessDocuments from '../../../components/selectiveprocess/docu
 import SelectiveProcessSteps from '../../../components/selectiveprocess/steps';
 
 
+
 export default function SelectiveProcessLayout() {
 
   const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>({ title: '', state: ProcessStepsState.IN_CONSTRUCTION });
@@ -47,7 +48,7 @@ export default function SelectiveProcessLayout() {
   }, []);
 
   function handleNewProcessSubmit(event) {
-    event.stopPropagation();      
+    event.stopPropagation();
     const process: SelectiveProcess = {
       title: newProcessTitle,
       state: ProcessStepsState.IN_CONSTRUCTION,
@@ -67,7 +68,30 @@ export default function SelectiveProcessLayout() {
 
   function openProcess(event) {
     event.stopPropagation();
-    setOpenModal(true);
+    if (checkSelectiveProcess()) {
+      setOpenModal(true);
+    }
+  }
+
+  function checkSelectiveProcess(): boolean {
+
+    if(!selectiveProcess?.processNotices || selectiveProcess?.processNotices?.length == 0 ){
+      api.showNotify("Antes de abrir o processo seletivo, cadastre seu edital em Documentos","error","Informações incompletas",4);
+      return false;
+    }
+
+    if(!selectiveProcess?.baremaCategories || selectiveProcess?.baremaCategories?.length == 0 ){
+      api.showNotify("Antes de abrir o processo seletivo, cadastre o Barema","error","Informações incompletas",4);
+      return false;
+    }
+
+    if(!selectiveProcess?.steps || selectiveProcess?.steps?.length == 0 ){
+      api.showNotify("Antes de abrir o processo seletivo, cadastre suas etapas","error","Informações incompletas",4);
+      return false;
+    }
+
+
+    return true;
   }
 
   async function confirmOpenProcess() {

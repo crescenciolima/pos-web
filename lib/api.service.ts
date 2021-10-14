@@ -250,11 +250,11 @@ export default function API(setLoading?: Function) {
         }
     }
 
-    async function showNotify(message, type, title) {
+    async function showNotify(message, type, title, duration = 3) {
         toast.notify(message, {
-            duration: 3,
+            duration: duration,
             type: type,
-            title: title
+            title: title,
         });
     }
 
@@ -318,6 +318,7 @@ export default function API(setLoading?: Function) {
         excludeFormData,
         getWithContext,
         getViaCep,
+        showNotify
     }
 
 }
