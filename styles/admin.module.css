@@ -33,3 +33,7 @@
         text-align: left;
     }
 }
+
+.etapaCol{
+    min-width: 360px;
+}

@@ -95,7 +95,7 @@ export default function SelectiveProcessUtil() {
         return subscriptionList;
     }
 
-    function isSubscriberApproved(sub: Subscription, process: SelectiveProcess): boolean {
+    function isSubscriberApproved(sub: Subscription, process: SelectiveProcess, ignoreBaremaScore = false): boolean {
         let aproved = true;
         let testStep = process.steps.find(step => step.type == ProcessStepsTypes.PROVA);
         let interviewStep = process.steps.find(step => step.type == ProcessStepsTypes.ENTREVISTA);
@@ -113,7 +113,7 @@ export default function SelectiveProcessUtil() {
             }
         }
 
-        if (baremaStep) {
+        if (baremaStep && !ignoreBaremaScore) {
             if (baremaStep.passingScore > calculateBaremaGrade(sub, process)) {
                 aproved = false;
             }
