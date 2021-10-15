@@ -19,7 +19,7 @@ export default function ResourceUtil() {
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA:
                 return !processUtil.hasPassedTest(subscription, selectiveProcess.steps.find((step) => step.type === ProcessStepsTypes.PROVA));
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA:
-                return !processUtil.hasPassedTest(subscription, selectiveProcess.steps.find((step) => step.type === ProcessStepsTypes.ENTREVISTA));
+                return !processUtil.hasPassedInterview(subscription, selectiveProcess.steps.find((step) => step.type === ProcessStepsTypes.ENTREVISTA));
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_AVALIACAO_CURRICULAR:
                 return !processUtil.isSubscriberApproved(subscription, selectiveProcess);
             default:
