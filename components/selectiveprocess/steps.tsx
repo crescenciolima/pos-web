@@ -1,6 +1,7 @@
 import { ErrorMessage, FieldArray, Formik } from 'formik'
 import React, { useEffect, useState } from "react";
 import * as Yup from 'yup'
+import adminStyle from '../../styles/admin.module.css';
 import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
@@ -126,7 +127,7 @@ export default function SelectiveProcessSteps(props: Props) {
                                     <table className="table table-striped">
                                         <thead>
                                             <tr>
-                                                <th>Etapa </th>
+                                                <th className={adminStyle.etapaCol}>Etapa </th>
                                                 <th>Data Início</th>
                                                 <th>Data Fim</th>
                                                 <th>Nota Corte (0-100)</th>
@@ -137,7 +138,7 @@ export default function SelectiveProcessSteps(props: Props) {
                                         <tbody>
                                             {values.steps.map((step, index) => (
                                                 <tr key={index}>
-                                                    <td>
+                                                    <td  className={adminStyle.etapaCol}>
                                                         <select
                                                             className="form-select form-select-sm"
                                                             name={`steps.${index}.type`}

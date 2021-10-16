@@ -45,7 +45,7 @@ export default function SelectiveBaremaResults(props: Props) {
             if (sub.status == SubscriptionStatus.DEFERIDA) {
                 sub['formatedDate'] = format(new Date(sub.subscriptionDate), 'dd/MM/yyyy');
                 processUtil.setSubscriptionPlaceName(sub, props.process);
-                let aproved = processUtil.isSubscriberApproved(sub, props.process);
+                let aproved = processUtil.isSubscriberApproved(sub, props.process, true);
                 if (aproved) {
                     sub['baremaGrade'] = processUtil.calculateBaremaGrade(sub, props.process);
                     finalList.push(sub);

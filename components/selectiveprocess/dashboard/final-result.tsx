@@ -92,7 +92,7 @@ export default function SelectiveProcessFinalResult(props: Props) {
         //Separando a lista pelas vagas
         let normalPlace: FinalListGroup = {
             name: "Ampla Concorrência",
-            subscriptionList: finalList.filter(sub => sub.reservedPlace == null),
+            subscriptionList: finalList.filter(sub => sub.reservedPlace === null || sub.reservedPlace === ''),
             numberPlaces: process.numberPlaces - reservedPlaces,
             uuid: null
         }

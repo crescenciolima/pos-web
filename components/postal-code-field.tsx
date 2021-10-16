@@ -60,7 +60,7 @@ export const PostalCodeField = (props) => {
           id="postalCode"
           className="form-control"
           maskChar=""
-          disabled={!!props.currentSubscription}  
+          disabled={!!props.disabled}  
           mask={MaskHelper.makeMask(field.value, '', 'cep')}
         />
         <p className="input-info">{searching && 'Pesquisando...'}</p>

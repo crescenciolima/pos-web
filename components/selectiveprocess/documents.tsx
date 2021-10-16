@@ -49,9 +49,14 @@ export default function SelectiveProcessDocuments(props: Props) {
 
             props.saveCallback(result.result);
 
-
-            setProcessForms(result.result.processForms ? result.result.processForms : []);
-            setProcessNotices(result.result.processNotices ? result.result.processNotices : []);
+            switch (values.type) {
+                case "Edital":
+                    setProcessNotices(result.result.processNotices ? result.result.processNotices : []);
+                    break;
+                case "Formulário":
+                    setProcessForms(result.result.processForms ? result.result.processForms : []);
+                    break;
+            }
 
         } catch (error) {
             console.error(error);

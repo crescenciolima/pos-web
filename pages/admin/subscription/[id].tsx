@@ -318,7 +318,7 @@ export default function ProcessSubscriprionLayout() {
         <>
         <div className="col-12">
         <fieldset>
-                <legend>Deficiência</legend>
+                <legend>Pessoa com Deficiência</legend>
                 <div className="mb-3">
                     <div>
                     <label className="form-label">Tipo de Deficiência</label>
@@ -370,6 +370,15 @@ export default function ProcessSubscriprionLayout() {
                                     <div className="mb-3">
                                         <label className="form-label">Justificativa:</label>
                                         <textarea className="form-control" readOnly disabled={true} id="justification" name="justification" rows={4} value={subscription.currentResource.justification} ></textarea>
+                                    </div>
+                                </div>
+
+                                <div className="col-12">
+                                    <div className="mb-3">
+                                        <label className="form-label">Anexos do Recurso:</label>
+                                        <div>
+                                            {subscription.currentResource.files?.map((file) => (<ImgThumbnail imgUrl={file} />))} 
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="col-12">
