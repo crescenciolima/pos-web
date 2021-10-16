@@ -17,11 +17,11 @@ export default function ResourceUtil() {
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO:
                 return subscription.status === SubscriptionStatus.INDEFERIDA;
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA:
-                return !processUtil.hasPassedTest(subscription, selectiveProcess.steps.find((step) => step.type === ProcessStepsTypes.PROVA));
+                return true;
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA:
                 return !processUtil.hasPassedInterview(subscription, selectiveProcess.steps.find((step) => step.type === ProcessStepsTypes.ENTREVISTA));
             case ProcessStepsTypes.INTERPOSICAO_RECURSO_AVALIACAO_CURRICULAR:
-                return !processUtil.isSubscriberApproved(subscription, selectiveProcess);
+                return processUtil.hasFileRejected(subscription);
             default:
                 return false;
         }
