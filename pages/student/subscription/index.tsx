@@ -82,32 +82,27 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 values = {...values, id: subscription.id};
             }
             const result = await api.post(APIRoutes.SUBSCRIPTION, values);
-            console.log(result);
             if(result){
                 setSubscription(result.result)
                 return result.result;
             }
-            //setReload(!reload);
         } catch (error) {
             console.error(error);
         }
     };
 
     const saveFileSubscription = async (values, files, type, roundWeight) => {
-        console.log(values);
         try {
             const route = getRouteFile(type);
             await api.postFile(route, values, files);
             const fileLength = files.length ? files.length : 1;
-            const newPercentage = percentage + (roundWeight * fileLength);
-            setPercentage(newPercentage > 100 ? 100 : newPercentage);
+            setPercentage((prev) => (prev + (roundWeight * fileLength)) > 100 ? 100 : (prev + (roundWeight * fileLength)));
         } catch (error) {
             console.error(error);
         }
     };
 
     const handleFile = async (subcategoryUuid, position, file) => {
-        console.log(subCategoriesFiles, subcategoryUuid, position);
         const subcategoryFound = subCategoriesFiles.find((subcategory) => subcategory.uuid === subcategoryUuid);
 
         if(!subcategoryFound){
@@ -119,7 +114,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
 
         let newPosition = true;
         const subCategoriesFilesUpdated = await subCategoriesFiles.map((subcategory) => {
-            console.log(subcategory);
             if(subcategory.uuid !== subcategoryUuid){
                 return subcategory;
             }
@@ -138,12 +132,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             return subcategory;
         });
 
-        console.log(subCategoriesFilesUpdated)
         setSubCategoriesFiles(subCategoriesFilesUpdated)
     }
 
     const handleFileForm = async (name, file) => {
-        console.log(name, file);
         const formFileFound = formFiles.find((formFile) => formFile.name === name);
 
         if(!formFileFound){
@@ -161,14 +153,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             return formFile;
         });
 
-        console.log(formFilesUpdated)
         setFormFiles(formFilesUpdated)
     }
 
     const getFileNameForm = (name) => {
         const formFileFound = formFiles.find((formFile) => formFile.name === name);
         if(formFileFound){
-            console.log(formFileFound);
             const file = formFileFound.file;
             return file ? file[0]?.name : 'Nenhum arquivo selecionado';
         }
@@ -201,7 +191,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         });        
         setCountFiles((prev) => prev - 1);
         setSubCategoriesFiles(subCategoriesFilesUpdated)
-        console.log(subCategoriesFilesUpdated)
     }
     
     const buildForm = async (_stageFiveValues) => {   
@@ -262,7 +251,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     }
 
     const processFormFiles = async (subscriptionId, roundWeight) => {
-        console.log(subCategoriesFiles);
         const arrayFormFiles = []
 
         for (let i = 0; i < formFiles.length; i++){
@@ -271,38 +259,27 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             arrayFormFiles.push({subscriptionID: subscriptionId, name: formFile.name, files: [file[0]], type: SubscriptionTypeFile.FORM});
         }
 
-        console.log(arrayFormFiles);
-
         for (let i = 0; i < arrayFormFiles.length; i++){
             await saveFileSubscription({subscriptionID: arrayFormFiles[i].subscriptionID, name: arrayFormFiles[i].name}, arrayFormFiles[i].files, SubscriptionTypeFile.FORM, roundWeight);
         }
     }
 
     const processDocumentFiles = async (subscriptionId, roundWeight) => {
-        console.log(documentFile);
-
         const arrayFiles = [documentFile[0]];
 
         const values = {type: SubscriptionTypeFile.DOCUMENT, subscriptionID: subscriptionId};
-
-        console.log(values);
 
         await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.DOCUMENT, roundWeight);
     }
 
     const processGraduationFile = async (subscriptionId, roundWeight) => {
-        console.log(graduationProofFile);
-
         const arrayFiles = [graduationProofFile[0]];
         const values = {type: SubscriptionTypeFile.GRADUATION, subscriptionID: subscriptionId};
-
-        console.log(values);
 
         await saveFileSubscription(values, arrayFiles, SubscriptionTypeFile.GRADUATION, roundWeight);
     }
 
     const processFiles = async (subscriptionId, roundWeight) => {
-        console.log(subCategoriesFiles);
         const arraySubcategories = []
 
         for (let i = 0; i < subCategoriesFiles.length; i++){
@@ -312,8 +289,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             arraySubcategories.push({subcategoryID: subcategoryFile.uuid, subscriptionID: subscriptionId, files: arrayFiles})
         }
 
-        console.log(arraySubcategories);
-
         for (let i = 0; i < arraySubcategories.length; i++){
             await saveFileSubscription({subcategoryID: arraySubcategories[i].subcategoryID, subscriptionID: arraySubcategories[i].subscriptionID}, arraySubcategories[i].files, SubscriptionTypeFile.BAREMA, roundWeight);
         }
@@ -322,15 +297,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const processSubscription = async (values) => {
         try {
             setCurrentStage(currentStage + 1);    
-            console.log(values, countFiles);
             setStageFiveValues(values);
-            const weight = 100 / countFiles;
-            console.log(weight);
+            const weight = 90 / countFiles;
             const roundWeight = MathHelper.roundNumber(weight, 2);
-            console.log(roundWeight);
-            setWeightFile(roundWeight);
             const subscription: Subscription = await buildForm(values);
             const result = await saveSubscription(subscription);
+            setPercentage(10);
             await processFiles(result.id, roundWeight);
             await processDocumentFiles(result.id, roundWeight);
             await processGraduationFile(result.id, roundWeight);   
@@ -355,7 +327,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             setStageFourValues(values);
             setCurrentStage(currentStage + 1);
         }else if(currentStage === 5){   
-            console.log(values, !documentFile, !graduationProofFile);
             setInvalidDocumentFile(!documentFile)
             setInvalidGraduationProofFile(!graduationProofFile)
             if(!documentFile || !graduationProofFile) {
@@ -388,7 +359,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                 values[subcategory.uuid] = [''];
             })
         })
-        console.log(values);
         return values;
     }
 
@@ -1287,7 +1257,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 name="documentFile"
                                                 onChange={(event) => {
                                                     actions.handleChange(event);
-                                                    console.log(event.currentTarget.files);
                                                     const files = event.currentTarget.files;
                                                     setCountFiles((prev) => !documentFile && files.length > 0 ? prev + 1 : (documentFile && files.length === 0 ? prev - 1 : prev));
                                                     setDocumentFile(files.length > 0 ? files : null);
@@ -1322,7 +1291,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 name="graduationProofFile"
                                                 onChange={(event) => {
                                                     actions.handleChange(event);
-                                                    console.log(event.currentTarget.files);
                                                     const files = event.currentTarget.files;
                                                     setCountFiles((prev) => !graduationProofFile && files.length > 0 ? prev + 1 : (graduationProofFile && files.length === 0 ? prev - 1 : prev));
                                                     setGraduationProofFile(files.length > 0 ? files : null);
@@ -1368,7 +1336,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                                                 name={`${subcategory.uuid}.${_idx}`}
                                                                                 onChange={(event) => {
                                                                                     actions.handleChange(event);
-                                                                                    console.log(event.currentTarget.files);
                                                                                     handleFile(subcategory.uuid, _idx, event.currentTarget.files);
                                                                                 }}
                                                                                 value={undefined}
@@ -1430,7 +1397,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             name={`form.${index}`}
                                             onChange={(event) => {
                                                 actions.handleChange(event);
-                                                console.log(event.currentTarget.files);
                                                 const files = event.currentTarget.files;
                                                 handleFileForm(form.name, files);
                                             }}
