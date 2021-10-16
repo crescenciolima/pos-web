@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import style from '../../../styles/subscription.module.css';
-import { Subscription, SubscriptionTypeFile } from "../../../models/subscription";
+import { Subscription, SubscriptionStatus, SubscriptionTypeFile } from "../../../models/subscription";
 import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
@@ -97,14 +97,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         console.log(values);
         try {
             const route = getRouteFile(type);
-            const result = await api.postFile(route, values, files);
-            console.log(percentage, weightFile, files.length);
+            await api.postFile(route, values, files);
             const fileLength = files.length ? files.length : 1;
-            console.log(percentage, roundWeight, files.length, fileLength);
             const newPercentage = percentage + (roundWeight * fileLength);
-            console.log(percentage, weightFile, files.length, fileLength, newPercentage);
             setPercentage(newPercentage > 100 ? 100 : newPercentage);
-            console.log(result);
         } catch (error) {
             console.error(error);
         }
@@ -1269,147 +1265,157 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
-                            <div className="col-12">
-                                <div className="mb-3">                                    
-                                    <div className="row">
-                                        <label className="form-label">Documento pessoal com foto<span>*</span></label>
-                                    </div>
-                                    
-                                    <div className="row">
-                                        <label htmlFor="documentFile" className={`${style.fileButton} col-3`}>
-                                            Escolher arquivo
-                                        </label>
-                                        <div className={`${style.fileName} col-9`}>
-                                            {documentFile ? documentFile[0]?.name : 'Nenhum arquivo selecionado'}
+                            <div className={style.boxFiles}>
+                                <label className={`mt-3 ${style.titleFileCategory}`}>Documentos Obrigatórios</label>
+                                <div className="col-12">
+                                    <div className="mb-3">                                    
+                                        <div className="row">
+                                            <label className="form-label">Documento pessoal com foto<span>*</span></label>
                                         </div>
-                                        <input 
-                                            type="file"
-                                            className="form-control"
-                                            id="documentFile"
-                                            name="documentFile"
-                                            onChange={(event) => {
-                                                actions.handleChange(event);
-                                                console.log(event.currentTarget.files);
-                                                const files = event.currentTarget.files;
-                                                setCountFiles((prev) => !documentFile && files.length > 0 ? prev + 1 : (documentFile && files.length === 0 ? prev - 1 : prev));
-                                                setDocumentFile(files.length > 0 ? files : null);
-                                                setInvalidDocumentFile(files.length === 0);
-                                            }}
-                                            value={undefined}
-                                            style={{display:'none'}}
-                                        />
-                                        <p className="input-error">
-                                            <ErrorMessage name="documentFile" className="input-error"/>
-                                            {invalidDocumentFile ? 'Preencha este campo.' : ''}
-                                        </p>
-                                    </div>                                    
-                                </div>
-                            </div>
-                                                   
-                            <div className="col-12">
-                                <div className="mb-3">
-                                    <div className="row">
-                                        <label className="form-label">Diploma da Graduação<span>*</span></label>
+                                        
+                                        <div className="row">
+                                            <label htmlFor="documentFile" className={`${style.fileButton} col-3`}>
+                                                Escolher arquivo
+                                            </label>
+                                            <div className={`${style.fileName} col-9`}>
+                                                {documentFile ? documentFile[0]?.name : 'Nenhum arquivo selecionado'}
+                                            </div>
+                                            <input 
+                                                type="file"
+                                                className="form-control"
+                                                id="documentFile"
+                                                name="documentFile"
+                                                onChange={(event) => {
+                                                    actions.handleChange(event);
+                                                    console.log(event.currentTarget.files);
+                                                    const files = event.currentTarget.files;
+                                                    setCountFiles((prev) => !documentFile && files.length > 0 ? prev + 1 : (documentFile && files.length === 0 ? prev - 1 : prev));
+                                                    setDocumentFile(files.length > 0 ? files : null);
+                                                    setInvalidDocumentFile(files.length === 0);
+                                                }}
+                                                value={undefined}
+                                                style={{display:'none'}}
+                                            />
+                                            <p className="input-error">
+                                                <ErrorMessage name="documentFile" className="input-error"/>
+                                                {invalidDocumentFile ? 'Preencha este campo.' : ''}
+                                            </p>
+                                        </div>                                    
                                     </div>
-                                    <div className="row">
-                                        <label htmlFor="graduationProofFile" className={`${style.fileButton} col-3`}>
-                                            Escolher arquivo
-                                        </label>
-                                        <div className={`${style.fileName} col-9`}>
-                                            {graduationProofFile ? graduationProofFile[0]?.name : 'Nenhum arquivo selecionado'}
+                                </div>                                                   
+                                <div className="col-12">
+                                    <div className="mb-3">
+                                        <div className="row">
+                                            <label className="form-label">Diploma da Graduação<span>*</span></label>
                                         </div>
-                                        <input 
-                                            type="file"
-                                            className="form-control"
-                                            id="graduationProofFile"
-                                            name="graduationProofFile"
-                                            onChange={(event) => {
-                                                actions.handleChange(event);
-                                                console.log(event.currentTarget.files);
-                                                const files = event.currentTarget.files;
-                                                setCountFiles((prev) => !graduationProofFile && files.length > 0 ? prev + 1 : (graduationProofFile && files.length === 0 ? prev - 1 : prev));
-                                                setGraduationProofFile(files.length > 0 ? files : null);
-                                                setInvalidGraduationProofFile(files.length === 0);
-                                            }}
-                                            value={undefined}
-                                            style={{display:'none'}}
-                                        />
-                                        <p className="input-error">
-                                            <ErrorMessage name="graduationProofFile" className="input-error"/>
-                                            {invalidGraduationProofFile ? 'Preencha este campo.' : ''}
-                                        </p>
-                                    </div>                                    
-                                </div>
-                            </div>       
-                            <div className="col-12">   
-                                {baremaCategories?.map((baremaCategory, index) => (
-                                    <>
-                                        <label htmlFor="files" className="form-label mt-5 text-bold" key={index}>
-                                            {baremaCategory.name}
-                                        </label>                                            
-                                        {baremaCategory.subcategories.map((subcategory, idx) => (
-                                            <>
-                                            <label className="form-label row mt-2" key={idx}>{subcategory.name}</label>  
-                                            <FieldArray
-                                                name={subcategory.uuid}
-                                                render={arrayHelpers => (
-                                                    <>
-                                                        {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, _idx) => (    
-                                                            <div key={`${subcategory.uuid}.${_idx}`} className="row">  
-                                                                <div className="col-11">
-                                                                    <div className="row">
-                                                                        <label htmlFor={`${subcategory.uuid}.${_idx}`} className={`${style.fileButton} col-3`}>Escolher arquivo</label>
-                                                                        <div className={`${style.fileName} col-9`}>{getFileName(subcategory.uuid, _idx)}</div>
-                                                                        <input 
-                                                                            type="file"
-                                                                            className="form-control"
-                                                                            id={`${subcategory.uuid}.${_idx}`}
-                                                                            name={`${subcategory.uuid}.${_idx}`}
-                                                                            onChange={(event) => {
-                                                                                actions.handleChange(event);
-                                                                                console.log(event.currentTarget.files);
-                                                                                handleFile(subcategory.uuid, _idx, event.currentTarget.files);
-                                                                            }}
-                                                                            value={undefined}
-                                                                            style={{display:'none'}}
-                                                                        />
+                                        <div className="row">
+                                            <label htmlFor="graduationProofFile" className={`${style.fileButton} col-3`}>
+                                                Escolher arquivo
+                                            </label>
+                                            <div className={`${style.fileName} col-9`}>
+                                                {graduationProofFile ? graduationProofFile[0]?.name : 'Nenhum arquivo selecionado'}
+                                            </div>
+                                            <input 
+                                                type="file"
+                                                className="form-control"
+                                                id="graduationProofFile"
+                                                name="graduationProofFile"
+                                                onChange={(event) => {
+                                                    actions.handleChange(event);
+                                                    console.log(event.currentTarget.files);
+                                                    const files = event.currentTarget.files;
+                                                    setCountFiles((prev) => !graduationProofFile && files.length > 0 ? prev + 1 : (graduationProofFile && files.length === 0 ? prev - 1 : prev));
+                                                    setGraduationProofFile(files.length > 0 ? files : null);
+                                                    setInvalidGraduationProofFile(files.length === 0);
+                                                }}
+                                                value={undefined}
+                                                style={{display:'none'}}
+                                            />
+                                            <p className="input-error">
+                                                <ErrorMessage name="graduationProofFile" className="input-error"/>
+                                                {invalidGraduationProofFile ? 'Preencha este campo.' : ''}
+                                            </p>
+                                        </div>                                    
+                                    </div>
+                                </div> 
+                            </div>  
+                            <div className={style.boxFiles}>
+                                <div className="col-12">   
+                                    <label className={`mt-2 ${style.titleFileCategory}`}>Arquivos do Barema</label>
+                                    <br />
+                                    {baremaCategories?.map((baremaCategory, index) => (
+                                        <>
+                                            <label htmlFor="files" className="mt-4 form-label text-bold-500" key={index}>
+                                                Categoria {index + 1}: {baremaCategory.name}
+                                            </label>                                            
+                                            {baremaCategory.subcategories.map((subcategory, idx) => (
+                                                <>
+                                                <label className="form-label row mt-2" key={idx}>{subcategory.name}</label>  
+                                                <FieldArray
+                                                    name={subcategory.uuid}
+                                                    render={arrayHelpers => (
+                                                        <>
+                                                            {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, _idx) => (    
+                                                                <div key={`${subcategory.uuid}.${_idx}`} className="row">  
+                                                                    <div className="col-11">
+                                                                        <div className="row">
+                                                                            <label htmlFor={`${subcategory.uuid}.${_idx}`} className={`${style.fileButton} col-3`}>Escolher arquivo</label>
+                                                                            <div className={`${style.fileName} col-9`}>{getFileName(subcategory.uuid, _idx)}</div>
+                                                                            <input 
+                                                                                type="file"
+                                                                                className="form-control"
+                                                                                id={`${subcategory.uuid}.${_idx}`}
+                                                                                name={`${subcategory.uuid}.${_idx}`}
+                                                                                onChange={(event) => {
+                                                                                    actions.handleChange(event);
+                                                                                    console.log(event.currentTarget.files);
+                                                                                    handleFile(subcategory.uuid, _idx, event.currentTarget.files);
+                                                                                }}
+                                                                                value={undefined}
+                                                                                style={{display:'none'}}
+                                                                            />
+                                                                        </div>
+                                                                        <p className="input-error"><ErrorMessage name={`${subcategory.uuid}.${_idx}`} className="input-error" /></p>
                                                                     </div>
-                                                                    <p className="input-error"><ErrorMessage name={`${subcategory.uuid}.${_idx}`} className="input-error" /></p>
+                                                                    <div className="col-1">
+                                                                        {_idx !== 0 && 
+                                                                            <button 
+                                                                                className="btn btn-secondary"
+                                                                                type="button" 
+                                                                                onClick={async () => {
+                                                                                    await removeFile(subcategory.uuid, _idx);
+                                                                                    arrayHelpers.remove(_idx); 
+                                                                                }}
+                                                                            >-</button>}
+                                                                        {_idx === 0 &&
+                                                                            <button type="button" onClick={() => arrayHelpers.push('')} className="btn btn-primary">
+                                                                                +
+                                                                            </button>
+                                                                        }
+                                                                    </div>
                                                                 </div>
-                                                                <div className="col-1">
-                                                                    {_idx !== 0 && 
-                                                                        <button 
-                                                                            className="btn btn-secondary"
-                                                                            type="button" 
-                                                                            onClick={async () => {
-                                                                                await removeFile(subcategory.uuid, _idx);
-                                                                                arrayHelpers.remove(_idx); 
-                                                                            }}
-                                                                        >-</button>}
-                                                                    {_idx === 0 &&
-                                                                        <button type="button" onClick={() => arrayHelpers.push('')} className="btn btn-primary">
-                                                                            +
-                                                                        </button>
-                                                                    }
-                                                                </div>
-                                                            </div>
-                                                        )))}
-                                                    </>
-                                                )}
-                                            />   
-                                            </>                                             
-                                        ))}
-                                    </>
-                                ))}
+                                                            )))}
+                                                        </>
+                                                    )}
+                                                />   
+                                                </>                                             
+                                            ))}
+                                        </>
+                                    ))}
+                                </div>
                             </div>
-                            <div>
-                                <label htmlFor="processForms" className="form-label mt-5 text-bold">Formulários</label>                                            
+                            <div className={style.boxFiles}>  
+                                <label htmlFor="processForms" className={`mt-2 ${style.titleFileCategoryForm}`}>Formulários</label>
+                                <div className={style.instructionsForm}>
+                                    Efetue o download do formulário desejado, preencha-o e digitalize (ou tire uma foto) para efetuar o upload.
+                                </div>                                          
                                 {selectiveProcess.processForms.map((form, index) => (
                                     <>
-                                    <label className="form-label row mt-2" key={index}>{form.name}</label>                                
-                                    <a href={form.url} className={style.titleFile} target="_blank">
-                                        <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Baixar formulário
+                                    <label className="form-label row mt-2 display-inherit" key={index}>{form.name}                               
+                                    <a href={form.url} className={style.titleFileForm} target="_blank">
+                                        <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>Download
                                     </a>
+                                    </label> 
                                     <div className="row">
                                         <label htmlFor={`form.${index}`} className={`${style.fileButton} col-3`}>
                                             Escolher arquivo
@@ -1453,60 +1459,74 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
-                            <div className="col-12">
-                                <div className="mb-3">                                    
-                                    <div className="row">
-                                        <label className="form-label text-bold">Documento pessoal com foto<span>*</span></label>
-                                    </div>                                    
-                                    <div className="row">
-                                        <div className={`col-9`}>
-                                            <span>                                  
-                                                <a href={currentSubscription?.documentFile} className={style.titleFile} target="_blank">
+                            <div className={style.boxFiles}>
+                                <label className={`mt-3 ${style.titleFileCategory}`}>Documentos Obrigatórios</label>
+                                <div className="col-12">
+                                    <div className="mb-3">                                    
+                                        <div className="row">
+                                            <label className="form-label text-bold-500">Documento pessoal com foto</label>
+                                        </div>                                    
+                                        <div className="row">
+                                            <div className={`col-9`}>
+                                                <span>                                  
+                                                    <a href={currentSubscription?.documentFile} className={style.titleFile} target="_blank">
+                                                        <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </div>                                    
+                                    </div>
+                                </div>                                                   
+                                <div className="col-12">
+                                    <div className="mb-3">
+                                        <div className="row">
+                                            <label className="form-label text-bold-500">Diploma da Graduação</label>
+                                        </div>                                                                  
+                                        <div className="row">
+                                            <div className={`col-9`}>                      
+                                                <a href={currentSubscription?.graduationProofFile} className={style.titleFile} target="_blank">
                                                     <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
                                                 </a>
-                                            </span>
-                                        </div>
-                                    </div>                                    
-                                </div>
-                            </div>                                                   
-                            <div className="col-12">
-                                <div className="mb-3">
-                                    <div className="row">
-                                        <label className="form-label text-bold">Diploma da Graduação<span>*</span></label>
-                                    </div>                                                                  
-                                    <div className="row">
-                                        <div className={`col-9`}>                      
-                                            <a href={currentSubscription?.graduationProofFile} className={style.titleFile} target="_blank">
-                                                <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
-                                            </a>
-                                        </div>
-                                    </div>     
-                                </div>
-                            </div>       
-                            <div className="col-12">   
-                                {currentSubscription && currentSubscription?.files && currentSubscription?.files.map((fileSubscription, index) => (
-                                    <>
-                                        <label htmlFor="files" className="form-label mt-5 text-bold" key={index}>
-                                            {getSubcategoryName(fileSubscription.subcategoryID)}
-                                        </label>   
-                                        <div>                                     
-                                            {fileSubscription.files.map((fileSubcategory, idx) => (
-                                                <a href={fileSubcategory.url} className={style.titleFile} target="_blank">
-                                                    <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo {idx + 1}
-                                                </a>      
-                                            ))}
-                                        </div> 
-                                    </>
-                                ))}
-                            </div>                            
-                            <div className="col-12 mt-5">   
-                                {currentSubscription && currentSubscription?.processForms && currentSubscription?.processForms.map((formFile, index) => (  
-                                    <div>    
-                                        <a href={formFile.url} className={style.titleFile} target="_blank" key={index}>
-                                            <FontAwesomeIcon icon={faFile} className={style.iconFile}/> {formFile.name}
-                                        </a>  
+                                            </div>
+                                        </div>     
                                     </div>
-                                ))}
+                                </div>  
+                            </div>
+                            <div className={style.boxFiles}>
+                                <div className="col-12">                                      
+                                    <label className={`mt-2 ${style.titleFileCategory}`}>Arquivos do Barema</label>
+                                    <br />
+                                    {currentSubscription && currentSubscription?.files && currentSubscription?.files.map((fileSubscription, index) => (
+                                        <>
+                                            <label htmlFor="files" className="form-label mt-3 text-bold-500" key={index}>
+                                                {getSubcategoryName(fileSubscription.subcategoryID)}
+                                            </label>   
+                                            <div>                                     
+                                            {fileSubscription.files.map((fileSubcategory, idx) => (
+                                                <div className="mb-3">
+                                                    <a href={fileSubcategory.url} className={style.titleFile} target="_blank">
+                                                        <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo {idx + 1}
+                                                    </a>
+                                                    <label className={fileSubcategory.status === SubscriptionStatus.DEFERIDA ? style.badgeSuccess : style.badgeDanger}>{fileSubcategory.status}</label>
+                                                    <label className={style.observationFile}>{fileSubcategory.observation ? 'Observação: ' + fileSubcategory.observation : ''}</label>
+                                                </div>      
+                                            ))}
+                                            </div> 
+                                        </>
+                                    ))}
+                                </div>    
+                            </div>  
+                            <div className={style.boxFiles}>                      
+                                <div className="col-12">   
+                                    <label htmlFor="processForms" className={`mt-2 mb-4 ${style.titleFileCategoryForm}`}>Formulários</label>
+                                    {currentSubscription && currentSubscription?.processForms && currentSubscription?.processForms.map((formFile, index) => (  
+                                        <div>    
+                                            <a href={formFile.url} className={style.titleFile} target="_blank" key={index}>
+                                                <FontAwesomeIcon icon={faFile} className={style.iconFile}/> {formFile.name}
+                                            </a>  
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
                         <br />

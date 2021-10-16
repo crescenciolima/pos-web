@@ -121,6 +121,13 @@ export default function SelectiveProcessUtil() {
         return aproved;
     }
 
+    function hasFileRejected(sub: Subscription){
+        const filesRejected = sub.files.find((subscriptionFileCategory) => 
+            subscriptionFileCategory.files.find(file => file.status === SubscriptionStatus.INDEFERIDA)
+        )
+        return filesRejected;
+    }
+
 
     return {
         getCurrentStep,
@@ -132,7 +139,8 @@ export default function SelectiveProcessUtil() {
         hasPassedInterview,
         hasPassedTest,
         setSubscriptionPlaceName,
-        getStepByType
+        getStepByType,
+        hasFileRejected
     }
 
 }
