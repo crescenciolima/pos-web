@@ -7,7 +7,7 @@ interface Props {
 
 const imgStyle={
     border: "1px solid #ddd",
-    "border-radius": "4px",
+    borderRadius: "4px",
     padding: "5px",
     width: "100px"
 };

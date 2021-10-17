@@ -40,28 +40,30 @@ export default function AdminBase(props: any) {
         <meta name="ROBOT" content="Index,Follow" />
         <meta name="author" content="" />
       </Head>
-      <main className={adminStyle.main}>
-          <div className='row'>
+      <main className={adminStyle.main+" container-fluid"}>
+        <div className='row'>
+          <div className="col-2  p-0">
             <AdminSidebar />
-            <div className="col">
-              <nav className="text-right p-3 text-primary bg-light">
-                <i className={adminStyle.icon}>
-                  <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
-                </i>
-                <label className={adminStyle.sidebarLabel} onClick={() => profile()}>Perfil</label>
-                <i className={adminStyle.icon}>
-                  <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
-                </i>
-                <label className={adminStyle.sidebarLabel} onClick={() => logout()}>Sair</label>
-              </nav>
-              <div className="ms-sm-auto px-md-4 my-4 mx-1">
-                <AdminContent>
-                  {props.children}
-                </AdminContent>
-              </div>
-
-            </div>
           </div>
+          <div className="col-10 p-0">
+            <nav className="text-right p-3 text-primary bg-light">
+              <i className={adminStyle.icon}>
+                <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
+              </i>
+              <label className={adminStyle.sidebarLabel} onClick={() => profile()}>Perfil</label>
+              <i className={adminStyle.icon}>
+                <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
+              </i>
+              <label className={adminStyle.sidebarLabel} onClick={() => logout()}>Sair</label>
+            </nav>
+            <div className="ms-sm-auto px-md-4 my-4 mx-1">
+              <AdminContent>
+                {props.children}
+              </AdminContent>
+            </div>
+
+          </div>
+        </div>
       </main>
       <ToastContainer align={"right"} position={"bottom"} />
 

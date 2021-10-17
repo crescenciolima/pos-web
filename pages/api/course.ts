@@ -6,6 +6,7 @@ import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware'
 import { authAdmin } from "./../../utils/firebase-admin";
 import TreatError from '../../lib/treat-error.service';
+import { APIResponse } from '../../models/api-response';
 
 const authService = AuthService();
 const cors = initMiddleware(
@@ -48,7 +49,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
         const courseList = await courseService.getAll();
 
-        res.status(200).json(courseList);
+        let response: APIResponse = {
+            msg: "Informações salvas com sucesso!",
+            result: courseList
+          }
+
+        res.status(200).json(response);
 
     } else if (req.method === 'GET'){
         

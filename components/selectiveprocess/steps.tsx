@@ -130,8 +130,8 @@ export default function SelectiveProcessSteps(props: Props) {
                                                 <th className={adminStyle.etapaCol}>Etapa </th>
                                                 <th>Data Início</th>
                                                 <th>Data Fim</th>
-                                                <th>Nota Corte (0-100)</th>
-                                                <th>Peso</th>
+                                                <th  className={adminStyle.inputCol}>Nota Corte (0-100)</th>
+                                                <th  className={adminStyle.inputCol}>Peso</th>
                                                 <th>Opções</th>
                                             </tr>
                                         </thead>
@@ -164,7 +164,7 @@ export default function SelectiveProcessSteps(props: Props) {
                                                             name={`steps.${index}.passingScore`}
                                                             id={'passingScore' + index}
                                                             placeholder="De 0 a 100"
-                                                            readOnly={!(step.type == ProcessStepsTypes.AVALIACAO_CURRICULAR || step.type == ProcessStepsTypes.ENTREVISTA || step.type == ProcessStepsTypes.PROVA)}
+                                                            readOnly={!( step.type == ProcessStepsTypes.ENTREVISTA || step.type == ProcessStepsTypes.PROVA)}
                                                             value={step.passingScore}
                                                             maxLength={3}
                                                             onChange={handleChange} />
