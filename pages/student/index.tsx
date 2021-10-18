@@ -3,23 +3,16 @@ import React, { useEffect, useState } from 'react'
 import { UserType } from "../../enum/type-user.enum";
 import Permission from "../../lib/permission.service";
 import StudentBase from "../../components/student/student-base";
-import { subSeconds } from 'date-fns/esm';
-import { useRouter } from 'next/router';
 import { APIRoutes } from '../../utils/api.routes';
 import API from '../../lib/api.service';
-import { route } from 'next/dist/next-server/server/router';
-import { Subscription, SubscriptionStatus } from '../../models/subscription';
 import { APIResponse } from '../../models/api-response';
 import { SelectiveProcess } from '../../models/selective-process';
-import { sub } from 'date-fns';
-import { setgroups } from 'process';
 import ImgThumbnail from '../../components/selectiveprocess/dashboard/img-thumbnail';
 
 
 export default function Admin(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
 
   const api = API();
-
   const [selectiveProcess, setSelectiveProcess] = useState<SelectiveProcess>(null); 
 
 
@@ -28,7 +21,6 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
       async (response: APIResponse) => {
         if(response.result){
           let selProc : SelectiveProcess = await response.result;
-
           setSelectiveProcess(selProc)
         }
       }
@@ -47,11 +39,9 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
           <div>
             <h4>Processo Seletivo: {selectiveProcess.title}</h4>
 
-            <p>Etapa atual: <b>{selectiveProcess.steps[selectiveProcess.currentStep].type}</b></p>
+            <p className="mt-4">Etapa atual: <b>{selectiveProcess.steps[selectiveProcess.currentStep].type}</b></p>
 
             <p>Estado do processo seletivo: {selectiveProcess.state=="open"? "Aberto" : "Fechado"}</p>
-
-            <p>Iniciado em: {new Date(selectiveProcess.currentStep).toLocaleDateString()}</p>
 
           </div>
         </fieldset>

@@ -20,6 +20,7 @@ export default function SelectiveProcessBasicInfo(props: Props) {
 
 
     const onSubmit = async (values, actions) => {
+        console.log("aqui")
         try {
             actions.setSubmitting(true);
 
@@ -47,7 +48,6 @@ export default function SelectiveProcessBasicInfo(props: Props) {
                 validationSchema={
                     Yup.object().shape({
                         title: Yup.string().required('Preencha este campo.'),
-                        description: Yup.string().required('Preencha este campo.'),
                     })}
                 onSubmit={onSubmit}>
                 {({

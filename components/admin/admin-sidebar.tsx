@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import adminStyle from '../../styles/admin.module.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChartLine, faChalkboardTeacher, faGraduationCap,  faFolder,  faUser, faSchool, faNewspaper } from '@fortawesome/free-solid-svg-icons'
+import { faDotCircle, faChalkboardTeacher, faGraduationCap,  faChartBar,  faUser, faSchool, faNewspaper } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import Permission from '../../lib/permission.service'
@@ -23,7 +23,7 @@ export default function AdminSidebar() {
                         <Link href="/admin">
                             <a className={adminStyle.navLink + " nav-link text-primary sidebar-item"}>
                                 <i className={adminStyle.icon}>
-                                    <FontAwesomeIcon icon={faChartLine} className="sm-icon" />
+                                    <FontAwesomeIcon icon={faDotCircle} className="sm-icon" />
                                 </i>
                                 <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Dashboard</label>
                             </a>
@@ -75,14 +75,17 @@ export default function AdminSidebar() {
                         </Link>
 
                     </li>
-                    {/* <li>
-                        <a href="#" className={adminStyle.navLink+" nav-link text-primary"}>
-                            <i className={adminStyle.icon}>
-                                <FontAwesomeIcon icon={faCopy} className="sm-icon" />
-                            </i>
-                            <label className={adminStyle.sidebarLabel+" d-none d-md-inline-block"}>Relatórios</label>
-                        </a>
-                    </li> */}
+                    <li>
+                        <Link href="/admin/results">
+                            <a className={adminStyle.navLink + " nav-link text-primary"}>
+                                <i className={adminStyle.icon}>
+                                    <FontAwesomeIcon icon={faChartBar} className="sm-icon" />
+                                </i>
+                                <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Resultados</label>
+                            </a>
+                        </Link>
+
+                    </li>
                     <li>
                         <Link href="/admin/user">
                             <a  className={adminStyle.navLink + " nav-link text-primary"}>

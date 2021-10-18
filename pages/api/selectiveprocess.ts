@@ -80,9 +80,9 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
       } else if (req.query.open == "true") {
         const process = await selectiveProcessService.getOpen();
         getResponse.result = process;
-      } else {
-        // const newsList = req.query.page ? await selectiveProcessService.getPage(+req.query.page.toString()) : await selectiveProcessService.getAll();
-        // getResponse.result = newsList;
+      } else  if (req.query.all == "true") {
+        const processList = await selectiveProcessService.getAll();
+        getResponse.result = processList;
       }
 
       res.status(200).json(getResponse);

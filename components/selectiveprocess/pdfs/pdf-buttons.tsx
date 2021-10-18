@@ -56,6 +56,8 @@ export default function PDFButtons(props: Props) {
   const disponibilizarResultado = async () => {
     if (!isLoading) {
       if (instance.loading == false && instance.url) {
+        setConfirmDialogOpen(false);
+
         if (uploadedFile.length == 0) {
           const body = {
             id: process.id,
@@ -73,7 +75,6 @@ export default function PDFButtons(props: Props) {
           setBaseProcess(process);
           setUploadedFile(savedStep.resultURL);
         }
-        setConfirmDialogOpen(false);
         setModalOpen(true);
 
       }

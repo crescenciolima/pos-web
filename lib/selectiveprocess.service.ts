@@ -57,9 +57,43 @@ export default function SelectiveProcessService() {
         return null;
     }
 
-  
+    async function getAll() {
+        let processList = [];
+
+        await selectiveProcessRef.get().then(
+            (snapshot) => {
+                snapshot.forEach(
+                    (result) => {
+                        const id = result.id;
+                        const doc = result.data();
+                        const selectiveProcess: SelectiveProcess = {
+                            id: id,
+                            title: doc['title'],
+                            creationDate: doc['creationDate'],
+                            state: doc['state'],
+                            numberPlaces: doc['numberPlaces'],
+                            description: doc['description'],
+                            reservedPlaces: doc['reservedPlaces'],
+                            baremaCategories: doc['baremaCategories'],
+                            processForms: doc['processForms'],
+                            processNotices: doc['processNotices'],
+                            steps: doc['steps'],
+                            currentStep: doc['currentStep']
+
+                        }
+                        processList.push(selectiveProcess);
+                    });
+
+            }
+        ).catch(
+        );
+
+        return processList;
+    }
+
+
     async function save(process: SelectiveProcess): Promise<any> {
-       return selectiveProcessRef.add(process);
+        return selectiveProcessRef.add(process);
     }
 
     async function update(process: SelectiveProcess) {
@@ -98,6 +132,7 @@ export default function SelectiveProcessService() {
         remove,
         getById,
         getOpen,
+        getAll
     }
 
 }
