@@ -20,6 +20,7 @@ interface Props {
     currentStep: ProcessStep;
     subscriptionList: Subscription[];
     reservedPlacesMap: any;
+    setBaseProcess:Function;
 }
 
 export default function SelectiveProcessSubscriptionList(props: Props) {
@@ -62,7 +63,7 @@ export default function SelectiveProcessSubscriptionList(props: Props) {
                     <h5 className="text-primary-dark">Inscritos</h5>
                 </div>
                 {currentStep.type != ProcessStepsTypes.INSCRICAO && <div className="col-6 text-right">
-                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()}></PDFButtons>
+                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()} subscriptionList={subscriptionList} setBaseProcess={props.setBaseProcess}></PDFButtons>
                 </div>}
             </div>
             <div className="row mt-3">
@@ -81,7 +82,7 @@ export default function SelectiveProcessSubscriptionList(props: Props) {
                             {subscriptionList.map((sub, i) => {
                                 return (
                                     <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} key={sub.id}>
-                                        <tr>
+                                        <tr >
                                             <td>{sub.name}</td>
                                             <td>{sub['formatedDate']}</td>
                                             <td>{sub.placeName}</td>
@@ -91,9 +92,7 @@ export default function SelectiveProcessSubscriptionList(props: Props) {
                                                 {sub.status == SubscriptionStatus.INDEFERIDA && <FontAwesomeIcon icon={faTimes} className="sm-icon me-1" />}
                                                 {sub.status}
                                             </td>
-                                            {/* <td><button className="btn btn-sm btn-danger" onClick={(e) => removeTeacher(e, newsItem)} >
-                                                <FontAwesomeIcon icon={faTrash} className="sm-icon" />
-                                            </button></td> */}
+                                          
                                         </tr>
                                     </Link>
                                 )
@@ -109,36 +108,6 @@ export default function SelectiveProcessSubscriptionList(props: Props) {
 
                 </div>
             </div>
-
-            {(currentStep.type == ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO)
-                &&
-                <div className="row mt-3">
-                    <div className="col-12">
-                        {allChecked &&
-                            <div className="alert alert-success text-center">
-                                Inscrições Homologadas com Sucesso.
-                            </div>
-                        }
-
-                        {!allChecked &&
-                            <div className="alert alert-warning text-center">
-                                <b>Atenção: </b>Finalize a análise das inscrições até a data limite.
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-
-            {(currentStep.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO)
-                &&
-                <div className="row mt-3">
-                    <div className="col-12">
-                        <div className="alert alert-success text-center">
-                            Homologação Definitiva Realizada com Sucesso.
-                        </div>
-                    </div>
-                </div>
-            }
 
         </>
     );

@@ -9,6 +9,9 @@ import { APIRoutes } from '../../../utils/api.routes';
 import { APIResponse } from '../../../models/api-response';
 import { DocumentProps } from 'next/document';
 import ResultPostModal from '../dashboard/result-post-modal';
+import ConfirmDialog from '../../confirm-dialog';
+import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
+import { Subscription } from '../../../models/subscription';
 
 // Create styles
 
@@ -17,17 +20,21 @@ interface Props {
   process: SelectiveProcess;
   currentStep: ProcessStep;
   document: React.ReactElement;
+  subscriptionList: Subscription[];
+  setBaseProcess: Function;
 }
 
 export default function PDFButtons(props: Props) {
 
-  let { process, document, currentStep } = props;
+  let { process, document, currentStep, subscriptionList, setBaseProcess } = props;
   const [isLoading, setLoading] = useState<boolean>(false);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState<boolean>(false);
   const [uploadedFile, setUploadedFile] = useState<string>("");
   const [instance, update] = usePDF({ document: document });
 
   const api = API(setLoading);
+  const processUtil = SelectiveProcessUtil();
 
   Font.register({
     family: 'Poppins', fonts: [
@@ -35,6 +42,16 @@ export default function PDFButtons(props: Props) {
       { src: "/fonts/Poppins-Bold.ttf", fontWeight: 700 },
     ]
   });
+
+
+  const openDialog = () => {
+    setConfirmDialogOpen(processUtil.isCurrentStepValid(process, subscriptionList, true))
+  }
+
+  const clseDialog = () => {
+    setConfirmDialogOpen(false)
+  }
+
 
   const disponibilizarResultado = async () => {
     if (!isLoading) {
@@ -48,10 +65,15 @@ export default function PDFButtons(props: Props) {
 
           const result: APIResponse = await api.postFile(APIRoutes.SELECTIVE_PROCESS_RESULTS_SUBMISSION, body, blob);
           const savedStep: ProcessStep = result.result;
-          console.log(savedStep.resultURL);
+          for (let step of process.steps) {
+            if (step.order == process.currentStep) {
+              step.resultURL = savedStep.resultURL
+            }
+          }
+          setBaseProcess(process);
           setUploadedFile(savedStep.resultURL);
         }
-
+        setConfirmDialogOpen(false);
         setModalOpen(true);
 
       }
@@ -70,8 +92,8 @@ export default function PDFButtons(props: Props) {
     <>
       <div className="row justify-content-end">
         <div className="col-auto">
-          <button className="btn btn-outline-primary" onClick={disponibilizarResultado} disabled={isLoading}>
-            {(!isLoading && !instance.loading)&& "Disponibilizar Resultados"}
+          <button className="btn btn-outline-primary" onClick={openDialog} disabled={isLoading}>
+            {(!isLoading && !instance.loading) && "Disponibilizar Resultados"}
             {(isLoading && !instance.loading) && "Enviando arquivo..."}
             {instance.loading && "Carregando documento..."}
           </button>
@@ -100,8 +122,9 @@ export default function PDFButtons(props: Props) {
       </div>
 
       <ResultPostModal open={modalOpen} onClose={onModalClose} selectiveProcess={process} fileURL={uploadedFile}></ResultPostModal>
+      <ConfirmDialog open={confirmDialogOpen} actionButtonText="Disponibilizar" title="Disponibilizar Resultados" text="Ao disponibilizar os resultados todos os inscritos teram acesso a ele, em seguida você também poderá gerar uma postagem pública. Deseja prosseguir?" onClose={clseDialog} onConfirm={disponibilizarResultado} />
+
     </>
   )
-
 
 }

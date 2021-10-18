@@ -30,7 +30,6 @@ export default function Admin() {
   const [finishDate, setFinishDate] = useState<string>();
   const [isSelectiveProcessOpen, setSelectiveProcessOpen] = useState<boolean>(false);
   const [subscriptionList, setSubscriptionList] = useState<Subscription[]>([]);
-  // const [allResourcesChecked, setAllResourcesChecked] = useState<boolean>(true);
   const [isStepModalOpen, setStepModalOpen] = useState<boolean>(false);
   const [isFinishModalOpen, setFinishModalOpen] = useState<boolean>(false);
   const [reservedPlacesMap, setReservedPlacesMap] = useState<any>({});
@@ -83,21 +82,6 @@ export default function Admin() {
     setStartDate(format(startDate, 'dd/MM/yyyy'))
     setFinishDate(format(finishDate, 'dd/MM/yyyy'))
 
-    //Verificando se todos os recursos foram julgados para homologação definitiva
-    //Se algum recurso de inscrição ainda não foi julgado a homologação definitiva ainda não está completa
-    // if (step.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
-    //   for (let subscription of subsList) {
-    //     if (subscription.resources) {
-    //       for (let resource of subscription.resources) {
-    //         if (resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO && resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
-    //           setAllResourcesChecked(false);
-    //           break;
-    //         }
-    //       }
-    //     }
-
-    //   }
-    // }
   };
 
   function finishProcess(event) {
@@ -107,7 +91,8 @@ export default function Admin() {
 
   function advanceStep(event) {
     event.stopPropagation();
-    setStepModalOpen(true);
+
+    setStepModalOpen(processUtil.isCurrentStepValid(selectiveProcess, subscriptionList));
   }
 
   async function confirmAdvanceStep() {
@@ -183,7 +168,7 @@ export default function Admin() {
                 || currentStep.type == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO
 
               )
-                && <SelectiveProcessSubscriptionList process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveProcessSubscriptionList>}
+                && <SelectiveProcessSubscriptionList process={selectiveProcess} currentStep={currentStep} setBaseProcess={setSelectiveProcess} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveProcessSubscriptionList>}
               {(
                 currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO
                 || currentStep.type == ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA
@@ -200,16 +185,17 @@ export default function Admin() {
                 || currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_PROVA
                 || currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_PROVA
               )
-                && <SelectiveProcessSubscriptionGrading process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveProcessSubscriptionGrading>}
+                && <SelectiveProcessSubscriptionGrading process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} 
+                reservedPlacesMap={reservedPlacesMap} setBaseProcess={setSelectiveProcess}></SelectiveProcessSubscriptionGrading>}
               {(currentStep.type == ProcessStepsTypes.AVALIACAO_CURRICULAR)
                 && <SelectiveBaremaAnalysisList process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveBaremaAnalysisList>
               }
               {((currentStep.type == ProcessStepsTypes.RESULTADO_PRELIMINAR_AVALIACAO_CURRICULAR)
                 || (currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR))
-                && <SelectiveBaremaResults process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveBaremaResults>
+                && <SelectiveBaremaResults process={selectiveProcess} currentStep={currentStep} setBaseProcess={setSelectiveProcess} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveBaremaResults>
               }
               {(currentStep.type == ProcessStepsTypes.RESULTADO_DEFINITIVO_PROCESSO_SELETIVO)
-                && <SelectiveProcessFinalResult process={selectiveProcess} currentStep={currentStep} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveProcessFinalResult>
+                && <SelectiveProcessFinalResult process={selectiveProcess} currentStep={currentStep} setBaseProcess={setSelectiveProcess} subscriptionList={subscriptionList} reservedPlacesMap={reservedPlacesMap}></SelectiveProcessFinalResult>
               }
 
             </div>

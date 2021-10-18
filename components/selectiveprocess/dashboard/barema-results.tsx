@@ -20,6 +20,7 @@ interface Props {
     currentStep: ProcessStep;
     subscriptionList: Subscription[];
     reservedPlacesMap: any;
+    setBaseProcess:Function;
 
 }
 
@@ -70,7 +71,7 @@ export default function SelectiveBaremaResults(props: Props) {
                     <h5 className="text-primary-dark">Inscritos</h5>
                 </div>
                 {currentStep.type != ProcessStepsTypes.INSCRICAO && <div className="col-6 text-right">
-                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()}></PDFButtons>
+                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()} subscriptionList={subscriptionList} setBaseProcess={props.setBaseProcess}></PDFButtons>
                 </div>}
             </div>
             <div className="row mt-3">

@@ -207,7 +207,11 @@ a {
     color: var(--primary-dark) !important;
 }
 
-tr{
+.table-hover tr{
+    cursor: pointer;
+}
+
+.cursor-pointer{
     cursor: pointer;
 }
 

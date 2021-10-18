@@ -1,5 +1,6 @@
 import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from "../models/selective-process";
 import { Subscription, SubscriptionStatus } from "../models/subscription";
+import API from "./api.service";
 
 
 export default function SelectiveProcessUtil() {
@@ -121,11 +122,70 @@ export default function SelectiveProcessUtil() {
         return aproved;
     }
 
-    function hasFileRejected(sub: Subscription){
-        const filesRejected = sub.files.find((subscriptionFileCategory) => 
+    function hasFileRejected(sub: Subscription) {
+        const filesRejected = sub.files.find((subscriptionFileCategory) =>
             subscriptionFileCategory.files.find(file => file.status === SubscriptionStatus.INDEFERIDA)
         )
         return filesRejected;
+    }
+
+    function isCurrentStepValid(process: SelectiveProcess, subscriptionList: Subscription[],ignoreResults = false): boolean {
+        let currentStep = getCurrentStep(process);
+        const api = API();
+
+        switch (currentStep.type) {
+            case ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO:
+
+                for (let sub of subscriptionList) {
+                    if (sub.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
+                        api.showNotify("Ainda existem inscrições aguardando análise", "error", "Atenção", 4);
+                        return false;
+                    }
+                }
+
+                if (!currentStep.resultURL) {
+                    api.showNotify("Divulge os resultados antes de avançar", "error", "Atenção", 4);
+                    return false;
+                }
+
+                break;
+
+            case ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO:
+            case ProcessStepsTypes.RESULTADO_PRELIMINAR_PROVA:
+            case ProcessStepsTypes.RESULTADO_PRELIMINAR_ENTREVISTA:
+            case ProcessStepsTypes.RESULTADO_PRELIMINAR_AVALIACAO_CURRICULAR:
+            case ProcessStepsTypes.RESULTADO_DEFINITIVO_PROVA:
+            case ProcessStepsTypes.RESULTADO_DEFINITIVO_ENTREVISTA:
+            case ProcessStepsTypes.RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR:
+            case ProcessStepsTypes.RESULTADO_DEFINITIVO_PROCESSO_SELETIVO:
+
+                if (!currentStep.resultURL && !ignoreResults) {
+                    api.showNotify("Disponibilize os resultados antes de avançar", "error", "Atenção", 4);
+                    return false;
+                }
+
+                break;
+
+            case ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO:
+            case ProcessStepsTypes.INTERPOSICAO_RECURSO_ENTREVISTA:
+            case ProcessStepsTypes.INTERPOSICAO_RECURSO_AVALIACAO_CURRICULAR:
+            case ProcessStepsTypes.INTERPOSICAO_RECURSO_PROVA:
+
+                for (let sub of subscriptionList) {
+                    if (sub.resources?.length > 0) {
+                        for (let resource of sub.resources) {
+                            if (resource.status == SubscriptionStatus.AGUARDANDO_ANALISE) {
+                                api.showNotify("Ainda existem recursos aguardando análise", "error", "Atenção", 4);
+                                return false;
+                            }
+                        }
+                    }
+                }
+
+                break;
+        }
+
+        return true;
     }
 
 
@@ -140,7 +200,8 @@ export default function SelectiveProcessUtil() {
         hasPassedTest,
         setSubscriptionPlaceName,
         getStepByType,
-        hasFileRejected
+        hasFileRejected,
+        isCurrentStepValid
     }
 
 }

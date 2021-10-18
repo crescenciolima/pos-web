@@ -75,6 +75,7 @@ export default function SelectiveProcessBasicInfo(props: Props) {
                             <textarea
                                 className="form-control"
                                 name="description"
+                                placeholder="Esse texto aparecerá abaixo do título nos PDFs dos resultados gerados"
                                 id="description"
                                 rows={3}
                                 value={values.description}

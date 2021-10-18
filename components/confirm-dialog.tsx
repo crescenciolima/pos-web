@@ -30,7 +30,7 @@ export default function ConfirmDialog(props: Props) {
                         <h5 className="modal-title">{title}</h5>
                         <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"  onClick={close}></button>
                     </div>
-                    <div className="modal-body">
+                    <div className="modal-body text-start">
                         <p>{text}</p>
                     </div>
                     <div className="modal-footer">

@@ -21,7 +21,7 @@ interface Props {
     currentStep: ProcessStep;
     subscriptionList: Subscription[];
     reservedPlacesMap: any;
-
+    setBaseProcess:Function;
 }
 
 export default function SelectiveProcessSubscriptionGrading(props: Props) {
@@ -136,15 +136,17 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
     }
     const PDF = PDFTestResult({ process: selectiveProcess, currentStep: currentStep, subscriptionList: subscriptionList, isTest });
 
+
+
     return (
         <>
 
             <div className="row">
                 <div className="col-6">
-                    <h5 className="text-primary-dark">Inscritos</h5>
+                    <h5 className="text-primary-dark">Candidatos {currentStep.type}</h5>
                 </div>
                 {!canEdit && <div className="col-6 text-right">
-                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()}></PDFButtons>
+                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()}  subscriptionList={subscriptionList} setBaseProcess={props.setBaseProcess}></PDFButtons>
                 </div>}
             </div>
             <div className="row mt-3">
@@ -206,7 +208,7 @@ export default function SelectiveProcessSubscriptionGrading(props: Props) {
                                         </td>
                                         <td className="align-middle">
                                             <Link href={`/admin/subscription/${encodeURIComponent(sub.id)}?stepType=${currentStep.type}`} >
-                                               <b className="link-primary"> Acessar</b>
+                                               <b className="link-primary cursor-pointer"> Acessar</b>
                                             </Link>
                                         </td>
                                     </tr>

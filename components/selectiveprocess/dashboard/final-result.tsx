@@ -22,6 +22,8 @@ interface Props {
     currentStep: ProcessStep;
     subscriptionList: Subscription[];
     reservedPlacesMap: any;
+    setBaseProcess:Function;
+
 }
 
 export interface FinalListGroup {
@@ -29,6 +31,7 @@ export interface FinalListGroup {
     numberPlaces: number;
     uuid: string;
     subscriptionList: Subscription[];
+    
 }
 
 export default function SelectiveProcessFinalResult(props: Props) {
@@ -115,6 +118,7 @@ export default function SelectiveProcessFinalResult(props: Props) {
     }, []);
 
     const PDF = PDFFinalResult({process: selectiveProcess, currentStep:currentStep, groupList:groupList, interview:interview, barema:barema, test:test})
+    
 
     return (
         <>
@@ -124,7 +128,7 @@ export default function SelectiveProcessFinalResult(props: Props) {
                     <h5 className="text-primary-dark">Classificação Final</h5>
                 </div>
                 <div className="col-6 text-right">
-                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()}></PDFButtons>
+                    <PDFButtons process={selectiveProcess} currentStep={currentStep} document={PDF()}  subscriptionList={[]} setBaseProcess={props.setBaseProcess}></PDFButtons>
                 </div>
             </div>
             {groupList.map((group, indexGroup) => {

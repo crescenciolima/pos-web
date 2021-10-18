@@ -19,6 +19,7 @@ import { ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../..
 import { format } from 'date-fns';
 import SelectiveBaremaAnalysis from '../../../components/selectiveprocess/subscription/subscription-barema-analysis';
 import ImgThumbnail from '../../../components/selectiveprocess/dashboard/img-thumbnail';
+import SelectiveResourcesAnalysis from '../../../components/selectiveprocess/subscription/subscription-resources';
 
 export default function ProcessSubscriprionLayout() {
 
@@ -91,37 +92,13 @@ export default function ProcessSubscriprionLayout() {
         }
     }
 
-    const saveResourceInfo = async (status: SubscriptionStatus) => {
-        try {
-            for (let resource of subscription.resources) {
-                if (resource.step == stepType
-                    || resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO && stepType == ProcessStepsTypes.HOMOLOGACAO_DEFINITIVA_INSCRICAO) {
 
-                    resource.status = status;
-                    resource.statusObservation = subscription.currentResource.statusObservation;
-
-                    if (subscription.status == SubscriptionStatus.INDEFERIDA && resource.status == SubscriptionStatus.DEFERIDA && resource.step == ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO) {
-                        subscription.status = status;
-                    }
-                }
-            }
-            subscription.currentResource = undefined;
-            const response: APIResponse = await api.post(APIRoutes.SELECTIVE_PROCESS_SUBSCRIPTION, subscription);
-            const sub: Subscription = response.result;
-            setSubscription(sub);
-
-        } catch (error) {
-            console.error(error);
-        }
-    }
 
     const handleStatusObsChange = (e) => {
         setSubscription({ ...subscription, statusObservation: e.target.value });
     }
 
-    const handleResouceStatusObsChange = (e) => {
-        setSubscription({ ...subscription, currentResource: { ...subscription.currentResource, statusObservation: e.target.value } });
-    }
+  
 
     const checkSpecialTreatment = (specialTreatmentType) => {
         switch (specialTreatmentType) {
@@ -160,6 +137,9 @@ export default function ProcessSubscriprionLayout() {
                     <ul className="nav nav-tabs nav-fill">
                         <li className="nav-item">
                             <a className={'nav-link ' + (menuSelection == 'dadosbasicos' ? 'active' : '')} onClick={(e) => setMenuSelection('dadosbasicos')} aria-current="page" >Inscrição</a>
+                        </li>
+                        <li className="nav-item">
+                            <a className={'nav-link ' + (menuSelection == 'recursos' ? 'active' : '')} onClick={(e) => setMenuSelection('recursos')} aria-current="page" >Recursos</a>
                         </li>
                         <li className="nav-item">
                             <a className={'nav-link ' + (menuSelection == 'barema' ? 'active' : '')} aria-disabled="true" onClick={(e) => setMenuSelection('barema')} >Barema</a>
@@ -414,44 +394,7 @@ export default function ProcessSubscriprionLayout() {
                         </fieldset>
                     </div>
 
-                    {
-                        subscription.currentResource &&
-                        <>
-                            <div className="row justify-content-center">
-                                <div className="col-12 my-4 "><hr></hr></div>
-                                <div className="col-12 text-center my-3">
-                                    <b>{stepType}</b>
-                                </div>
-                                <div className="col-12">
-                                    <div className="mb-3">
-                                        <label className="form-label">Justificativa:</label>
-                                        <textarea className="form-control" readOnly disabled={true} id="justification" name="justification" rows={4} value={subscription.currentResource.justification} ></textarea>
-                                    </div>
-                                </div>
-
-                                <div className="col-12">
-                                    <div className="mb-3">
-                                        <label className="form-label">Anexos do Recurso:</label>
-                                        <div>
-                                            {subscription.currentResource.files?.map((file) => (<ImgThumbnail imgUrl={file} />))}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="col-12">
-                                    <div className="mb-3">
-                                        <label className="form-label">Parecer do recurso</label>
-                                        <textarea className="form-control" id="obs" name="obs" rows={3} value={subscription.currentResource.statusObservation} onChange={handleResouceStatusObsChange}></textarea>
-                                    </div>
-                                </div>
-                                <div className="col-auto">
-                                    <button className="btn btn-primary" onClick={(e) => saveResourceInfo(SubscriptionStatus.DEFERIDA)}>Deferir</button>
-                                </div>
-                                <div className="col-auto">
-                                    <button className="btn btn-danger" onClick={(e) => saveResourceInfo(SubscriptionStatus.INDEFERIDA)}>Indeferir</button>
-                                </div>
-                            </div>
-                        </>
-                    }
+          
                     {
                         (stepType == ProcessStepsTypes.INSCRICAO || stepType == ProcessStepsTypes.HOMOLOGACAO_PRELIMINAR_INSCRICAO) &&
                         <fieldset>
@@ -477,6 +420,13 @@ export default function ProcessSubscriprionLayout() {
             }
 
             {
+                menuSelection == 'recursos'
+                && <>
+                    <SelectiveResourcesAnalysis subscription={subscription} process={selectiveProcess} stepType={stepType}></SelectiveResourcesAnalysis>
+                </>
+            }
+
+{
                 menuSelection == 'barema'
                 && <>
                     <SelectiveBaremaAnalysis subscription={subscription} process={selectiveProcess}></SelectiveBaremaAnalysis>
