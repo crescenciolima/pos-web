@@ -12,13 +12,13 @@ import { APIResponse } from '../../../models/api-response';
 import fire from '../../../utils/firebase-util';
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
+import style from '../../../styles/subscription.module.css';
 import { Subscription, SubscriptionStatus } from '../../../models/subscription';
 import { faClock, faFile, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
 import { format } from 'date-fns';
 import SelectiveBaremaAnalysis from '../../../components/selectiveprocess/subscription/subscription-barema-analysis';
-import ImgThumbnail from '../../../components/selectiveprocess/dashboard/img-thumbnail';
 import SelectiveResourcesAnalysis from '../../../components/selectiveprocess/subscription/subscription-resources';
 
 export default function ProcessSubscriprionLayout() {
@@ -100,7 +100,7 @@ export default function ProcessSubscriprionLayout() {
 
   
 
-    const checkSpecialTreatment = (specialTreatmentType) => {
+    const getSpecialTreatment = (specialTreatmentType) => {
         switch (specialTreatmentType) {
             case 'prova_braille':
                 return "Prova em Braille";
@@ -195,9 +195,11 @@ export default function ProcessSubscriprionLayout() {
                                     </div>
 
                                     <div className="col-12 mb-3">
-                                        <label className="form-label">Documento com Foto</label>
+                                        <label className="form-label">  </label>
                                         <br />
-                                        <ImgThumbnail imgUrl={subscription.documentFile} />
+                                        <a href={subscription.documentFile} className={style.titleFileForm} target="_blank">
+                                            <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>Documento com Foto
+                                        </a>
                                     </div>
                                     <div className="col-12 mb-3">
                                         <label className="form-label">Infomações Adicionais</label>
@@ -322,7 +324,9 @@ export default function ProcessSubscriprionLayout() {
                                     <div className="col-12 mb-3">
                                         <label className="form-label">Comprovante de Graduação: </label>
                                         <br />
-                                        <ImgThumbnail imgUrl={subscription.graduationProofFile} />
+                                        <a href={subscription.graduationProofFile} className={style.titleFileForm} target="_blank">
+                                            <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>Diploma
+                                        </a>
                                     </div>
 
                                         <div className="col-lg-6 mb-3">
@@ -361,12 +365,12 @@ export default function ProcessSubscriprionLayout() {
                                         </div>
                                         <br />
                                         <div>
-                                            <label className="form-label">Auxílios Solicitados para a Prova</label>
+                                            <label className="form-label">Auxílios Solicitados para a Prova:</label>
                                         </div>
 
                                         <div>
                                             {subscription.specialTreatmentTypes?.map((treatment) => (
-                                                <li>{checkSpecialTreatment(treatment)}</li>
+                                                <li>{getSpecialTreatment(treatment)}</li>
                                             ))}
                                         </div>
                                     </div>
@@ -377,15 +381,14 @@ export default function ProcessSubscriprionLayout() {
 
                     <div className="col-12">
                         <fieldset>
-                            <legend>Formulários de Inscrição</legend>
+                            <legend>Formulários</legend>
                             <div className="mb-3">
                                 {subscription.processForms?.map((form, key) => (
                                     <>
                                         <div>
-                                            <label className="form-label">{form.name}</label>
-                                        </div>
-                                        <div>
-                                            <ImgThumbnail imgUrl={form.url} />
+                                            <a href={subscription.graduationProofFile} className={style.titleFileForm} target="_blank">
+                                                <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>{form.name}
+                                            </a>
                                         </div>
                                         <br />
                                     </>

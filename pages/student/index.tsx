@@ -7,7 +7,9 @@ import { APIRoutes } from '../../utils/api.routes';
 import API from '../../lib/api.service';
 import { APIResponse } from '../../models/api-response';
 import { SelectiveProcess } from '../../models/selective-process';
-import ImgThumbnail from '../../components/selectiveprocess/dashboard/img-thumbnail';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFile } from '@fortawesome/free-solid-svg-icons';
+import style from '../../styles/subscription.module.css';
 
 
 export default function Admin(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -27,7 +29,6 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
     )
   },[])
 
-  //return a null component before StudentBase si rendered
   if (selectiveProcess === null){
     return (<StudentBase></StudentBase>)
   }
@@ -53,10 +54,9 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
                 {selectiveProcess.processNotices?.map((notice) => (
                   <>
                     <div>
-                      <label className="form-label">{notice.name}</label>
-                    </div>
-                    <div>
-                      <ImgThumbnail imgUrl={notice.url} />
+                      <a href={notice.url} className={style.titleFileForm} target="_blank">
+                        <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>{notice.name}
+                      </a>
                     </div>
                   </>
                 ))}                
@@ -65,7 +65,7 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
         </div>
         <div>
           <fieldset>
-          <label className="form-label">Etapas do Processo Seletivo</label>
+          <legend>Etapas do Processo Seletivo</legend>
           <table id="selective-process">
             <thead>
               <tr>
@@ -77,7 +77,7 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
             <tbody>
               {selectiveProcess.steps.map((step,key)=>(
                 <tr key={key} className={selectiveProcess.currentStep === key?"current-sel-proc":""} 
-                title={selectiveProcess.currentStep === key?"Etapa Atual":""}>
+                title={selectiveProcess.currentStep === key?"Etapa atual":""}>
                   <td>{step.type}</td>
                   <td>{new Date(step.startDate).toLocaleDateString()}</td>
                   <td>{new Date(step.finishDate).toLocaleDateString()}</td>
