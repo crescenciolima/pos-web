@@ -37,7 +37,7 @@ export default function PDFTableLine(props: Props) {
         <View style={styles.container}>
             {columnList.map((column, index) => {
                 return (
-                    <Text  key={index} style={{ width: column.width, borderRightWidth: index+1 == columnList.length ? 0 : 1, marginHorizontal:"5", textAlign: column.textAlign, height:"100%" }}>{column.value} </Text>
+                    <Text  key={index} style={{ width: column.width, borderRightWidth: index+1 == columnList.length ? 0 : 1, marginHorizontal:"5", textAlign: column.textAlign, height:"100%" }}>{column.value || ""} </Text>
                 )
             })}
 

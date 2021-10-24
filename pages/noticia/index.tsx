@@ -1,9 +1,6 @@
 import Head from 'next/head'
 import { GetStaticProps } from 'next'
 import React from 'react'
-import Image from 'next/image'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPhoneAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import SiteHeader from '../../components/site-header'
 import NewsService from '../../lib/news.service'
 import fire from '../../utils/firebase-util'
@@ -13,6 +10,7 @@ import style from '../../styles/news.module.css'
 import CourseService from '../../lib/course.service'
 import { Course } from '../../models/course'
 import SiteFooter from '../../components/site-footer'
+import { format } from 'date-fns';
 
 export default function Noticias({ newsList, course }) {
 
@@ -63,8 +61,11 @@ export const getStaticProps: GetStaticProps = async () => {
   const newsList = await newsService.getAll();
 
   for (let news of newsList) {
-    const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
-    news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
+    try {
+      news.dateString = format(new Date(news.date), 'dd/MM/yyyy')
+    } catch (error) {
+      news.dateString = "-"
+    }
   }
 
   const courseService = CourseService();
