@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { News } from '../../../models/news';
 import fire from '../../../utils/firebase-util';
+import { format } from 'date-fns';
 
 
 export default function NewsLayout() {
@@ -28,9 +29,11 @@ export default function NewsLayout() {
       (result: APIResponse) => {
         let newsList: News[] = result.result;
         for (let news of newsList) {
-          // const date = fire.firestore.Timestamp.fromMillis(news.date * 1000).toDate();
-          const date = fire.firestore.Timestamp.fromMillis(news.date).toDate();
-          news.dateString = date.toLocaleDateString() + " " + date.toLocaleTimeString();
+          try {
+            news.dateString = format(new Date(news.date), 'dd/MM/yyyy')
+          } catch (error) {
+            news.dateString = "-"
+          }
         }
         setNewsList(newsList);
       }

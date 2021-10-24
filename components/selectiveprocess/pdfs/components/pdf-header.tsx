@@ -42,9 +42,9 @@ const styles = StyleSheet.create({
   const PDFHeader = ({title, description, step, logoW = "30%"}) => (
     <View style={styles.titleContainer}>
         <Image src="/images/ifbavca.png" style={[styles.logo, {width: logoW}]}></Image>
-        <Text style={styles.title}>{title}</Text>
-        {description && <Text style={styles.subTitle}>{description}</Text>}
-        <Text style={styles.step}>{step}</Text>
+        <Text style={styles.title}>{title || ""}</Text>
+        <Text style={styles.subTitle}>{description || ""}</Text>
+        <Text style={styles.step}>{step || ""}</Text>
     </View>
   );
   

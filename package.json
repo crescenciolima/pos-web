@@ -11,7 +11,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
-    "@react-pdf/renderer": "^2.0.19",
+    "@react-pdf/renderer": "^2.0.20",
     "atob": "^2.1.2",
     "bootstrap": "^5.0.0-beta3",
     "bootstrap-icons": "^1.4.1",

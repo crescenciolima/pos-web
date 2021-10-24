@@ -26,9 +26,6 @@ export default function ResultPostModal(props: Props) {
     const api = API();
 
     const { open, onClose, fileURL } = props;
-    const [numPages, setNumPages] = useState(null);
-    const [pagesList, setPageList] = useState([]);
-    const [isPDF, setIsPDF] = useState(false);
     const [selectedFile, setSelectedFile] = useState<SubscriptionFile>({ status: SubscriptionStatus.AGUARDANDO_ANALISE, uuid: "", url: "", observation: "" });
 
     const [news, setNews] = useState<News>({
@@ -38,20 +35,15 @@ export default function ResultPostModal(props: Props) {
     const [file, setFile] = useState<FileList>();
 
     useEffect(() => {
-        // if (props.file) {
-        //     setIsPDF(props.file.url.indexOf(".pdf") != -1);
-        //     setSelectedFile(props.file);
-        // }
+  
         if (props.selectiveProcess.steps) {
             const { selectiveProcess } = props;
             const step = selectiveProcess.steps[selectiveProcess.currentStep];
-            // console.log(step);
             let preContent = `
             <h5>Resultado Disponível</h5>
             <p>${step.type}</p>
             <a style="margin-top:1rem;color: rgb(52, 168, 83);" href="${fileURL}" target="_blank">Acesse clicando aqui.<a/>
             `
-            // console.log(preContent)
             setNewsContent(preContent);
             setNews({ ...news, title: step.type, text: preContent, coverURL: "https://firebasestorage.googleapis.com/v0/b/posweb-b42dd.appspot.com/o/news%2Fdefault.png?alt=media&token=d6c4f2b7-151d-4f84-90c8-668dff4c15b7" })
         }
