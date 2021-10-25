@@ -15,11 +15,10 @@ export default function AuthService() {
                 return await formatUser(response.user);
             })
             .catch(async (err) => {
-                res.status(200).json( {
+                return {
                     error: true,
                     message: err.code
-                });
-                return null;
+                }
             });
     }
 

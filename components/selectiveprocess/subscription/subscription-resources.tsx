@@ -11,8 +11,7 @@ import { faTrash, faClock, faCheck, faTimes, faFile, faIgloo } from '@fortawesom
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import ImgThumbnail from '../dashboard/img-thumbnail';
-
+import style from '../../../styles/subscription.module.css';
 
 interface Props {
     subscription: Subscription;
@@ -96,7 +95,12 @@ export default function SelectiveResourcesAnalysis(props: Props) {
                                 <div className="mb-3">
                                     <label className="form-label">Anexos do Recurso:</label>
                                     <div>
-                                        {subscription.currentResource.files?.map((file) => (<ImgThumbnail imgUrl={file} />))}
+                                        {subscription.currentResource.files?.map((file) => (
+                                            <a href={file} className={style.titleFileForm} target="_blank">
+                                                <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>{file}
+                                            </a>
+                                        ))}
+
                                     </div>
                                 </div>
                             </div>
@@ -147,9 +151,6 @@ export default function SelectiveResourcesAnalysis(props: Props) {
                     </div>
                 </div>
             </fieldset>
-
-
-
         </>
     );
 }

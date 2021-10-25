@@ -74,6 +74,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
         values.type = UserType.STUDENT;
         const result = await api.post(APIRoutes.SIGNUP, values);
         if (result) {
+            console.log("rsult ok: "+result)
             setPageName(buildPage()[PAGES.LOGIN]);
             setPageType(PAGES.LOGIN);
         }

@@ -7,6 +7,9 @@ import UserService from '../../../lib/user.service';
 import { User } from '../../../models/user';
 import { APIResponse } from '../../../models/api-response';
 import initMiddleware from '../../../utils/init-middleware';
+import { string } from 'yup/lib/locale';
+import FirebaseMessage from '../../../utils/firebase-message-util';
+import TreatError from '../../../lib/treat-error.service';
 
 const cors = initMiddleware(
     // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -29,24 +32,38 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             name: name,
             email: email,
             password: password,
-            type: type
+            type: type,
         }
 
-        const result: User = await authService.signUp(user, res);
+        let result: any = await authService.signUp(user, res);
 
-        delete user.password;
+        if (!result.error){
+
+            delete user.password;
+            
+            if(result.id){
+                user.id = result.id;
+                await userService.update(user);
+                user.token = result.token;
+            }
+
+            let response: APIResponse = {
+                msg: "Usuário cadastrado com sucesso!",
+                result: user
+            }
+
+            res.status(200).json(response);
+        } 
         
-        if(result.id){
-            user.id = result.id;
-            await userService.update(user);
-            user.token = result.token;
-        }
+        else {
+            const treatError = TreatError();
 
-        let response: APIResponse = {
-            msg: "Usuário cadastrado com sucesso!",
-            result: user
+            const errorMsg = await treatError.firebase(result);
+
+            let response: APIResponse = errorMsg
+            
+            res.status(401).json(response);
         }
-        res.status(200).json(response);
 
     } else {
         res.status(200).json([]);

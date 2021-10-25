@@ -64,8 +64,9 @@ export default function API(setLoading?: Function) {
             });
 
             const result: APIResponse = await res.json();
-
+            
             if (result.error) {
+                console.log("passa aqui com erro: "+result)
                 showNotify(result.msg, "error", "Erro");
                 if (setLoading) setLoading(false);
                 return;
