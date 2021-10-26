@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import adminStyle from '../../styles/admin.module.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDotCircle, faChalkboardTeacher, faGraduationCap,  faChartBar,  faUser, faSchool, faNewspaper } from '@fortawesome/free-solid-svg-icons'
+import { faDotCircle, faChalkboardTeacher, faGraduationCap,  faChartBar,  faUser, faSchool, faNewspaper, faFileAlt } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import Permission from '../../lib/permission.service'
@@ -61,9 +61,17 @@ export default function AdminSidebar() {
                                 <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Posts</label>
                             </a>
                         </Link>
+                    </li>                    
+                    <li>
+                        <Link href="/admin/works">
+                            <a className={adminStyle.navLink + " nav-link text-primary"}>
+                                <i className={adminStyle.icon}>
+                                    <FontAwesomeIcon icon={faFileAlt} className="sm-icon" />
+                                </i>
+                                <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Trabalhos</label>
+                            </a>
+                        </Link>
                     </li>
-
-
                     <li>
                         <Link href="/admin/selectiveprocess">
                             <a className={adminStyle.navLink + " nav-link text-primary"}>
@@ -73,7 +81,6 @@ export default function AdminSidebar() {
                                 <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Processo Seletivo</label>
                             </a>
                         </Link>
-
                     </li>
                     <li>
                         <Link href="/admin/results">

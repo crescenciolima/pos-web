@@ -26,7 +26,16 @@ export default function API(setLoading?: Function) {
 
 
             for (let key in body) {
-                data.append(key, body[key]);
+                const content = body[key]
+                let keyName = key
+                if(Array.isArray(content)){
+                    keyName = `${key}[]`
+                    for (let _key in content) {
+                        data.append(keyName, content[_key]);
+                    }
+                }else{
+                    data.append(keyName,content);
+                }
             }
 
             const res = await fetch(url, {
@@ -66,7 +75,6 @@ export default function API(setLoading?: Function) {
             const result: APIResponse = await res.json();
             
             if (result.error) {
-                console.log("passa aqui com erro: "+result)
                 showNotify(result.msg, "error", "Erro");
                 if (setLoading) setLoading(false);
                 return;
@@ -108,6 +116,7 @@ export default function API(setLoading?: Function) {
             console.log(result);
 
             if (result.error) {
+                showNotify(result.msg, "error", "Erro");
                 if (setLoading) setLoading(false);
                 return null;
             }
@@ -147,8 +156,9 @@ export default function API(setLoading?: Function) {
             const result: APIResponse = await res.json();
 
             if (result.error) {
+                showNotify(result.msg, "error", "Erro");
                 if (setLoading) setLoading(false);
-                return false;
+                return;
             }
 
             if (setLoading) setLoading(false);

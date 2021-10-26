@@ -7,8 +7,6 @@ import TreatError from '../../lib/treat-error.service';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
 import { v4 as uuidv4 } from 'uuid';
-import fire from '../../utils/firebase-util';
-
 
 const cors = initMiddleware(
   Cors({
