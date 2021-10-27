@@ -13,19 +13,25 @@
     width: 100%;
     max-width: 400px;
     padding: 2rem;
-    margin: auto;
     background-color: var(--background-light);
     border-radius: 1rem;
-    margin: 1.3rem;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 2rem 3rem;
+    margin-left: auto;
+    margin-right: auto;
   }
   
   @media (min-width: 768px) {
     .bd-placeholder-img-lg {
       font-size: 3.5rem;
     }
-    .formSignin {
-      padding: 3.2rem;
-      margin: auto;
+    .formSignin {    
+      margin-top: 1em;
+      margin-bottom: 1em;
+      padding: 2rem 3rem;
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 

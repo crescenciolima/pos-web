@@ -115,8 +115,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
             <main className={style.main}>
                 <div className={style.formSignin}>
                 <Image src="/images/ifba-logo-footer.png" className=" text-center mx-auto" alt="logo"width="120" height="120" />
-
-                    <h1 className="h3 mb-5 fw-normal text-center">{pageName}</h1>
+                    <h1 className="h3 mb-4 fw-normal text-center">{pageName}</h1>
                     <Formik
                         enableReinitialize
                         initialValues={{ name: '', email: '', password: '' }}

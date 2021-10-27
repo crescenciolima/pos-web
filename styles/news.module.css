@@ -31,3 +31,11 @@
     background-color: var(--background-color);
     min-height: 80vh;
 }
+
+.iconFile {
+    color:#34A853;
+    margin-bottom: 8px;
+    width: 1em;
+    margin-right: .5em;
+}
+  

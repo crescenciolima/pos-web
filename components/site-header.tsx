@@ -48,6 +48,11 @@ export default function SiteHeader() {
                 </Link>
               </li>
               <li className="nav-item">
+                <Link href="/trabalhos">
+                  <a className="nav-link">Trabalhos</a>
+                </Link>
+              </li>
+              <li className="nav-item">
                 <Link href="/login">
                   <a className={"nav-link " + homeStyle.login}>Entrar</a>
                 </Link>
