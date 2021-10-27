@@ -44,6 +44,8 @@ export default function API(setLoading?: Function) {
                 headers: await buildHeadersFormData(),
             });
 
+            await treatResponse(res);
+
             const result: APIResponse = await res.json();
             console.error(result);
 
@@ -65,12 +67,14 @@ export default function API(setLoading?: Function) {
         try {
 
             if (setLoading) setLoading(true);
-            (body);
+
             const res = await fetch(url, {
                 body: JSON.stringify(body),
                 headers: await buildHeaders(),
                 method: 'POST',
             });
+
+            await treatResponse(res);
 
             const result: APIResponse = await res.json();
             
@@ -111,10 +115,9 @@ export default function API(setLoading?: Function) {
                 headers: await buildHeaders(),
             });
 
-            console.log(res);
-            const result: APIResponse = await res.json();
-            console.log(result);
+            await treatResponse(res);
 
+            const result: APIResponse = await res.json();
             if (result.error) {
                 showNotify(result.msg, "error", "Erro");
                 if (setLoading) setLoading(false);
@@ -192,6 +195,8 @@ export default function API(setLoading?: Function) {
                 method: 'DELETE',
             });
 
+            await treatResponse(res);
+
             const result: APIResponse = await res.json();
 
             toast.notify(result.msg, {
@@ -228,16 +233,12 @@ export default function API(setLoading?: Function) {
                 }
             }
 
-            // if (params) {
-            //     let urlBuilder = new URL(url);
-            //     urlBuilder.search = new URLSearchParams(params).toString();
-            //     url = urlBuilder.toString();
-            // }
-
             const res = await fetch(url, {
                 method: 'DELETE',
                 body: data
             });
+
+            await treatResponse(res);
 
             const result: APIResponse = await res.json();
 
@@ -290,6 +291,13 @@ export default function API(setLoading?: Function) {
             'Content-Type': 'application/json',
             'Authorization': token,
         };
+    }
+
+    async function treatResponse(response: Response) {
+        if(response.status === 401) {
+            await cookies.removeToken()
+            window.location.href = '/login'
+        }
     }
 
     async function getViaCep(postalCode) {

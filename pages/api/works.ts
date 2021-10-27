@@ -32,7 +32,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   await cors(req, res);
 
-  if(!await authService.checkAuthentication(req)){
+  if(await authService.checkAuthentication(req)){
     return res.status(401).send(await treatError.general('Usuário não autorizado.'))
   }
 
@@ -41,10 +41,8 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
     case "POST":
       try{
         await multerAny(req, res);
-
         const blob: BlobCorrected = req.files?.length ? req.files[0] : null;
         const { id, title, text, url, authors }: Works = req.body;
-  
         const work: Works = { title, text, url, authors, date: (new Date()).toISOString() }
   
         if(!id){
@@ -69,7 +67,8 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
   
         res.status(200).json(response);
       }catch(e){
-        return res.status(400).json(treatError.general("Erro ao salvar Trabalho"));
+        console.log(e);
+        return res.status(400).json(await treatError.general("Erro ao salvar Trabalho"));
       }
 
       break;

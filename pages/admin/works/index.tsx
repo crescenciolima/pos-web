@@ -56,7 +56,7 @@ export default function WorksLayout() {
     <AdminBase>
       <div className="row">
         <div className="col-6">
-          <h3 className="text-primary-dark">Notícias</h3>
+          <h3 className="text-primary-dark">Trabalhos</h3>
         </div>
         <div className="col-6 text-right">
           <Link href="/admin/works/new">

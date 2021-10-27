@@ -9,7 +9,6 @@ import * as Yup from 'yup'
 import { ErrorMessage, Field, FieldArray, Formik } from 'formik'
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
-import fire from '../../../utils/firebase-util';
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -26,7 +25,6 @@ export default function SaveWorksLayout() {
     const [worksContent, setWorksContent] = useState('');
 
     useEffect(() => {
-
         const { id } = router.query;
         if (id) {
             if (id.toString() == "new") {
@@ -44,12 +42,14 @@ export default function SaveWorksLayout() {
     }
 
     const saveWorks = async (values: Works) => {
+        if(works?.id){
+            values.id = works.id
+        }
+        if(works?.url){
+            values.url = works.url
+        }
         values.text = worksContent;
-        if(file && file.length > 0){
-            await api.postFile(APIRoutes.WORKS, values, file[0]);
-        } else {            
-            await api.post(APIRoutes.WORKS, {...values, url: works.url});
-        }        
+        await api.postFile(APIRoutes.WORKS, values, file && file.length > 0 ? file[0] : null);     
         router.push("/admin/works");
     };
 
@@ -89,7 +89,7 @@ export default function SaveWorksLayout() {
                 validationSchema={
                     Yup.object().shape({
                         title: Yup.string().required('Preencha este campo.'),
-                        url: works?.url ? null : Yup.string().required('Preencha este campo.'),
+                        file: works?.url ? null : Yup.string().required('Preencha este campo.'),
                         authors: Yup.array()
                             .required('Preencha este campo.')
                             .min(1, 'Defina ao menos um autor.')
@@ -157,15 +157,15 @@ export default function SaveWorksLayout() {
                             <input
                                 type="file"
                                 className="form-control"
-                                name="url"
-                                id="url"
-                                value={values.url}
+                                name="file"
+                                id="file"
+                                value={values.file}
                                 onChange={(event) => {
                                     handleChange(event);
                                     setFile(event.currentTarget.files);
                                 }} />
 
-                            <p className="input-error"><ErrorMessage name="url" className="input-error" /></p>
+                            <p className="input-error"><ErrorMessage name="file" className="input-error" /></p>
                         </div>
                         {works?.url &&
                             <a href={works.url} className={style.titleFile} target="_blank">
