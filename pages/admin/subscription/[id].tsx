@@ -386,7 +386,7 @@ export default function ProcessSubscriprionLayout() {
                                 {subscription.processForms?.map((form, key) => (
                                     <>
                                         <div>
-                                            <a href={subscription.graduationProofFile} className={style.titleFileForm} target="_blank">
+                                            <a href={form.url} className={style.titleFileForm} target="_blank">
                                                 <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>{form.name}
                                             </a>
                                         </div>
@@ -425,7 +425,7 @@ export default function ProcessSubscriprionLayout() {
             {
                 menuSelection == 'recursos'
                 && <>
-                    <SelectiveResourcesAnalysis subscription={subscription} process={selectiveProcess} stepType={stepType}></SelectiveResourcesAnalysis>
+                    {/* <SelectiveResourcesAnalysis subscription={subscription} process={selectiveProcess} stepType={stepType}></SelectiveResourcesAnalysis> */}
                 </>
             }
 

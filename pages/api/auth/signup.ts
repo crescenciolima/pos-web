@@ -53,9 +53,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             }
 
             res.status(200).json(response);
-        } 
-        
-        else {
+        } else {
             const treatError = TreatError();
 
             const errorMsg = await treatError.firebase(result);
