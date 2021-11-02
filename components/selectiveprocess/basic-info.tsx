@@ -20,7 +20,6 @@ export default function SelectiveProcessBasicInfo(props: Props) {
 
 
     const onSubmit = async (values, actions) => {
-        console.log("aqui")
         try {
             actions.setSubmitting(true);
 

@@ -130,9 +130,6 @@ export default function PDFBaremaResult(props: Props) {
     legendLines.push(legendLine)
   }
 
-  console.log(tableHeaders)
-  console.log(lines)
-
   // Create Document Component
   const PDF = () => (
     <Document>
