@@ -8,7 +8,6 @@ import MaskedInput from 'react-input-mask';
 import DatePicker, { registerLocale }  from "react-datepicker";
 import ptBR from 'date-fns/locale/pt-BR';
 import "react-datepicker/dist/react-datepicker.css";
-import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import style from '../../../styles/subscription.module.css';
@@ -26,6 +25,7 @@ import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 import { DocumentValidateHelper } from '../../../helpers/document-validate-helper';
 import { MathHelper } from '../../../helpers/math-helper';
 import { PostalCodeField } from '../../../components/postal-code-field';
+import WarningDialog from '../../../components/warning-dialog';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -53,6 +53,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [countFiles, setCountFiles] = useState<number>(0);
     const [weightFile, setWeightFile] = useState<number>(0);
     const [percentage, setPercentage] = useState<number>(0);
+    const [openModal, setOpenModal] = useState<boolean>(false);
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
         { name: "Auxílio de Leitor/Ledor", value: 'auxilio_leitor' },
@@ -61,6 +62,20 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         { name: "Auxílio para Transcrição", value: 'auxilio_transcricao' },
         { name: "Mesa e Cadeiras sem Braço", value : 'mesa_sem_braco' },
     ];
+    const maxLengthFile = 52428800;
+
+    function closeModal() {
+        setOpenModal(false);
+    }
+
+    const verifyFileLength = (file)  =>{
+        console.log(file, file[0].size, maxLengthFile)
+        if(file && file[0].size > maxLengthFile) {
+            setOpenModal(true)
+            return false
+        }
+        return true
+    }
 
     const getRouteFile = (type) => {
         switch (type) {
@@ -103,6 +118,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     };
 
     const handleFile = async (subcategoryUuid, position, file) => {
+        if(verifyFileLength(file)) {
+            return
+        }
+
         const subcategoryFound = subCategoriesFiles.find((subcategory) => subcategory.uuid === subcategoryUuid);
 
         if(!subcategoryFound){
@@ -136,6 +155,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     }
 
     const handleFileForm = async (name, file) => {
+        if(verifyFileLength(file)) {
+            return
+        }
+
         const formFileFound = formFiles.find((formFile) => formFile.name === name);
 
         if(!formFileFound){
@@ -1257,7 +1280,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 name="documentFile"
                                                 onChange={(event) => {
                                                     actions.handleChange(event);
-                                                    const files = event.currentTarget.files;
+                                                    const files = event.currentTarget.files;                                                   
+                                                    if(verifyFileLength(files)) {
+                                                        return
+                                                    }
                                                     setCountFiles((prev) => !documentFile && files.length > 0 ? prev + 1 : (documentFile && files.length === 0 ? prev - 1 : prev));
                                                     setDocumentFile(files.length > 0 ? files : null);
                                                     setInvalidDocumentFile(files.length === 0);
@@ -1292,6 +1318,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 onChange={(event) => {
                                                     actions.handleChange(event);
                                                     const files = event.currentTarget.files;
+                                                    if(verifyFileLength(files)) {
+                                                        return
+                                                    }
                                                     setCountFiles((prev) => !graduationProofFile && files.length > 0 ? prev + 1 : (graduationProofFile && files.length === 0 ? prev - 1 : prev));
                                                     setGraduationProofFile(files.length > 0 ? files : null);
                                                     setInvalidGraduationProofFile(files.length === 0);
@@ -1315,10 +1344,14 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <>
                                             <label htmlFor="files" className="mt-4 form-label text-bold-500" key={index}>
                                                 Categoria {index + 1}: {baremaCategory.name}
-                                            </label>                                            
+                                            </label>                       
+                                            <label className={style.badgeMaxPoint}>Pontuação máxima: {baremaCategory.maxPoints}</label>  
+                                            <br />                   
                                             {baremaCategory.subcategories.map((subcategory, idx) => (
                                                 <>
-                                                <label className="form-label row mt-2" key={idx}>{subcategory.name}</label>  
+                                                <label className="form-label mt-2" key={idx}>{subcategory.name}</label> 
+                                                <label className={style.badgePoint}>{subcategory.points} {subcategory.points > 1 ? 'pontos' : 'ponto'}</label>  
+                                                <br />
                                                 <FieldArray
                                                     name={subcategory.uuid}
                                                     render={arrayHelpers => (
@@ -1536,6 +1569,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     Data de Inscrição: {(new Date(currentSubscription.subscriptionDate)).toLocaleString()}
                 </div>
             }
+            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 50MB"} onClose={closeModal} />
         </StudentBase>
     )
 }
