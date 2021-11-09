@@ -29,9 +29,7 @@ export default function ResourceUtil() {
 
     function canRequestResource(subscription: Subscription, selectiveProcess: SelectiveProcess): boolean {                      
         const currentStep: ProcessStep = processUtil.getCurrentStep(selectiveProcess);
-        console.log(subscription, currentStep, selectiveProcess);
         let resourceFound: SubscriptionResource = subscription.resources.find((resource) => currentStep.type === resource.step);
-        console.log(stepTypeAllowResource(currentStep.type), resourceFound, resultAllowResource(currentStep.type, subscription, selectiveProcess));
         
         if(!stepTypeAllowResource(currentStep.type) || resourceFound || !resultAllowResource(currentStep.type, subscription, selectiveProcess)) {
            return false;

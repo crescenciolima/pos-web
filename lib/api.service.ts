@@ -13,7 +13,6 @@ export default function API(setLoading?: Function) {
             if (setLoading) setLoading(true);
 
             let data = new FormData();
-            console.log(file)
             if (file) {
                 if (file.length) {
                     for (let i = 0; i < file.length; i++) {

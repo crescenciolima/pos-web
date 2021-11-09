@@ -40,6 +40,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       
         const userData = await userService.getById(result.id);
         result.type = userData.type;
+        result.name = userData.name;
 
         let response: APIResponse = {
             msg: "Login efetuado com sucesso!",

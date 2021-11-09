@@ -33,7 +33,6 @@ export default function Cookies() {
     }
 
     async function removeToken() {  
-        console.log('teste');
         destroyCookie(null, process.env.NEXT_PUBLIC_TOKEN);
     }
 

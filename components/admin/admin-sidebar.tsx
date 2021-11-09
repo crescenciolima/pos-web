@@ -6,9 +6,11 @@ import Link from 'next/link'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import Permission from '../../lib/permission.service'
 import { UserType } from '../../enum/type-user.enum'
+import { useContext } from 'react'
+import UserContext from '../../context/user'
 
 export default function AdminSidebar() {
-    //const { userType } = props; 
+    const { state } = useContext(UserContext);
     return (
         <nav className="d-md-block sidebar">
             <div className="d-flex flex-column p-1 p-md-3 text-primary">
@@ -93,7 +95,7 @@ export default function AdminSidebar() {
                         </Link>
 
                     </li>
-                    <li>
+                    {state.type === UserType.MASTER && <li>
                         <Link href="/admin/user">
                             <a  className={adminStyle.navLink + " nav-link text-primary"}>
                                 <i className={adminStyle.icon}>
@@ -102,8 +104,7 @@ export default function AdminSidebar() {
                                 <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Usuários</label>
                             </a>
                         </Link>
-
-                    </li>
+                    </li>}
                 </ul>
             </div>
         </nav>

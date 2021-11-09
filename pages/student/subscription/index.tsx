@@ -8,7 +8,6 @@ import MaskedInput from 'react-input-mask';
 import DatePicker, { registerLocale }  from "react-datepicker";
 import ptBR from 'date-fns/locale/pt-BR';
 import "react-datepicker/dist/react-datepicker.css";
-import { useRouter } from 'next/router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import style from '../../../styles/subscription.module.css';
@@ -26,6 +25,7 @@ import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 import { DocumentValidateHelper } from '../../../helpers/document-validate-helper';
 import { MathHelper } from '../../../helpers/math-helper';
 import { PostalCodeField } from '../../../components/postal-code-field';
+import WarningDialog from '../../../components/warning-dialog';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -53,6 +53,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [countFiles, setCountFiles] = useState<number>(0);
     const [weightFile, setWeightFile] = useState<number>(0);
     const [percentage, setPercentage] = useState<number>(0);
+    const [openModal, setOpenModal] = useState<boolean>(false);
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
         { name: "Auxílio de Leitor/Ledor", value: 'auxilio_leitor' },
@@ -61,6 +62,19 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         { name: "Auxílio para Transcrição", value: 'auxilio_transcricao' },
         { name: "Mesa e Cadeiras sem Braço", value : 'mesa_sem_braco' },
     ];
+    const maxLengthFile = 52428800;
+
+    function closeModal() {
+        setOpenModal(false);
+    }
+
+    const verifyFileLength = (file)  =>{
+        if(file && file[0].size > maxLengthFile) {
+            setOpenModal(true)
+            return false
+        }
+        return true
+    }
 
     const getRouteFile = (type) => {
         switch (type) {
@@ -103,6 +117,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     };
 
     const handleFile = async (subcategoryUuid, position, file) => {
+        if(!verifyFileLength(file)) {
+            return;
+        }
+
         const subcategoryFound = subCategoriesFiles.find((subcategory) => subcategory.uuid === subcategoryUuid);
 
         if(!subcategoryFound){
@@ -136,6 +154,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     }
 
     const handleFileForm = async (name, file) => {
+        if(!verifyFileLength(file)) {
+            return;
+        }
+
         const formFileFound = formFiles.find((formFile) => formFile.name === name);
 
         if(!formFileFound){
@@ -512,10 +534,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         <StudentBase>
             {[1, 2, 3, 4, 5].includes(currentStage) &&
                 <div className="row">   
-                    <div className={`${style.title} col-6`}>       
+                    <div className={`${style.title} col-md-6`}>       
                         {getTitle()}
                     </div>
-                    <div className={`${style.steps} col-6`}>
+                    <div className={`${style.steps} col-md-6`}>
                         <span className={`${style.step} ${currentStage === 1 ? style.stepActive : ''} ${currentStage > 1 ? style.stepFinish : ''}`}></span>
                         <span className={`${style.step} ${currentStage === 2 ? style.stepActive : ''} ${currentStage > 2 ? style.stepFinish : ''}`}></span>
                         <span className={`${style.step} ${currentStage === 3 ? style.stepActive : ''} ${currentStage > 3 ? style.stepFinish : ''}`}></span>
@@ -524,6 +546,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     </div>
                 </div>
             }
+            {currentSubscription && <label className={currentSubscription.status === SubscriptionStatus.DEFERIDA ? style.badgeSuccess : style.badgeDanger}>{currentSubscription.status}</label>}
             {currentStage === 1 && 
                 <>
                     <Formik
@@ -566,7 +589,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         {(actions) => (
                         <Form>
                             <div className="row mt-5 justify-content-center">
-                                <div className="col-6">
+                                <div className="col-md-6">
                                     <div className="mb-3">
                                         <label htmlFor="name" className="form-label">Nome<span>*</span></label>
                                         <input 
@@ -580,7 +603,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="name" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-3">
+                                <div className="col-md-3">
                                     <div className="mb-3">
                                         <label htmlFor="birthdate" className="form-label">Data de Nascimento<span>*</span></label>                 
                                         <DatePicker 
@@ -597,7 +620,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="birthdate" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-3">
+                                <div className="col-md-3">
                                     <div className="mb-3">
                                         <label htmlFor="document" className="form-label">CPF<span>*</span></label>
                                         <Field 
@@ -620,7 +643,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="document" className="input-error" /></p>
                                     </div>                
                                 </div> 
-                                <div className="col-3">
+                                <div className="col-md-3">
                                     <div className="mb-3">
                                         <label htmlFor="identityDocument" className="form-label">Documento de Identidade<span>*</span></label>
                                         <input 
@@ -634,7 +657,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="identityDocument" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-2">
+                                <div className="col-md-2">
                                     <div className="mb-3">
                                         <label htmlFor="issuingAgency" className="form-label">Órgão Expedidor<span>*</span></label>
                                         <input 
@@ -648,7 +671,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="issuingAgency" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-3">
+                                <div className="col-md-3">
                                     <div className="mb-3">
                                         <label htmlFor="issuanceDate" className="form-label">Data de Expedição<span>*</span></label>                                                   
                                         <DatePicker 
@@ -665,7 +688,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="issuanceDate" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-4">
+                                <div className="col-md-4">
                                     <div className="mb-3">
                                         <label htmlFor="phoneNumber" className="form-label">Telefone<span>*</span></label>
                                         <Field 
@@ -687,7 +710,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="phoneNumber" className="input-error" /></p>
                                     </div>                
                                 </div>
-                                <div className="col-4">
+                                <div className="col-md-4">
                                     <div className="mb-3">
                                         <label htmlFor="alternativePhoneNumber" className="form-label">Telefone Alternativo</label>
                                         <Field 
@@ -709,7 +732,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="alternativePhoneNumber" className="input-error" /></p>
                                     </div>
                                 </div>        
-                                <div className="col-2">
+                                <div className="col-md-2">
                                     <div className="mb-3">
                                         <label htmlFor="postalCode" className="form-label">CEP<span>*</span></label>  
                                         <PostalCodeField 
@@ -723,7 +746,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="postalCode" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-4">
+                                <div className="col-md-4">
                                     <div className="mb-3">
                                         <label htmlFor="street" className="form-label">Endereço<span>*</span></label>
                                         <input 
@@ -737,7 +760,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="street" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-2">
+                                <div className="col-md-2">
                                     <div className="mb-3">
                                         <label htmlFor="houseNumber" className="form-label">Número<span>*</span></label>
                                         <input 
@@ -751,7 +774,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="houseNumber" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-4">
+                                <div className="col-md-4">
                                     <div className="mb-3">
                                         <label htmlFor="complement" className="form-label">Complemento</label>
                                         <input 
@@ -765,7 +788,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="complement" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-3">
+                                <div className="col-md-3">
                                     <div className="mb-3">
                                         <label htmlFor="district" className="form-label">Bairro<span>*</span></label>
                                         <input 
@@ -779,7 +802,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="district" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-3">
+                                <div className="col-md-3">
                                     <div className="mb-3">
                                         <label htmlFor="city" className="form-label">Cidade<span>*</span></label>
                                         <input 
@@ -793,7 +816,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         <p className="input-error"><ErrorMessage name="city" className="input-error" /></p>
                                     </div>
                                 </div>
-                                <div className="col-2">
+                                <div className="col-md-2">
                                     <div className="mb-3">
                                         <label htmlFor="state" className="form-label">Estado<span>*</span></label>
                                         <input 
@@ -838,7 +861,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
-                            <div className="col-5">
+                            <div className="col-md-5">
                                 <div className="mb-3">
                                     <label htmlFor="graduation" className="form-label">Graduação<span>*</span></label>
                                     <input 
@@ -852,7 +875,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="graduation" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-7">
+                            <div className="col-md-7">
                                 <div className="mb-3">
                                     <label htmlFor="graduationInstitution" className="form-label">Instituição de obtenção do título de Graduação<span>*</span></label>
                                     <input 
@@ -866,7 +889,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="graduationInstitution" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-5">
+                            <div className="col-md-5">
                                 <div className="mb-3">
                                     <label htmlFor="postgraduateLatoSensu" className="form-label">Pós-graduação Lato Sensu</label>
                                     <input 
@@ -880,7 +903,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="postgraduateLatoSensu" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-7">
+                            <div className="col-md-7">
                                 <div className="mb-3">
                                     <label htmlFor="postgraduateLatoSensuInstitution" className="form-label">Instituição de obtenção do título de Pós-graduação Lato Sensu</label>
                                     <input 
@@ -894,7 +917,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="postgraduateLatoSensuInstitution" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-5">
+                            <div className="col-md-5">
                                 <div className="mb-3">
                                     <label htmlFor="postgraduateStrictoSensu" className="form-label">Pós-graduação Stricto Sensu</label>
                                     <input 
@@ -908,7 +931,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="postgraduateStrictoSensu" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-7">
+                            <div className="col-md-7">
                                 <div className="mb-3">
                                     <label htmlFor="postgraduateStrictoSensuInstitution" className="form-label">Instituição de obtenção do título de Pós-graduação Stricto Sensu</label>
                                     <input 
@@ -954,7 +977,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
-                            <div className="col-6">
+                            <div className="col-md-6">
                                 <div className="mb-3">
                                     <label htmlFor="profession" className="form-label">Atividade Profissional</label>
                                     <input 
@@ -968,7 +991,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="profession" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-md-6">
                                 <div className="mb-3">
                                     <label htmlFor="company" className="form-label">Instituição ou Empresa de Atuação</label>
                                     <input 
@@ -984,7 +1007,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             </div>
                         </div>
                         <div className="row justify-content-center">
-                            <div className="col-2">
+                            <div className="col-md-2">
                                 <div className="mb-3">
                                     <label htmlFor="postalCode" className="form-label">CEP</label>  
                                     <PostalCodeField 
@@ -998,7 +1021,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="postalCode" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-3">
+                            <div className="col-md-3">
                                 <div className="mb-3">
                                     <label htmlFor="streetCompany" className="form-label">Endereço</label>
                                     <input 
@@ -1012,7 +1035,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="streetCompany" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-2">
+                            <div className="col-md-2">
                                 <div className="mb-3">
                                     <label htmlFor="houseNumberCompany" className="form-label">Número</label>
                                     <input 
@@ -1026,7 +1049,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="houseNumberCompany" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-5">
+                            <div className="col-md-5">
                                 <div className="mb-3">
                                     <label htmlFor="complementCompany" className="form-label">Complemento</label>
                                     <input 
@@ -1040,7 +1063,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="complementCompany" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-4">
+                            <div className="col-md-4">
                                 <div className="mb-3">
                                     <label htmlFor="districtCompany" className="form-label">Bairro</label>
                                     <input 
@@ -1054,7 +1077,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="districtCompany" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-4">
+                            <div className="col-md-4">
                                 <div className="mb-3">
                                     <label htmlFor="cityCompany" className="form-label">Cidade</label>
                                     <input 
@@ -1068,7 +1091,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="cityCompany" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-4">
+                            <div className="col-md-4">
                                 <div className="mb-3">
                                     <label htmlFor="stateCompany" className="form-label">Estado</label>
                                     <input 
@@ -1082,7 +1105,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="stateCompany" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-md-6">
                                 <div className="mb-3">
                                     <label htmlFor="workShift" className="form-label">Turno de Trabalho</label>
                                     <input 
@@ -1096,7 +1119,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="workShift" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-6">
+                            <div className="col-md-6">
                                 <div className="mb-3">
                                     <label htmlFor="workRegime" className="form-label">Carga Horária ou Regime de Trabalho</label>
                                     <input 
@@ -1139,7 +1162,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
-                            <div className="col-3">
+                            <div className="col-md-3">
                                 <label htmlFor="disability" className="form-label">Portador de Deficiência<span>*</span></label>
                                 <div role="group" aria-labelledby="my-radio-group"> 
                                     <div className={style.radioGroup}>
@@ -1157,7 +1180,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     <p className="input-error"><ErrorMessage name="disability" className="input-error" /></p>
                                 </div>
                             </div>
-                            <div className="col-5">
+                            <div className="col-md-5">
                                 {actions.values.disability === '1' && 
                                     <div className="mb-3">
                                         <label htmlFor="disabilityType" className="form-label">Tipo de Deficiência</label>
@@ -1173,7 +1196,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     </div>
                                 }
                             </div>
-                            <div className="col-4">
+                            <div className="col-md-4">
                                 {actions.values.disability === '1' && 
                                     <div className="mb-3">
                                         <label htmlFor="type" className="form-label">Tipos de Atendimento Especial</label>
@@ -1195,7 +1218,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     </div>
                                 }
                             </div>
-                            <div className="col-12">
+                            <div className="col-md-12">
                                 <label htmlFor="reservedPlace" className="form-label">Concorrência às vagas destinadas para:<span>*</span></label>
                                 <div role="group" aria-labelledby="my-radio-group"> 
                                     <div className={style.radioGroup}>
@@ -1235,19 +1258,20 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
+                            <p className={style.warningFile}>*Os arquivos devem ter no máximo 50MB</p>
                             <div className={style.boxFiles}>
                                 <label className={`mt-3 ${style.titleFileCategory}`}>Documentos Obrigatórios</label>
-                                <div className="col-12">
+                                <div className="col-md-12">
                                     <div className="mb-3">                                    
                                         <div className="row">
                                             <label className="form-label">Documento pessoal com foto<span>*</span></label>
                                         </div>
                                         
                                         <div className="row">
-                                            <label htmlFor="documentFile" className={`${style.fileButton} col-3`}>
+                                            <label htmlFor="documentFile" className={`${style.fileButton} col-md-3`}>
                                                 Escolher arquivo
                                             </label>
-                                            <div className={`${style.fileName} col-9`}>
+                                            <div className={`${style.fileName} col-md-9`}>
                                                 {documentFile ? documentFile[0]?.name : 'Nenhum arquivo selecionado'}
                                             </div>
                                             <input 
@@ -1257,7 +1281,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 name="documentFile"
                                                 onChange={(event) => {
                                                     actions.handleChange(event);
-                                                    const files = event.currentTarget.files;
+                                                    const files = event.currentTarget.files;                                                   
+                                                    if(!verifyFileLength(files)) {
+                                                        return;
+                                                    }
                                                     setCountFiles((prev) => !documentFile && files.length > 0 ? prev + 1 : (documentFile && files.length === 0 ? prev - 1 : prev));
                                                     setDocumentFile(files.length > 0 ? files : null);
                                                     setInvalidDocumentFile(files.length === 0);
@@ -1272,16 +1299,16 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         </div>                                    
                                     </div>
                                 </div>                                                   
-                                <div className="col-12">
+                                <div className="col-md-12">
                                     <div className="mb-3">
                                         <div className="row">
                                             <label className="form-label">Diploma da Graduação<span>*</span></label>
                                         </div>
                                         <div className="row">
-                                            <label htmlFor="graduationProofFile" className={`${style.fileButton} col-3`}>
+                                            <label htmlFor="graduationProofFile" className={`${style.fileButton} col-md-3`}>
                                                 Escolher arquivo
                                             </label>
-                                            <div className={`${style.fileName} col-9`}>
+                                            <div className={`${style.fileName} col-md-9`}>
                                                 {graduationProofFile ? graduationProofFile[0]?.name : 'Nenhum arquivo selecionado'}
                                             </div>
                                             <input 
@@ -1292,6 +1319,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 onChange={(event) => {
                                                     actions.handleChange(event);
                                                     const files = event.currentTarget.files;
+                                                    if(!verifyFileLength(files)) {
+                                                        return
+                                                    }
                                                     setCountFiles((prev) => !graduationProofFile && files.length > 0 ? prev + 1 : (graduationProofFile && files.length === 0 ? prev - 1 : prev));
                                                     setGraduationProofFile(files.length > 0 ? files : null);
                                                     setInvalidGraduationProofFile(files.length === 0);
@@ -1308,27 +1338,31 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 </div> 
                             </div>  
                             <div className={style.boxFiles}>
-                                <div className="col-12">   
+                                <div className="col-md-12">   
                                     <label className={`mt-2 ${style.titleFileCategory}`}>Arquivos do Barema</label>
                                     <br />
                                     {baremaCategories?.map((baremaCategory, index) => (
                                         <>
                                             <label htmlFor="files" className="mt-4 form-label text-bold-500" key={index}>
                                                 Categoria {index + 1}: {baremaCategory.name}
-                                            </label>                                            
+                                            </label>                       
+                                            <label className={style.badgeMaxPoint}>Pontuação máxima: {baremaCategory.maxPoints}</label>  
+                                            <br />                   
                                             {baremaCategory.subcategories.map((subcategory, idx) => (
                                                 <>
-                                                <label className="form-label row mt-2" key={idx}>{subcategory.name}</label>  
+                                                <label className="form-label mt-2" key={idx}>{subcategory.name}</label> 
+                                                <label className={style.badgePoint}>{subcategory.points} {subcategory.points > 1 ? 'pontos' : 'ponto'}</label>  
+                                                <br />
                                                 <FieldArray
                                                     name={subcategory.uuid}
                                                     render={arrayHelpers => (
                                                         <>
                                                             {actions.values[subcategory.uuid] && actions.values[subcategory.uuid].length > 0 && (actions.values[subcategory.uuid].map((item, _idx) => (    
                                                                 <div key={`${subcategory.uuid}.${_idx}`} className="row">  
-                                                                    <div className="col-11">
+                                                                    <div className="col-md-11">
                                                                         <div className="row">
-                                                                            <label htmlFor={`${subcategory.uuid}.${_idx}`} className={`${style.fileButton} col-3`}>Escolher arquivo</label>
-                                                                            <div className={`${style.fileName} col-9`}>{getFileName(subcategory.uuid, _idx)}</div>
+                                                                            <label htmlFor={`${subcategory.uuid}.${_idx}`} className={`${style.fileButton} col-md-3`}>Escolher arquivo</label>
+                                                                            <div className={`${style.fileName} col-md-9`}>{getFileName(subcategory.uuid, _idx)}</div>
                                                                             <input 
                                                                                 type="file"
                                                                                 className="form-control"
@@ -1336,7 +1370,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                                                 name={`${subcategory.uuid}.${_idx}`}
                                                                                 onChange={(event) => {
                                                                                     actions.handleChange(event);
-                                                                                    handleFile(subcategory.uuid, _idx, event.currentTarget.files);
+                                                                                    const files = event.currentTarget.files;
+                                                                                    if(!verifyFileLength(files)) {
+                                                                                        return;
+                                                                                    }
+                                                                                    handleFile(subcategory.uuid, _idx, files);
                                                                                 }}
                                                                                 value={undefined}
                                                                                 style={{display:'none'}}
@@ -1344,7 +1382,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                                         </div>
                                                                         <p className="input-error"><ErrorMessage name={`${subcategory.uuid}.${_idx}`} className="input-error" /></p>
                                                                     </div>
-                                                                    <div className="col-1">
+                                                                    <div className="col-md-1">
                                                                         {_idx !== 0 && 
                                                                             <button 
                                                                                 className="btn btn-secondary"
@@ -1384,10 +1422,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                     </a>
                                     </label> 
                                     <div className="row">
-                                        <label htmlFor={`form.${index}`} className={`${style.fileButton} col-3`}>
+                                        <label htmlFor={`form.${index}`} className={`${style.fileButton} col-md-3`}>
                                             Escolher arquivo
                                         </label>
-                                        <div className={`${style.fileName} col-9`}>
+                                        <div className={`${style.fileName} col-md-9`}>
                                             {getFileNameForm(form.name)}
                                         </div>
                                         <input 
@@ -1398,6 +1436,9 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             onChange={(event) => {
                                                 actions.handleChange(event);
                                                 const files = event.currentTarget.files;
+                                                if(!verifyFileLength(files)) {
+                                                    return;
+                                                }
                                                 handleFileForm(form.name, files);
                                             }}
                                             value={undefined}
@@ -1427,13 +1468,13 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                         <div className="row mt-5 justify-content-center">
                             <div className={style.boxFiles}>
                                 <label className={`mt-3 ${style.titleFileCategory}`}>Documentos Obrigatórios</label>
-                                <div className="col-12">
+                                <div className="col-md-12">
                                     <div className="mb-3">                                    
                                         <div className="row">
                                             <label className="form-label text-bold-500">Documento pessoal com foto</label>
                                         </div>                                    
                                         <div className="row">
-                                            <div className={`col-9`}>
+                                            <div className={`col-md-9`}>
                                                 <span>                                  
                                                     <a href={currentSubscription?.documentFile} className={style.titleFile} target="_blank">
                                                         <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
@@ -1443,13 +1484,13 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                         </div>                                    
                                     </div>
                                 </div>                                                   
-                                <div className="col-12">
+                                <div className="col-md-12">
                                     <div className="mb-3">
                                         <div className="row">
                                             <label className="form-label text-bold-500">Diploma da Graduação</label>
                                         </div>                                                                  
                                         <div className="row">
-                                            <div className={`col-9`}>                      
+                                            <div className={`col-md-9`}>                      
                                                 <a href={currentSubscription?.graduationProofFile} className={style.titleFile} target="_blank">
                                                     <FontAwesomeIcon icon={faFile} className={style.iconFile}/>Arquivo
                                                 </a>
@@ -1459,7 +1500,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 </div>  
                             </div>
                             <div className={style.boxFiles}>
-                                <div className="col-12">                                      
+                                <div className="col-md-12">                                      
                                     <label className={`mt-2 ${style.titleFileCategory}`}>Arquivos do Barema</label>
                                     <br />
                                     {currentSubscription && currentSubscription?.files && currentSubscription?.files.map((fileSubscription, index) => (
@@ -1483,7 +1524,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                 </div>    
                             </div>  
                             <div className={style.boxFiles}>                      
-                                <div className="col-12">   
+                                <div className="col-md-12">   
                                     <label htmlFor="processForms" className={`mt-2 mb-4 ${style.titleFileCategoryForm}`}>Formulários</label>
                                     {currentSubscription && currentSubscription?.processForms && currentSubscription?.processForms.map((formFile, index) => (  
                                         <div>    
@@ -1536,6 +1577,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     Data de Inscrição: {(new Date(currentSubscription.subscriptionDate)).toLocaleString()}
                 </div>
             }
+            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 50MB"} onClose={closeModal} />
         </StudentBase>
     )
 }
