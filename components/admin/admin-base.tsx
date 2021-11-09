@@ -1,18 +1,20 @@
 import Head from 'next/head';
 import { GetServerSidePropsContext, GetStaticProps } from 'next';
-import React from 'react';
+import React, { useContext } from 'react';
 import AdminSidebar from './admin-sidebar';
 import adminStyle from '../../styles/admin.module.css';
 import AdminContent from './admin-content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt, faUserAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faUserAlt, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer } from 'react-nextjs-toast';
 import { APIRoutes } from '../../utils/api.routes';
 import API from '../../lib/api.service';
 import Cookies from '../../lib/cookies.service';
 import { useRouter } from 'next/router';
+import UserContext from '../../context/user';
 
 export default function AdminBase(props: any) {
+  const { state } = useContext(UserContext);
   const router = useRouter();
   const api = API();
   const cookie = Cookies();
@@ -46,16 +48,24 @@ export default function AdminBase(props: any) {
             <AdminSidebar />
           </div>
           <div className="col-10 p-0">
-            <nav className="text-right p-3 text-primary bg-light">
-              <i className={adminStyle.icon}>
-                <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
-              </i>
-              <label className={adminStyle.sidebarLabel} onClick={() => profile()}>Perfil</label>
-              <i className={adminStyle.icon}>
-                <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
-              </i>
-              <label className={adminStyle.sidebarLabel} onClick={() => logout()}>Sair</label>
-            </nav>
+            <nav className="p-3 text-primary row">
+                  <div className="col-md-6">
+                    <i className={adminStyle.icon}>
+                      <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
+                    </i>
+                    <label className={adminStyle.currentUser}>Oi, {state.name}!</label>
+                  </div>
+                  <div className="text-right col-md-6">
+                    <i className={adminStyle.icon}>
+                      <FontAwesomeIcon icon={faUserCircle} className="sm-icon" />
+                    </i>
+                    <label className={adminStyle.sidebarLabel} onClick={() => profile()}>Perfil</label>
+                    <i className={adminStyle.icon}>
+                      <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
+                    </i>
+                    <label className={adminStyle.sidebarLabel} onClick={() => logout()}>Sair</label>
+                  </div>
+                </nav>
             <div className="ms-sm-auto px-md-4 my-4 mx-1">
               <AdminContent>
                 {props.children}

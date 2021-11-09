@@ -65,27 +65,34 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
         </div>
         <div>
           <fieldset>
-          <legend>Etapas do Processo Seletivo</legend>
-          <table id="selective-process">
-            <thead>
-              <tr>
-                <td>Etapa</td>
-                <td>Data de Início</td>
-                <td>Data de Finalização</td>
-              </tr>
-            </thead>
-            <tbody>
-              {selectiveProcess.steps.map((step,key)=>(
-                <tr key={key} className={selectiveProcess.currentStep === key?"current-sel-proc":""} 
-                title={selectiveProcess.currentStep === key?"Etapa atual":""}>
-                  <td>{step.type}</td>
-                  <td>{new Date(step.startDate).toLocaleDateString()}</td>
-                  <td>{new Date(step.finishDate).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          
+            <legend>Etapas do Processo Seletivo</legend>
+            <div className="table-responsive col-12">
+              <table id="selective-process">
+                <thead>
+                  <tr>
+                    <td>Etapa</td>
+                    <td>Data de Início</td>
+                    <td>Data de Finalização</td>
+                    <td>Resultado</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {selectiveProcess.steps.map((step,key)=>(
+                    <tr key={key} className={selectiveProcess.currentStep === key?"current-sel-proc":""} 
+                    title={selectiveProcess.currentStep === key?"Etapa atual":""}>
+                      <td>{step.type}</td>
+                      <td>{new Date(step.startDate).toLocaleDateString()}</td>
+                      <td>{new Date(step.finishDate).toLocaleDateString()}</td>
+                      <td>
+                          {step.resultURL ? <a href={step.resultURL} className={style.titleFileForm} target="_blank">
+                            <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>Download
+                          </a> : '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>          
           </fieldset>
         </div>
       </div>

@@ -1,11 +1,11 @@
 import Head from 'next/head';
 import { GetServerSidePropsContext, GetStaticProps } from 'next';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import StudentSidebar from './student-sidebar';
 import adminStyle from '../../styles/admin.module.css';
 import AdminContent from './student-content';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt, faUserAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt, faUserAlt, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { ToastContainer } from 'react-nextjs-toast';
 import { APIRoutes } from '../../utils/api.routes';
 import API from '../../lib/api.service';
@@ -13,8 +13,11 @@ import Cookies from '../../lib/cookies.service';
 import { useRouter } from 'next/router';
 import { ClipLoader } from 'react-spinners';
 import { css } from "@emotion/core";
+import UserContext from '../../context/user';
 
 export default function StudentBase(props: any) {
+  const { state } = useContext(UserContext);
+  console.log(state);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const api = API();
@@ -58,27 +61,37 @@ export default function StudentBase(props: any) {
         </div>
       }
       <div className={`${loading ? 'hide' : 'show'}`}>
-        <main className={`${adminStyle.main}`}>
-          <div className="container-fluid">
+        <main className={`${adminStyle.main} container-fluid`}>
             <div className='row'>
-              <StudentSidebar toogleLoading={toogleLoading} />
-              <div className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-                <div className="text-right p-3 text-primary">
-                  <i className={adminStyle.icon}>
-                    <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
-                  </i>
-                  <label className={adminStyle.sidebarLabel} onClick={() => profile()}>Perfil</label>
-                  <i className={adminStyle.icon}>
-                    <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
-                  </i>
-                  <label className={adminStyle.sidebarLabel} onClick={() => logout()}>Sair</label>
+              <div className="col-2  p-0">
+                <StudentSidebar toogleLoading={toogleLoading} />
+              </div>
+              <div className="col-10 p-0">
+                <div className="p-3 text-primary row">
+                  <div className="col-md-6">
+                    <i className={adminStyle.icon}>
+                      <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
+                    </i>
+                    <label className={adminStyle.currentUser}>Oi, {state.name}!</label>
+                  </div>
+                  <div className="text-right col-md-6">
+                    <i className={adminStyle.icon}>
+                      <FontAwesomeIcon icon={faUserCircle} className="sm-icon" />
+                    </i>
+                    <label className={adminStyle.sidebarLabel} onClick={() => profile()}>Perfil</label>
+                    <i className={adminStyle.icon}>
+                      <FontAwesomeIcon icon={faSignOutAlt} className="sm-icon" />
+                    </i>
+                    <label className={adminStyle.sidebarLabel} onClick={() => logout()}>Sair</label>
+                  </div>
                 </div>
-                <AdminContent>
-                  {props.children}
-                </AdminContent>
+                <div className="ms-sm-auto px-md-4 my-4 mx-1">
+                  <AdminContent>
+                    {props.children}
+                  </AdminContent>
+                </div>
               </div>
             </div>
-          </div>
         </main>
       </div>
       <ToastContainer align={"right"} position={"bottom"} />
