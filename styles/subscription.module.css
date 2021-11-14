@@ -172,3 +172,25 @@
   color:#34A853;
 }
 
+.badgeMaxPoint{
+  margin-left: 0.5em;
+  background-color: #6a6a6a;
+  padding: 0.1em 0.3em 0.1em 0.3em;
+  border-radius: 0.5em;
+  color: white;
+  font-size: 0.8em;
+}
+
+.badgePoint{
+  margin-left: 0.5em;
+  background-color: #2a7a40;
+  padding: 0.1em 0.3em 0.1em 0.3em;
+  border-radius: 0.5em;
+  color: white;
+  font-size: 0.8em;
+}
+
+.warningFile{
+  font-size: 0.9em;
+}
+

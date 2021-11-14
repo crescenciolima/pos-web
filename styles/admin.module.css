@@ -41,3 +41,7 @@
 .inputCol{
     min-width: 200px;
 }
+
+.currentUser{
+    font-weight: 500;
+}

@@ -148,6 +148,6 @@ export default function ProfileLayout() {
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
     const permission = Permission();
-    return await permission.checkPermission(ctx, [UserType.MASTER]);
+    return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
 };
 

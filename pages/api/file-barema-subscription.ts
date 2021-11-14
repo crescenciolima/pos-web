@@ -41,9 +41,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
           if(!await authService.checkAuthentication(req)){
             return res.status(401).send(await treatError.general('Usuário não autorizado.'))
-          }
-
-          console.log('ARQUIVOS',req.files);    
+          }  
 
           if(!req.files?.length){                
             return res.status(400).json(await treatError.general("Arquivo não encontrado."));
@@ -59,11 +57,8 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
             const url = await uploadService.upload(path, blob, uuidv4());
             urls.push({uuid: uuidv4(), url: url, status: SubscriptionStatus.AGUARDANDO_ANALISE, observation: ''});
           }
-
-          console.log(urls);
           
           let subscription = await subscriptionService.getById(subscriptionID);
-          console.log(subscription);
 
           let subscriptionFiles = [];
           if(subscription.files && subscription.files.length){
@@ -88,8 +83,6 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
             ...subscription,     
             files: subscriptionFiles        
           };
-
-          console.log(subscription);
 
           await subscriptionService.update(subscription);
     

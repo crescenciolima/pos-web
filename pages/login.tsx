@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { GetServerSidePropsContext, GetStaticProps, InferGetServerSidePropsType } from 'next';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ErrorMessage, Formik } from 'formik';
 import * as Yup from 'yup';
 import { ToastContainer } from 'react-nextjs-toast';
@@ -15,9 +15,11 @@ import Cookies from '../lib/cookies.service';
 import Permission from '../lib/permission.service';
 import { User } from '../models/user';
 import { APIRoutes } from '../utils/api.routes';
+import UserContext from '../context/user';
 
 
 export default function Login(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const { setState } = useContext(UserContext);
     const [pageName, setPageName] = useState('Login');
     const [pageType, setPageType] = useState('login');
     const router = useRouter();
@@ -52,8 +54,9 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
         setPageType(page);
     };
 
-    const redirectAfterLogin = (type: string) => {
-        if (type === UserType.STUDENT) {
+    const redirectAfterLogin = (user: User) => {
+        setState({ name: user.name,  type: user.type });
+        if (user.type === UserType.STUDENT) {
             router.push("/student");
         } else {
             router.push("/admin");
@@ -65,7 +68,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
         if (response) {
             const user: User = response.result;
             await cookie.setToken(user.token);
-            redirectAfterLogin(user.type);
+            redirectAfterLogin(user);
             return;
         }
     }

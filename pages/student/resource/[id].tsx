@@ -197,10 +197,10 @@ export default function SaveResourceLayout() {
                                             <>
                                                 {values.files && values.files.length > 0 && (values.files.map((item, index) => (    
                                                     <div key={index} className="row">  
-                                                        <div className="col-11">
+                                                        <div className="col-md-11">
                                                             <div className="row">
-                                                                <label htmlFor={`files.${index}`} className={`${style.fileButton} col-3`}>Escolher arquivo</label>
-                                                                <div className={`${style.fileName} col-9`}>{getFileName(index)}</div>
+                                                                <label htmlFor={`files.${index}`} className={`${style.fileButton} col-md-3`}>Escolher arquivo</label>
+                                                                <div className={`${style.fileName} col-md-9`}>{getFileName(index)}</div>
                                                                 <input 
                                                                     type="file"
                                                                     className="form-control"
@@ -216,7 +216,7 @@ export default function SaveResourceLayout() {
                                                             </div>
                                                             <p className="input-error"><ErrorMessage name={`files.${index}`} className="input-error" /></p>
                                                         </div>
-                                                        <div className="col-1">
+                                                        <div className="col-md-1">
                                                             {index !== 0 && 
                                                                 <button 
                                                                     className="btn btn-secondary"

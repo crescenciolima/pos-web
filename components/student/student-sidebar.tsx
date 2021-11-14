@@ -12,6 +12,7 @@ import API from '../../lib/api.service';
 import { ClipLoader } from 'react-spinners';
 import ResourceUtil from '../../lib/resource.util';
 import SelectiveProcessUtil from '../../lib/selectiveprocess.util';
+import Link from 'next/link'
 
 export default function StudentSidebar({toogleLoading}) {
   const api = API();
@@ -47,39 +48,44 @@ export default function StudentSidebar({toogleLoading}) {
     `;
 
     return (
-        <nav className="col-md-3 col-lg-2 d-md-block sidebar">
-            <div className="d-flex flex-column p-3 text-primary">
-                <a className="navbar-brand text-center" href="/">
-                    <Image src="/images/ifbavca.png" className="d-inline-block align-text-top" alt="Logo" width={140} height={40} priority={true} />
+        <nav className="d-md-block sidebar">
+            <div className="d-flex flex-column p-1 p-md-3 text-primary">
+            <a className="navbar-brand text-center d-none d-md-inline-block" href="/">
+                    <Image src="/images/ifbavca.png" className=" align-text-top" alt="Logo" width={140} height={40} priority={true} />
                 </a>
+                <a className="navbar-brand text-center mx-0 d-inline-block d-md-none" href="/">
+                    <Image src="/images/logo-mobile.png" className=" align-text-top" alt="Logo" width={50} height={55} priority={true} />
+                </a>                
                 {loading && 
                     <div>
                         <ClipLoader color="#34A853" loading={loading} size={50} css={override}/>
                     </div>
                 }
-                {!loading && <ul className="nav nav-pills flex-column mb-auto text-primary mt-5">
+                {!loading && <ul className="nav nav-pills flex-column mb-auto text-primary mt-2 mt-md-5 ">
                     <li key={1}>
-                        <a href="/student" className="nav-link text-primary sidebar-item">
-                            <i className={adminStyle.icon}>
-                                <FontAwesomeIcon icon={faHome} className="sm-icon" />
-                            </i>
-                            <label className={adminStyle.sidebarLabel}>Início</label>
-                        </a>
+                        <Link href="/student">
+                            <a className={adminStyle.navLink + " nav-link text-primary sidebar-item"}>
+                                <i className={adminStyle.icon}>
+                                    <FontAwesomeIcon icon={faHome} className="sm-icon" />
+                                </i>
+                                <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Início</label>
+                            </a>
+                        </Link>
                     </li>
                     {selectiveProcess && <li key={2}>
-                        <a href="/student/subscription" className="nav-link text-primary">
+                        <a href="/student/subscription" className={adminStyle.navLink + " nav-link text-primary"}>
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faBookReader} className="sm-icon" />
                             </i>
-                            <label className={adminStyle.sidebarLabel}>Inscrição</label>
+                            <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Inscrição</label>
                         </a>
                     </li>}
                     {currentSubscription && allowResource && <li key={3}>
-                        <a href="/student/resource" className="nav-link text-primary">
+                        <a href="/student/resource" className={adminStyle.navLink + " nav-link text-primary"}>
                             <i className={adminStyle.icon}>
                                 <FontAwesomeIcon icon={faQuestionCircle} className="sm-icon" />
                             </i>
-                            <label className={adminStyle.sidebarLabel}>Recurso</label>
+                            <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Recurso</label>
                         </a>
                     </li>}
                 </ul>}
