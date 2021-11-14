@@ -201,10 +201,6 @@ export default function ProcessSubscriprionLayout() {
                                             <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>Documento com Foto
                                         </a>
                                     </div>
-                                    <div className="col-12 mb-3">
-                                        <label className="form-label">Infomações Adicionais</label>
-                                        <textarea className="form-control" id="obs" rows={3} readOnly value={subscription.observation}></textarea>
-                                    </div>
 
                                     <div className="col-12">
                                         <hr />

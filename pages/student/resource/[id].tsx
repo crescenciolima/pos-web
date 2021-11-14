@@ -49,7 +49,6 @@ export default function SaveResourceLayout() {
 
             if(step){
                 let resourceFound: SubscriptionResource = subscription.resources.find((resource) => decodeStep === resource.step);
-                console.log(resourceFound);
                 setResource(resourceFound);
             } else {
                 const resultSelectiveProcess: APIResponse = await api.get(APIRoutes.SELECTIVE_PROCESS, { 'id': subscription.selectiveProcessID });
@@ -128,7 +127,6 @@ export default function SaveResourceLayout() {
         });
 
         setFiles(newFiles)
-        console.log(newFiles)
     }
 
     if(isLoading){
@@ -210,7 +208,6 @@ export default function SaveResourceLayout() {
                                                                     name={`files.${index}`}
                                                                     onChange={(event) => {
                                                                         handleChange(event);
-                                                                        console.log(event.currentTarget.files);
                                                                         handleFile(index, event.currentTarget.files);
                                                                     }}
                                                                     value={undefined}

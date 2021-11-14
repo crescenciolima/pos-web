@@ -54,7 +54,6 @@ export default function SaveWorksLayout() {
     };
 
     const onSubmit = async (values, actions) => {
-        console.log(values)
         try {
             actions.setSubmitting(true);
             await saveWorks(values);

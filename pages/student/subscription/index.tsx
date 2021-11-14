@@ -526,6 +526,15 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             }
             {currentStage === 1 && 
                 <>
+                {currentSubscription!==null &&
+                    <> 
+                    <div className="row">
+                        <div>
+                            <p>Status de sua inscrição: {currentSubscription.status}</p>
+                        </div>
+                    </div>
+                    </>
+                }
                     <Formik
                         enableReinitialize
                         initialValues={
