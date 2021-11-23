@@ -105,7 +105,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         res.status(200).json(response);
       }catch(e){
         console.log(e);
-        return res.json({error: "error"});
+        return res.status(400).json(await treatError.general("Erro ao salvar recurso."));
       }
 
       break;

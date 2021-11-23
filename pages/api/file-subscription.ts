@@ -43,8 +43,6 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
             return res.status(401).send(await treatError.general('Usuário não autorizado.'))
           }
 
-          console.log('ARQUIVOS',req.files);    
-
           if(!req.files?.length){                
             return res.status(400).json(await treatError.general("Arquivo não encontrado."));
           }
@@ -56,19 +54,13 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           const path = `${StoragePaths.SUBSCRIPTION}/${subscriptionID}/${type}/`;
           const url = await uploadService.upload(path, blob, uuidv4());
 
-          console.log(url);
-          
           let subscription = await subscriptionService.getById(subscriptionID);
-
-          console.log('before',subscription);
 
           if(type === SubscriptionTypeFile.GRADUATION){
             subscription = {...subscription, graduationProofFile: url};
           } else if(type === SubscriptionTypeFile.DOCUMENT){
             subscription = {...subscription, documentFile: url};
           }
-
-          console.log('after',subscription);
 
           await subscriptionService.update(subscription);
     
@@ -80,7 +72,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           res.status(200).json(response);
         }catch(e){
           console.log(e);
-          return res.status(400).json(treatError.general("Erro ao salvar arquivo"));
+          return res.status(400).json(await treatError.general("Erro ao salvar arquivo"));
         }
         break;
     default:

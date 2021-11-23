@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { GetServerSidePropsContext, GetStaticProps, InferGetServerSidePropsType } from 'next';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ErrorMessage, Formik } from 'formik';
 import * as Yup from 'yup';
 import { ToastContainer } from 'react-nextjs-toast';
@@ -15,9 +15,11 @@ import Cookies from '../lib/cookies.service';
 import Permission from '../lib/permission.service';
 import { User } from '../models/user';
 import { APIRoutes } from '../utils/api.routes';
+import UserContext from '../context/user';
 
 
 export default function Login(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const { setState } = useContext(UserContext);
     const [pageName, setPageName] = useState('Login');
     const [pageType, setPageType] = useState('login');
     const router = useRouter();
@@ -52,8 +54,9 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
         setPageType(page);
     };
 
-    const redirectAfterLogin = (type: string) => {
-        if (type === UserType.STUDENT) {
+    const redirectAfterLogin = (user: User) => {
+        setState({ name: user.name,  type: user.type });
+        if (user.type === UserType.STUDENT) {
             router.push("/student");
         } else {
             router.push("/admin");
@@ -65,7 +68,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
         if (response) {
             const user: User = response.result;
             await cookie.setToken(user.token);
-            redirectAfterLogin(user.type);
+            redirectAfterLogin(user);
             return;
         }
     }
@@ -74,7 +77,6 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
         values.type = UserType.STUDENT;
         const result = await api.post(APIRoutes.SIGNUP, values);
         if (result) {
-            console.log("rsult ok: "+result)
             setPageName(buildPage()[PAGES.LOGIN]);
             setPageType(PAGES.LOGIN);
         }
@@ -115,8 +117,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
             <main className={style.main}>
                 <div className={style.formSignin}>
                 <Image src="/images/ifba-logo-footer.png" className=" text-center mx-auto" alt="logo"width="120" height="120" />
-
-                    <h1 className="h3 mb-5 fw-normal text-center">{pageName}</h1>
+                    <h1 className="h3 mb-4 fw-normal text-center">{pageName}</h1>
                     <Formik
                         enableReinitialize
                         initialValues={{ name: '', email: '', password: '' }}

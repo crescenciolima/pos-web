@@ -13,7 +13,6 @@ export default function API(setLoading?: Function) {
             if (setLoading) setLoading(true);
 
             let data = new FormData();
-            console.log(file)
             if (file) {
                 if (file.length) {
                     for (let i = 0; i < file.length; i++) {
@@ -26,7 +25,16 @@ export default function API(setLoading?: Function) {
 
 
             for (let key in body) {
-                data.append(key, body[key]);
+                const content = body[key]
+                let keyName = key
+                if(Array.isArray(content)){
+                    keyName = `${key}[]`
+                    for (let _key in content) {
+                        data.append(keyName, content[_key]);
+                    }
+                }else{
+                    data.append(keyName,content);
+                }
             }
 
             const res = await fetch(url, {
@@ -34,6 +42,8 @@ export default function API(setLoading?: Function) {
                 body: data,
                 headers: await buildHeadersFormData(),
             });
+
+            await treatResponse(res);
 
             const result: APIResponse = await res.json();
             console.error(result);
@@ -62,6 +72,8 @@ export default function API(setLoading?: Function) {
                 headers: await buildHeaders(),
                 method: 'POST',
             });
+
+            await treatResponse(res);
 
             const result: APIResponse = await res.json();
             
@@ -102,11 +114,11 @@ export default function API(setLoading?: Function) {
                 headers: await buildHeaders(),
             });
 
-            console.log(res);
-            const result: APIResponse = await res.json();
-            console.log(result);
+            await treatResponse(res);
 
+            const result: APIResponse = await res.json();
             if (result.error) {
+                showNotify(result.msg, "error", "Erro");
                 if (setLoading) setLoading(false);
                 return null;
             }
@@ -146,8 +158,9 @@ export default function API(setLoading?: Function) {
             const result: APIResponse = await res.json();
 
             if (result.error) {
+                showNotify(result.msg, "error", "Erro");
                 if (setLoading) setLoading(false);
-                return false;
+                return;
             }
 
             if (setLoading) setLoading(false);
@@ -180,6 +193,8 @@ export default function API(setLoading?: Function) {
             const res = await fetch(url, {
                 method: 'DELETE',
             });
+
+            await treatResponse(res);
 
             const result: APIResponse = await res.json();
 
@@ -217,16 +232,12 @@ export default function API(setLoading?: Function) {
                 }
             }
 
-            // if (params) {
-            //     let urlBuilder = new URL(url);
-            //     urlBuilder.search = new URLSearchParams(params).toString();
-            //     url = urlBuilder.toString();
-            // }
-
             const res = await fetch(url, {
                 method: 'DELETE',
                 body: data
             });
+
+            await treatResponse(res);
 
             const result: APIResponse = await res.json();
 
@@ -279,6 +290,13 @@ export default function API(setLoading?: Function) {
             'Content-Type': 'application/json',
             'Authorization': token,
         };
+    }
+
+    async function treatResponse(response: Response) {
+        if(response.status === 401) {
+            await cookies.removeToken()
+            window.location.href = '/login'
+        }
     }
 
     async function getViaCep(postalCode) {

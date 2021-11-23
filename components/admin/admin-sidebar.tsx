@@ -1,14 +1,16 @@
 import Image from 'next/image'
 import adminStyle from '../../styles/admin.module.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faDotCircle, faChalkboardTeacher, faGraduationCap,  faChartBar,  faUser, faSchool, faNewspaper } from '@fortawesome/free-solid-svg-icons'
+import { faDotCircle, faChalkboardTeacher, faGraduationCap,  faChartBar,  faUser, faSchool, faNewspaper, faFileAlt } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
 import Permission from '../../lib/permission.service'
 import { UserType } from '../../enum/type-user.enum'
+import { useContext } from 'react'
+import UserContext from '../../context/user'
 
 export default function AdminSidebar() {
-    //const { userType } = props; 
+    const { state } = useContext(UserContext);
     return (
         <nav className="d-md-block sidebar">
             <div className="d-flex flex-column p-1 p-md-3 text-primary">
@@ -61,9 +63,17 @@ export default function AdminSidebar() {
                                 <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Posts</label>
                             </a>
                         </Link>
+                    </li>                    
+                    <li>
+                        <Link href="/admin/works">
+                            <a className={adminStyle.navLink + " nav-link text-primary"}>
+                                <i className={adminStyle.icon}>
+                                    <FontAwesomeIcon icon={faFileAlt} className="sm-icon" />
+                                </i>
+                                <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Trabalhos</label>
+                            </a>
+                        </Link>
                     </li>
-
-
                     <li>
                         <Link href="/admin/selectiveprocess">
                             <a className={adminStyle.navLink + " nav-link text-primary"}>
@@ -73,7 +83,6 @@ export default function AdminSidebar() {
                                 <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Processo Seletivo</label>
                             </a>
                         </Link>
-
                     </li>
                     <li>
                         <Link href="/admin/results">
@@ -86,7 +95,7 @@ export default function AdminSidebar() {
                         </Link>
 
                     </li>
-                    <li>
+                    {state.type === UserType.MASTER && <li>
                         <Link href="/admin/user">
                             <a  className={adminStyle.navLink + " nav-link text-primary"}>
                                 <i className={adminStyle.icon}>
@@ -95,8 +104,7 @@ export default function AdminSidebar() {
                                 <label className={adminStyle.sidebarLabel + " d-none d-md-inline-block"}>Usuários</label>
                             </a>
                         </Link>
-
-                    </li>
+                    </li>}
                 </ul>
             </div>
         </nav>

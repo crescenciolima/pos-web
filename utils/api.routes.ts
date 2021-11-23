@@ -26,6 +26,8 @@ export class APIRoutes {
 
     static NEWS:string = APIRoutes.API_URL + "/api/news"
 
+    static WORKS:string = APIRoutes.API_URL + "/api/works"
+
     static SUBSCRIPTION:string = APIRoutes.API_URL + "/api/subscription"
     
     static FILE_BAREMA_SUBSCRIPTION:string = APIRoutes.API_URL + "/api/file-barema-subscription"

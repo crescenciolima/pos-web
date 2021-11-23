@@ -59,7 +59,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   
         res.status(200).json(response);
       }catch(e){
-        return res.status(400).json(treatError.general("Erro ao salvar usuário"));
+        return res.status(400).json(await treatError.general("Erro ao salvar usuário"));
       }
 
       break;

@@ -1,0 +1,26 @@
+.iconFile {
+    color:#34A853;
+    margin-bottom: 8px;
+    width: 1em;
+    margin-right: .5em;
+}
+  
+.titleFile{
+    margin-right: .5em;
+}
+
+.rowAuthor{    
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.inputAuthor{    
+    width: 95%;
+    margin-right: 10px;
+}
+
+.buttonAuthor{    
+    width: 5%;
+    max-height: 2.5em;
+}
+
