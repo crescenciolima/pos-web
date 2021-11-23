@@ -64,7 +64,7 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
               </div>
               <div className="col-11 col-md-10 col-xxl-6 mt-5">
                 <div className="card  btn-round bg-color border-0">
-                <div className="card-body d-flex flex-column flex-md-row">
+                  <div className="card-body d-flex flex-column flex-md-row">
                     <img src="/images/home/unavailable.svg" alt="Nenhum processo seletivo" className={homeStyle.cardImg} width={180} height={180} ></img>
                     <div className="d-flex ms-3 flex-column mt-3 my-md-auto">
                       <h5 className="card-title text-primary-dark">Olá,</h5>
@@ -100,7 +100,7 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
                             <Link href="/login">
                               <button type="button" className="btn btn-primary btn-round px-5 py-2 my-auto">Inscreva-se</button>
                             </Link>
-                            
+
                           </div>
                         </div>
                       </>
@@ -139,7 +139,7 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
 
 export const getStaticProps: GetStaticProps = async () => {
 
-  //News Info
+  //Recuperando as ultimas notícias
   const newsService = NewsService();
   const newsList = await newsService.getFirstResults();
   for (let news of newsList) {
@@ -150,10 +150,8 @@ export const getStaticProps: GetStaticProps = async () => {
     }
   }
 
-
-  //Course Infor
+  //Recuperando dados do curso
   const courseService = CourseService();
-
   let courseData = await courseService.getFirstCourse();
   let course: Course = {
     name: '<Nome do Curso>',
@@ -162,22 +160,15 @@ export const getStaticProps: GetStaticProps = async () => {
     coordMail: '<E-mail da Coordenação>',
     coordPhone: '<Telefone da Coordenação>'
   }
-
   if (courseData) {
     course = courseData
   }
 
-  //Process Info
-
+  //Recuperando dados do processo seletivo
   const processService = SelectiveProcessService();
-
   const process = await processService.getOpen();
-  let hasOpenProcess = false;
-  let title = "";
-  let acceptingSubscription = false;
-  let subscriptionDate = "";
-  let editalURL = "";
-
+  let title = "", subscriptionDate = "", editalURL = "";
+  let hasOpenProcess = false, acceptingSubscription = false;
   if (process) {
     if (process.state == ProcessStepsState.OPEN) {
       hasOpenProcess = true;
@@ -190,7 +181,7 @@ export const getStaticProps: GetStaticProps = async () => {
       }
 
       //Edital
-      editalURL = process.processNotices[process.processNotices.length -1].url;
+      editalURL = process.processNotices[process.processNotices.length - 1].url;
     }
   }
 
@@ -205,7 +196,6 @@ export const getStaticProps: GetStaticProps = async () => {
       subscriptionDate,
       editalURL
     },
-    revalidate: 1800
-
+    revalidate: 600
   }
 }

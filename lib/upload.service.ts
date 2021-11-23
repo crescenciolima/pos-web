@@ -9,16 +9,18 @@ export default function FileUploadService() {
 
     async function upload(folder: StoragePaths, blob: BlobCorrected, fileName: string): Promise<string> {
 
-        //Removing spaces from the file name
+        //Removendo espaços em branco do nome
         fileName= fileName.trim().replace(" ","");
         while(fileName.includes(" ")){
             fileName= fileName.replace(" ","");
         }
 
         try {
+            //Envia e aguarda a referência do arquivo enviado
             let uploadRef = await storage.ref().child(`${folder}${fileName}`).put(blob.buffer, {contentType: blob['mimetype']});
+            //Recupera e devolve a URL de acesso
             const downloadURL = await uploadRef.ref.getDownloadURL();
-            return downloadURL
+            return downloadURL;
         } catch (err) {
             console.log(err)
             return "";

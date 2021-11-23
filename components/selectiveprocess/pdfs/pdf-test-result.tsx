@@ -65,7 +65,7 @@ export default function PDFTestResult(props: Props) {
     let subInfo: PDFTableInfo[] = [
       { value: sub.name, width: "30%", textAlign: "left" },
       { value: (isTest ? sub.testGrade || '-' : sub.interviewGrade || '-').toString() || "-", width: "20%", textAlign: "center" },
-      { value: ((isTest && processUtil.hasPassedTest(sub, currentStep)) || (!isTest && !processUtil.hasPassedInterview(sub, currentStep))) ? "Desclassificado" : "Classificado", width: "20%", textAlign: "center" },
+      { value: ((isTest && processUtil.hasPassedTest(sub, currentStep)) || (!isTest && processUtil.hasPassedInterview(sub, currentStep))) ? "Classificado" : "Desclassificado", width: "20%", textAlign: "center" },
       { value: observation, width: "30%", textAlign: "left" },
     ];
     lines.push(subInfo);
