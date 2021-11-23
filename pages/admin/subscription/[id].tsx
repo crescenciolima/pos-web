@@ -421,7 +421,7 @@ export default function ProcessSubscriprionLayout() {
             {
                 menuSelection == 'recursos'
                 && <>
-                    {/* <SelectiveResourcesAnalysis subscription={subscription} process={selectiveProcess} stepType={stepType}></SelectiveResourcesAnalysis> */}
+                    <SelectiveResourcesAnalysis subscription={subscription} process={selectiveProcess} stepType={stepType}></SelectiveResourcesAnalysis>
                 </>
             }
 
