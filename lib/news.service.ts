@@ -4,14 +4,32 @@ import firestore from "../utils/firestore-util";
 
 export default function NewsService() {
 
+    //Referência a coleção de notícias do banco de dados no FireStore
     const newsRef = firestore.collection("news");
-    const resultsPPage = 10;
 
+    //Salva uma nova notícia
+    async function save(news: News) {
+        newsRef.add(news);
+    }
+
+    //Atualiza uma notícia existente utilizando o ID
+    async function update(news: News) {
+        newsRef.doc(news.id).set(news);
+    }
+
+    //Remove uma notícia existente utilizando o ID
+    async function remove(id: string) {
+        await newsRef.doc(id).delete();
+    }
+
+    //Consulta todas as notícias
     async function getAll() {
         let newsList = [];
 
+        //Ordena de forma decrescente pela data da notícia
         await newsRef.orderBy('date', 'desc').get().then(
             (snapshot) => {
+                //Varrendo os resultados devolvidos
                 snapshot.forEach(
                     (result) => {
                         const id = result.id;
@@ -30,9 +48,8 @@ export default function NewsService() {
             }
         ).catch(
         );
-
+        
         return newsList;
-
     }
 
     async function getFirstResults() {
@@ -63,17 +80,6 @@ export default function NewsService() {
 
     }
 
-    async function save(news: News) {
-        newsRef.add(news);
-    }
-
-    async function update(news: News) {
-        newsRef.doc(news.id).set(news);
-    }
-
-    async function remove(teacherID: string) {
-        await newsRef.doc(teacherID).delete();
-    }
 
     async function getById(id) {
         let snapshot = await newsRef.doc(id).get();

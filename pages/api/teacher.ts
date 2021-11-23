@@ -36,9 +36,11 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       try{
         await multerAny(req, res);
 
+        //Extraindo os dados da requisição
         const blob: BlobCorrected = req.files?.length ? req.files[0] : null;
         const { id, name, about, email, phone, photo }: Teacher = req.body;
   
+        //Povoando um objeto do tipo Docente com os dados
         const teacher: Teacher = {
           name: name,
           about: about,
@@ -46,24 +48,27 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           phone: phone,
           photo: blob ? "" : photo
         }
-  
+        
+        //Verificando se um arquivo foi enviado e se deve sobrescreve-lo
         if(blob){
           const uploadService = FileUploadService();
           if(id){
             await uploadService.remove(photo);
           }
+          //Envia o arquivo usando o serviço de upload
           let url = await uploadService.upload(StoragePaths.TEACHERS, blob, teacher.name);
-    
           teacher.photo = url;
         }
-  
+        
+        //Verifica se os dados enviados possuiam um ID, se sim, é uma atualização, se não um cadastro
         if(id){
           teacher.id = id;
           await teacherService.update(teacher);
         }else{
           await teacherService.save(teacher);
         }
-  
+        
+        //Cria e devolve a resposta ao cliente
         let response: APIResponse = {
           msg: "Docente salvo com sucesso!",
           result: teacher
