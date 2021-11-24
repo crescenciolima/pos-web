@@ -95,12 +95,13 @@ export default function SelectiveResourcesAnalysis(props: Props) {
                                 <div className="mb-3">
                                     <label className="form-label">Anexos do Recurso:</label>
                                     <div>
-                                        {subscription.currentResource.files?.map((file) => (
+                                        {subscription.currentResource.files?.map((file, i) => (
                                             <a href={file} className={style.titleFileForm} target="_blank">
-                                                <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/>{file}
+                                                <FontAwesomeIcon icon={faFile} className={style.iconFileForm}/> Arquivo {i+1} 
+                                                <br />
                                             </a>
+                                            
                                         ))}
-
                                     </div>
                                 </div>
                             </div>
