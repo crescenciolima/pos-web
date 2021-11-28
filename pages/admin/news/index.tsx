@@ -12,6 +12,9 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { News } from '../../../models/news';
 import fire from '../../../utils/firebase-util';
 import { format } from 'date-fns';
+import { GetServerSidePropsContext } from 'next';
+import { UserType } from '../../../enum/type-user.enum';
+import Permission from '../../../lib/permission.service';
 
 
 export default function NewsLayout() {
@@ -113,4 +116,9 @@ export default function NewsLayout() {
     </AdminBase>
   )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const permission = Permission();
+  return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
+};
 

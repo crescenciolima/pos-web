@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { GetServerSidePropsContext, GetStaticProps } from 'next';
-import React, { useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import AdminSidebar from './admin-sidebar';
 import adminStyle from '../../styles/admin.module.css';
 import AdminContent from './admin-content';
@@ -11,23 +11,30 @@ import { APIRoutes } from '../../utils/api.routes';
 import API from '../../lib/api.service';
 import Cookies from '../../lib/cookies.service';
 import { useRouter } from 'next/router';
-import UserContext from '../../context/user';
 
 export default function AdminBase(props: any) {
-  const { state } = useContext(UserContext);
+  const [ userName, setUserName ] = useState('');
   const router = useRouter();
   const api = API();
   const cookie = Cookies();
 
   const logout = async () => {
     await api.get(APIRoutes.SIGNOUT);
-    await cookie.removeToken();
+    await cookie.removeAll();
     router.push("/login");
   }
 
   const profile = async () => {
     router.push("/admin/profile");
   }
+
+  useEffect(() => {   
+    const loadData = async () => {
+      const name = await cookie.getUserNameClient();
+      setUserName(name);
+    };      
+    loadData();
+  }, []);
 
   return (
     <>
@@ -53,7 +60,7 @@ export default function AdminBase(props: any) {
                     <i className={adminStyle.icon}>
                       <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
                     </i>
-                    <label className={adminStyle.currentUser}>Oi, {state.name}!</label>
+                    <label className={adminStyle.currentUser}>Oi, {userName}!</label>
                   </div>
                   <div className="text-right col-md-6">
                     <i className={adminStyle.icon}>

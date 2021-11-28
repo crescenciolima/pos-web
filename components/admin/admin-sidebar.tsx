@@ -3,14 +3,22 @@ import adminStyle from '../../styles/admin.module.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faDotCircle, faChalkboardTeacher, faGraduationCap,  faChartBar,  faUser, faSchool, faNewspaper, faFileAlt } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
-import Permission from '../../lib/permission.service'
 import { UserType } from '../../enum/type-user.enum'
-import { useContext } from 'react'
-import UserContext from '../../context/user'
+import { useEffect, useState } from 'react'
+import Cookies from '../../lib/cookies.service'
 
 export default function AdminSidebar() {
-    const { state } = useContext(UserContext);
+    const [ userType, setUserType ] = useState('');
+    const cookie = Cookies();
+
+    useEffect(() => {   
+        const loadData = async () => {
+          const type = await cookie.getUserTypeClient();
+          setUserType(type);
+        };      
+        loadData();
+      }, []);
+
     return (
         <nav className="d-md-block sidebar">
             <div className="d-flex flex-column p-1 p-md-3 text-primary">
@@ -95,7 +103,7 @@ export default function AdminSidebar() {
                         </Link>
 
                     </li>
-                    {state.type === UserType.MASTER && <li>
+                    {userType === UserType.MASTER && <li>
                         <Link href="/admin/user">
                             <a  className={adminStyle.navLink + " nav-link text-primary"}>
                                 <i className={adminStyle.icon}>

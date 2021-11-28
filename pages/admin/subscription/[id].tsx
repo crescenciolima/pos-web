@@ -20,6 +20,9 @@ import { ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../..
 import { format } from 'date-fns';
 import SelectiveBaremaAnalysis from '../../../components/selectiveprocess/subscription/subscription-barema-analysis';
 import SelectiveResourcesAnalysis from '../../../components/selectiveprocess/subscription/subscription-resources';
+import { GetServerSidePropsContext } from 'next';
+import { UserType } from '../../../enum/type-user.enum';
+import Permission from '../../../lib/permission.service';
 
 export default function ProcessSubscriprionLayout() {
 
@@ -434,4 +437,9 @@ export default function ProcessSubscriprionLayout() {
         </AdminBase >
     )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+    const permission = Permission();
+    return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
+  };
 

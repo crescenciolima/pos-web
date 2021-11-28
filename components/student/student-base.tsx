@@ -1,6 +1,5 @@
 import Head from 'next/head';
-import { GetServerSidePropsContext, GetStaticProps } from 'next';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import StudentSidebar from './student-sidebar';
 import adminStyle from '../../styles/admin.module.css';
 import AdminContent from './student-content';
@@ -13,11 +12,9 @@ import Cookies from '../../lib/cookies.service';
 import { useRouter } from 'next/router';
 import { ClipLoader } from 'react-spinners';
 import { css } from "@emotion/core";
-import UserContext from '../../context/user';
 
 export default function StudentBase(props: any) {
-  const { state } = useContext(UserContext);
-  console.log(state);
+  const [ userName, setUserName ] = useState('');
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const api = API();
@@ -29,13 +26,21 @@ export default function StudentBase(props: any) {
 
   const logout = async () => {
     await api.get(APIRoutes.SIGNOUT);
-    await cookie.removeToken();
+    await cookie.removeAll();
     router.push("/login");
   }
 
   const profile = async () => {
     router.push("/student/profile");
   }
+
+  useEffect(() => {   
+    const loadData = async () => {
+      const name = await cookie.getUserNameClient();
+      setUserName(name);
+    };      
+    loadData();
+  }, []);
 
   const override = css`  
     display: block;
@@ -72,7 +77,7 @@ export default function StudentBase(props: any) {
                     <i className={adminStyle.icon}>
                       <FontAwesomeIcon icon={faUserAlt} className="sm-icon" />
                     </i>
-                    <label className={adminStyle.currentUser}>Oi, {state.name}!</label>
+                    <label className={adminStyle.currentUser}>Oi, {userName}!</label>
                   </div>
                   <div className="text-right col-md-6">
                     <i className={adminStyle.icon}>
