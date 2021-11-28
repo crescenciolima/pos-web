@@ -17,6 +17,9 @@ import SelectiveProcessPlaces from '../../../components/selectiveprocess/places'
 import SelectiveProcessBarema from '../../../components/selectiveprocess/barema';
 import SelectiveProcessDocuments from '../../../components/selectiveprocess/documents';
 import SelectiveProcessSteps from '../../../components/selectiveprocess/steps';
+import { GetServerSidePropsContext } from 'next';
+import { UserType } from '../../../enum/type-user.enum';
+import Permission from '../../../lib/permission.service';
 
 
 
@@ -211,3 +214,7 @@ export default function SelectiveProcessLayout() {
   )
 }
 
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+  const permission = Permission();
+  return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
+};

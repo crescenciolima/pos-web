@@ -14,6 +14,9 @@ import 'suneditor/dist/css/suneditor.min.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import style from '../../../styles/works.module.css';
+import { GetServerSidePropsContext } from 'next';
+import { UserType } from '../../../enum/type-user.enum';
+import Permission from '../../../lib/permission.service';
 
 export default function SaveWorksLayout() {
 
@@ -196,4 +199,9 @@ export default function SaveWorksLayout() {
         </AdminBase>
     )
 }
+
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+    const permission = Permission();
+    return await permission.checkPermission(ctx, [UserType.MASTER, UserType.ADMIN]);
+  };
 

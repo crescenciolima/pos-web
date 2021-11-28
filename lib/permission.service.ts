@@ -67,15 +67,13 @@ export default function Permission() {
     async function checkPermission(ctx: GetServerSidePropsContext, typesAllowed: String[]) {
         try {
             await checkToken(ctx);
-
             const user: User =  await getCurrentUser(ctx);   
 
             if(typesAllowed.includes(user.type as UserType)){
                 return await buildReturnMessage(Message.AUTHORIZED);
             }
         
-            return redirectTo("/error/not-authorized");
-        
+            return redirectTo("/error/not-authorized");        
         } catch (err) {
             return redirectTo("/login");
         }

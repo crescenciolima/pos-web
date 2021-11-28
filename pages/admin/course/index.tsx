@@ -107,7 +107,7 @@ export default function CourseLayout({ course }: CourseProps, props: InferGetSer
               ></textarea>
               <ErrorMessage name="description" className="input-error" />
             </div>
-            <div>
+            <div className="mb-3">
               <label htmlFor="coordName" className="form-label">Nome do coordenador</label>
               <input
                 type="text"
@@ -119,7 +119,7 @@ export default function CourseLayout({ course }: CourseProps, props: InferGetSer
                 onChange={handleChange} />
               <ErrorMessage name="coordName" className="input-error" />
             </div>
-            <div>
+            <div className="mb-3">
               <label htmlFor="coordName" className="form-label">E-mail</label>
               <input
                 type="email"
@@ -131,7 +131,7 @@ export default function CourseLayout({ course }: CourseProps, props: InferGetSer
                 onChange={handleChange} />
               <ErrorMessage name="coordMail" className="input-error" />
             </div>
-            <div>
+            <div className="mb-3">
               <label htmlFor="coordName" className="form-label">Telefone</label>
               <input
                 type="tel"

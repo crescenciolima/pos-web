@@ -5,6 +5,14 @@ import { parseCookies, setCookie, destroyCookie } from "nookies";
 
 export default function Cookies() {
 
+    async function setUserName(userName: string) {
+        set(process.env.NEXT_PUBLIC_USER_NAME, userName);
+    }
+
+    async function setUserType(type: string) {
+        set(process.env.NEXT_PUBLIC_USER_TYPE, type);
+    }
+
     async function setToken(token: string) {
         set(process.env.NEXT_PUBLIC_TOKEN, token);
     }
@@ -17,6 +25,16 @@ export default function Cookies() {
     async function getTokenClient() {
         const cookies = await getClient();
         return cookies[process.env.NEXT_PUBLIC_TOKEN];
+    }
+
+    async function getUserNameClient() {
+        const cookies = await getClient();
+        return cookies[process.env.NEXT_PUBLIC_USER_NAME];
+    }
+
+    async function getUserTypeClient() {
+        const cookies = await getClient();
+        return cookies[process.env.NEXT_PUBLIC_USER_TYPE];
     }
 
     async function getClient() {  
@@ -36,10 +54,21 @@ export default function Cookies() {
         destroyCookie(null, process.env.NEXT_PUBLIC_TOKEN);
     }
 
+    async function removeAll() {  
+        destroyCookie(null, process.env.NEXT_PUBLIC_TOKEN);
+        destroyCookie(null, process.env.NEXT_PUBLIC_USER_NAME);
+        destroyCookie(null, process.env.NEXT_PUBLIC_USER_TYPE);
+    }
+
     return {
         setToken,
+        setUserName,
+        setUserType,
         getTokenClient,
         getTokenServer,
+        getUserNameClient,
+        getUserTypeClient,
         removeToken,
+        removeAll,
     }
 }
