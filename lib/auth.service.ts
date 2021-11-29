@@ -15,6 +15,7 @@ export default function AuthService() {
                 return await formatUser(response.user);
             })
             .catch(async (err) => {
+                console.error('Error on signUp', err);
                 return {
                     error: true,
                     message: err.code
@@ -27,7 +28,7 @@ export default function AuthService() {
             return await formatUser(userCredential.user);
         })
         .catch(async (err) => {
-            console.log(err)
+            console.error('Error on signIn', err);
             return {
                 error: true,
                 message: err.code
@@ -41,6 +42,7 @@ export default function AuthService() {
             return true;
         })
         .catch(async (err) => {
+            console.error('Error on signOut', err);
             return {
                 error: true,
                 message: err.code
@@ -53,6 +55,7 @@ export default function AuthService() {
             return true;
         })
         .catch(async (err) => {
+            console.error('Error on removeUser', err);
             return {
                 error: true,
                 message: err.code
@@ -65,6 +68,7 @@ export default function AuthService() {
             return true;
         })
         .catch(async (err) => {
+            console.error('Error on forgotPassword', err);
             return {
                 error: true,
                 message: err.code
@@ -77,6 +81,7 @@ export default function AuthService() {
             return email;
         })
         .catch(async (err) => {
+            console.error('Error on verifyPasswordResetCode', err);
             return {
                 error: true,
                 message: err.code
@@ -89,6 +94,7 @@ export default function AuthService() {
             return true;
         })
         .catch(async (err) => {
+            console.error('Error on confirmPasswordReset', err);
             return {
                 error: true,
                 message: err.code
@@ -101,7 +107,7 @@ export default function AuthService() {
             return true;
         })
         .catch(async (err) => {
-            console.log(err);
+            console.error('Error on updateUser', err);
             return {
                 error: true,
                 message: err.code
@@ -118,7 +124,7 @@ export default function AuthService() {
             const result = await authAdmin.verifyIdToken(authorization);
             return result.uid;
         } catch (err) {
-            console.log(err);
+            console.error('Error on currentUser', err);
             return false;
         }
     }
