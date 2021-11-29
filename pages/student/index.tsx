@@ -42,7 +42,7 @@ export default function Admin(props: InferGetServerSidePropsType<typeof getServe
 
             <p className="mt-4">Etapa atual: <b>{selectiveProcess.steps[selectiveProcess.currentStep].type}</b></p>
 
-            <p>Estado do processo seletivo: {selectiveProcess.state=="open"? "Aberto" : "Fechado"}</p>
+            <p>Status do processo seletivo: {selectiveProcess.state === "open" ? "Aberto" : "Fechado"}</p>
 
           </div>
         </fieldset>
