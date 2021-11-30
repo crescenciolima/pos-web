@@ -64,7 +64,7 @@ export default function AuthService() {
     }
 
     async function forgotPassword(user: User) {
-        return fire.auth().sendPasswordResetEmail(user.email, {url: `${process.env.NEXT_PUBLIC_VERCEL_URL}/reset-password`}).then(async (userCredential) => {
+        return fire.auth().sendPasswordResetEmail(user.email, {url: `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/reset-password`}).then(async (userCredential) => {
             return true;
         })
         .catch(async (err) => {
