@@ -168,7 +168,7 @@ export default function SaveNewsLayout() {
                     </form>
                 )}
             </Formik>
-            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
+            <WarningDialog open={openModal} actionButtonText="OK" title="Aviso" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
         </AdminBase>
     )
 }
