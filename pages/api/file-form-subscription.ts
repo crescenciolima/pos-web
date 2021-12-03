@@ -11,9 +11,10 @@ import { BlobCorrected, NextApiRequestWithFormData } from '../../utils/types-uti
 import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../utils/storage-path';
 import { v4 as uuidv4 } from 'uuid';
+import { Constants } from '../../utils/constants';
 
 global.XMLHttpRequest = require('xhr2');
-const upload = multer();
+const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
 
 const multerAny = initMiddleware(
   upload.any()

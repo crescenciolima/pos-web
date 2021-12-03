@@ -46,18 +46,23 @@ export default function API(setLoading?: Function) {
             await treatResponse(res);
 
             const result: APIResponse = await res.json();
-            console.error(result);
 
-            toast.notify(result.msg, {
-                duration: 3,
-                type: "success",
-                title: "Notificação"
-            });
+            if (result.error) {
+                showNotify(result.msg, "error", "Erro");
+                if (setLoading) setLoading(false);
+                return;
+            }
+
             if (setLoading) setLoading(false);
-            return result;
 
+            showNotify(result.msg, "success", "Notificação");
+
+            return result;
         } catch (error) {
-            console.log(error);
+            console.error(error);
+            showNotify(error.msg, "error", "Erro");
+            if (setLoading) setLoading(false);
+            return;
         }
 
     }
@@ -89,11 +94,9 @@ export default function API(setLoading?: Function) {
 
             return result;
         } catch (error) {
-            (error)
+            console.error(error);
             showNotify(error.msg, "error", "Erro");
-
             if (setLoading) setLoading(false);
-
             return;
         }
 
@@ -128,14 +131,9 @@ export default function API(setLoading?: Function) {
 
         } catch (error) {
             console.error(error);
-            console.log(error);
-            toast.notify("Ocorreu um erro ao buscar os dados", {
-                duration: 3,
-                type: "error",
-                title: "Erro"
-            });
+            showNotify(error.msg, "error", "Erro");
             if (setLoading) setLoading(false);
-
+            return;
         }
 
     }
@@ -168,13 +166,9 @@ export default function API(setLoading?: Function) {
 
         } catch (error) {
             console.error(error);
-            toast.notify("Ocorreu um erro ao buscar os dados", {
-                duration: 3,
-                type: "error",
-                title: "Erro"
-            });
+            showNotify(error.msg, "error", "Erro");
             if (setLoading) setLoading(false);
-
+            return;
         }
 
     }

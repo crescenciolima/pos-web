@@ -17,6 +17,8 @@ import style from '../../../styles/works.module.css';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
+import { FileHelper } from '../../../helpers/file-helper';
+import WarningDialog from '../../../components/warning-dialog';
 
 export default function SaveWorksLayout() {
 
@@ -26,6 +28,17 @@ export default function SaveWorksLayout() {
     const [works, setWorks] = useState<Works>();
     const [file, setFile] = useState<FileList>();
     const [worksContent, setWorksContent] = useState('');
+    const [openModal, setOpenModal] = useState<boolean>(false);
+
+    function closeModal() {
+        setOpenModal(false);
+    }
+
+    const verifyFileSize = (file)  => {
+        const check = FileHelper.checkFileSize(file);
+        setOpenModal(!check)
+        return check
+    }
 
     useEffect(() => {
         const { id } = router.query;
@@ -45,21 +58,25 @@ export default function SaveWorksLayout() {
     }
 
     const saveWorks = async (values: Works) => {
-        if(works?.id){
-            values.id = works.id
+        try {
+            if(works?.id){
+                values.id = works.id
+            }
+            if(works?.url){
+                values.url = works.url
+            }
+            values.text = worksContent;
+            await api.postFile(APIRoutes.WORKS, values, file && file.length > 0 ? file[0] : null);    
+        } catch (e) {
+            console.error(e);
         }
-        if(works?.url){
-            values.url = works.url
-        }
-        values.text = worksContent;
-        await api.postFile(APIRoutes.WORKS, values, file && file.length > 0 ? file[0] : null);     
-        router.push("/admin/works");
     };
 
     const onSubmit = async (values, actions) => {
         try {
             actions.setSubmitting(true);
-            await saveWorks(values);
+            await saveWorks(values); 
+            router.push("/admin/works");
         } catch (error) {
             console.error(error);
             actions.setSubmitting(false);
@@ -115,7 +132,7 @@ export default function SaveWorksLayout() {
                                 placeholder="Título do trabalho"
                                 value={values.title}
                                 onChange={handleChange} />
-                            <p className="input-error"><ErrorMessage name="title" className="input-error" /></p>
+                            <p className="input-error"><ErrorMessage name="title"/></p>
                         </div>
                         <div className="mb-3">
                             <label className="form-label">Autores<span>*</span></label>  
@@ -162,12 +179,17 @@ export default function SaveWorksLayout() {
                                 name="file"
                                 id="file"
                                 value={values.file}
-                                onChange={(event) => {
+                                onChange={(event) => {                                
+                                    const files = event.currentTarget.files;                                                   
+                                    if(!verifyFileSize(files)) {
+                                        setFieldValue('file', '');
+                                        return;
+                                    }
                                     handleChange(event);
-                                    setFile(event.currentTarget.files);
+                                    setFile(files);
                                 }} />
-
-                            <p className="input-error"><ErrorMessage name="file" className="input-error" /></p>
+                            <p className="input-info">*Os arquivos devem ter no máximo 5MB</p>
+                            <p className="input-error"><ErrorMessage name="file" /></p>
                         </div>
                         {works?.url &&
                             <a href={works.url} className={style.titleFile} target="_blank">
@@ -195,7 +217,8 @@ export default function SaveWorksLayout() {
                         </div>
                     </form>
                 )}
-            </Formik>
+            </Formik>            
+            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
         </AdminBase>
     )
 }

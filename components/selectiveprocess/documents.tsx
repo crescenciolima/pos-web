@@ -10,6 +10,8 @@ import { APIResponse } from '../../models/api-response';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import style from '../../styles/selectiveprocess.module.css'
+import { FileHelper } from '../../helpers/file-helper';
+import WarningDialog from '../warning-dialog';
 // import { toast } from 'react-nextjs-toast'
 
 interface Props {
@@ -26,8 +28,17 @@ export default function SelectiveProcessDocuments(props: Props) {
     const [document, setDocument] = useState<ProcessDocument>({ name: "", url: "" });
     const [type, setType] = useState<String>("Edital");
     const [file, setFile] = useState<FileList>();
+    const [openModal, setOpenModal] = useState<boolean>(false);
 
+    function closeModal() {
+        setOpenModal(false);
+    }
 
+    const verifyFileSize = (file)  => {
+        const check = FileHelper.checkFileSize(file);
+        setOpenModal(!check)
+        return check
+    }
 
     useEffect(() => {
         setProcessForms(props.process.processForms ? props.process.processForms : []);
@@ -132,7 +143,7 @@ export default function SelectiveProcessDocuments(props: Props) {
                                 placeholder=""
                                 value={values.name}
                                 onChange={handleChange} />
-                            <ErrorMessage name="name" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="name" /></p>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="title" className="form-label">Tipo</label>
@@ -145,7 +156,7 @@ export default function SelectiveProcessDocuments(props: Props) {
                                 <option>Edital</option>
                                 <option>Formulário</option>
                             </select>
-                            <ErrorMessage name="type" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="type" /></p>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="photo" className="form-label">Arquivo</label>
@@ -156,10 +167,16 @@ export default function SelectiveProcessDocuments(props: Props) {
                                 id="url"
                                 value={values.url}
                                 onChange={(event) => {
+                                    const files = event.currentTarget.files;                                                   
+                                    if(!verifyFileSize(files)) {
+                                        setFieldValue('url', '');
+                                        return;
+                                    }
                                     handleChange(event);
-                                    setFile(event.currentTarget.files);
+                                    setFile(files);
                                 }} />
-                            <ErrorMessage name="url" className="input-error" />
+                            <p className="input-info">*Os arquivos devem ter no máximo 5MB</p>
+                            <p className="input-error"><ErrorMessage name="url" /></p>
                         </div>
 
                         <div className="text-right">
@@ -234,6 +251,7 @@ export default function SelectiveProcessDocuments(props: Props) {
 
                 </div>
             </div>
+            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
         </>
     );
 

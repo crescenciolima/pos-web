@@ -10,9 +10,10 @@ import WorksService from '../../lib/works.service';
 import { Works } from '../../models/works';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
+import { Constants } from '../../utils/constants';
 
 global.XMLHttpRequest = require('xhr2');
-const upload = multer();
+const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
 
 const multerAny = initMiddleware(
   upload.any()
@@ -32,20 +33,22 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   await cors(req, res);
 
-  if(await authService.checkAuthentication(req)){
-    return res.status(401).send(await treatError.general('Usuário não autorizado.'))
-  }
-
   switch (req.method) {
 
     case "POST":
       try{
         await multerAny(req, res);
+        
+        if(!await authService.checkAuthentication(req)){
+          return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+        }
+        console.log(req.files);
         const blob: BlobCorrected = req.files?.length ? req.files[0] : null;
         const { id, title, text, url, authors }: Works = req.body;
         const work: Works = { title, text, url, authors, date: (new Date()).toISOString() }
   
         if(!id){
+          delete work.url;
           const newWork = await worksService.save(work);
           work.id = newWork.id;
         } else {          
@@ -91,7 +94,11 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       res.status(200).json(getResponse);
       break
 
-    case "DELETE":
+    case "DELETE":      
+      if(!await authService.checkAuthentication(req)){
+        return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+      }
+
       let worksID = req.query.id.toString();
       const deletedWorks = await worksService.getById(worksID);
       let uploadService = FileUploadService();

@@ -12,6 +12,8 @@ import { APIResponse } from '../../../models/api-response';
 import fire from '../../../utils/firebase-util';
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
+import { FileHelper } from '../../../helpers/file-helper';
+import WarningDialog from '../../../components/warning-dialog';
 
 export default function SaveNewsLayout() {
 
@@ -23,6 +25,17 @@ export default function SaveNewsLayout() {
     });
     const [file, setFile] = useState<FileList>();
     const [newsContent, setNewsContent] = useState('');
+    const [openModal, setOpenModal] = useState<boolean>(false);
+
+    function closeModal() {
+        setOpenModal(false);
+    }
+
+    const verifyFileSize = (file)  => {
+        const check = FileHelper.checkFileSize(file);
+        setOpenModal(!check)
+        return check
+    }
 
     useEffect(() => {
 
@@ -55,7 +68,8 @@ export default function SaveNewsLayout() {
     const onSubmit = async (values, actions) => {
         try {
             actions.setSubmitting(true);
-            await saveNews(values);
+            await saveNews(values); 
+            router.push("/admin/news");
         } catch (error) {
             console.error(error);
             actions.setSubmitting(false);
@@ -104,22 +118,27 @@ export default function SaveNewsLayout() {
                                 placeholder="Título da notícia"
                                 value={values.title}
                                 onChange={handleChange} />
-                            <ErrorMessage name="title" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="title" /></p>
                         </div>
                         <div className="mb-3">
-                            <label htmlFor="photo" className="form-label">Capa</label>
+                            <label htmlFor="coverURL" className="form-label">Capa</label>
                             <input
                                 type="file"
                                 className="form-control"
                                 name="coverURL"
                                 id="coverURL"
                                 value={values.coverURL}
-                                onChange={(event) => {
+                                onChange={(event) => {                                    
+                                    const files = event.currentTarget.files;                                                   
+                                    if(!verifyFileSize(files)) {
+                                        setFieldValue('coverURL', '');
+                                        return;
+                                    }
                                     handleChange(event);
-                                    setFile(event.currentTarget.files);
+                                    setFile(files);
                                 }} />
-
-                            <ErrorMessage name="coverURL" className="input-error" />
+                            <p className="input-info">*Os arquivos devem ter no máximo 5MB</p>
+                            <p className="input-error"><ErrorMessage name="coverURL" /></p>
                         </div>
                         {news.coverURL &&
                             <div className="mb-3 text-center">
@@ -149,6 +168,7 @@ export default function SaveNewsLayout() {
                     </form>
                 )}
             </Formik>
+            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
         </AdminBase>
     )
 }

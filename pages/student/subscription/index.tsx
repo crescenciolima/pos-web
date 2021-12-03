@@ -26,6 +26,8 @@ import { DocumentValidateHelper } from '../../../helpers/document-validate-helpe
 import { MathHelper } from '../../../helpers/math-helper';
 import { PostalCodeField } from '../../../components/postal-code-field';
 import WarningDialog from '../../../components/warning-dialog';
+import { FileHelper } from '../../../helpers/file-helper';
+import ConfirmDialog from '../../../components/confirm-dialog';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -42,7 +44,6 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [stageTwoValues, setStageTwoValues] = useState(null);
     const [stageThreeValues, setStageThreeValues] = useState(null);
     const [stageFourValues, setStageFourValues] = useState(null);
-    const [stageFiveValues, setStageFiveValues] = useState(null);
     const [subCategoriesFiles, setSubCategoriesFiles] = useState<any>([]);
     const [formFiles, setFormFiles] = useState<any>([]);
     const [baremaCategories, setBaremaCategories] = useState<any>(null);
@@ -51,9 +52,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     const [invalidDocumentFile, setInvalidDocumentFile] = useState<any>(false);
     const [invalidGraduationProofFile, setInvalidGraduationProofFile] = useState<any>(false);
     const [countFiles, setCountFiles] = useState<number>(0);
-    const [weightFile, setWeightFile] = useState<number>(0);
     const [percentage, setPercentage] = useState<number>(0);
-    const [openModal, setOpenModal] = useState<boolean>(false);
+    const [openFileModal, setOpenFileModal] = useState<boolean>(false);
+    const [openConfirmationModal, setOpenConfirmationModal] = useState<boolean>(false);
+    const [isConfirmed, setIsConfirmed] = useState<boolean>(false);
     const specialTreatmentTypes = [
         { name: "Prova em Braille", value: 'prova_braille' },
         { name: "Auxílio de Leitor/Ledor", value: 'auxilio_leitor' },
@@ -62,18 +64,22 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         { name: "Auxílio para Transcrição", value: 'auxilio_transcricao' },
         { name: "Mesa e Cadeiras sem Braço", value : 'mesa_sem_braco' },
     ];
-    const maxLengthFile = 52428800;
 
-    function closeModal() {
-        setOpenModal(false);
+    function closeModal(type) {
+        switch (type) {
+            case "file":
+                setOpenFileModal(false);
+                break;
+            case "confirmation":
+                setOpenConfirmationModal(false);
+                break;
+        }
     }
 
-    const verifyFileLength = (file)  =>{
-        if(file && file[0].size > maxLengthFile) {
-            setOpenModal(true)
-            return false
-        }
-        return true
+    const verifyFileSize = (file)  => {
+        const check = FileHelper.checkFileSize(file);
+        setOpenFileModal(!check)
+        return check
     }
 
     const getRouteFile = (type) => {
@@ -117,7 +123,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     };
 
     const handleFile = async (subcategoryUuid, position, file) => {
-        if(!verifyFileLength(file)) {
+        if(!verifyFileSize(file)) {
             return;
         }
 
@@ -154,7 +160,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
     }
 
     const handleFileForm = async (name, file) => {
-        if(!verifyFileLength(file)) {
+        if(!verifyFileSize(file)) {
             return;
         }
 
@@ -215,7 +221,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         setSubCategoriesFiles(subCategoriesFilesUpdated)
     }
     
-    const buildForm = async (_stageFiveValues) => {   
+    const buildForm = async () => {   
         const subscription: Subscription = {    
             name: stageOneValues.name,
             document: stageOneValues.document,
@@ -316,13 +322,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }
     }
 
-    const processSubscription = async (values) => {
+    const processSubscription = async () => {
         try {
-            setCurrentStage(currentStage + 1);    
-            setStageFiveValues(values);
+            setCurrentStage(currentStage + 1);   
             const weight = 90 / countFiles;
             const roundWeight = MathHelper.roundNumber(weight, 2);
-            const subscription: Subscription = await buildForm(values);
+            const subscription: Subscription = await buildForm();
             const result = await saveSubscription(subscription);
             setPercentage(10);
             await processFiles(result.id, roundWeight);
@@ -354,7 +359,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             if(!documentFile || !graduationProofFile) {
                 return;
             }
-            await processSubscription(values);
+            setOpenConfirmationModal(true);
         }
     }
 
@@ -372,6 +377,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
             setCurrentStage(currentStage - 1);
         }
         window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    const confirmSubscription = async () => {
+        closeModal('confirmation'); 
+        await processSubscription();
     }
 
     const generateForm = () => {
@@ -1259,7 +1269,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
-                            <p className={style.warningFile}>*Os arquivos devem ter no máximo 50MB</p>
+                            <p className={style.warningFile}>*Os arquivos devem ter no máximo 5MB</p>
                             <div className={style.boxFiles}>
                                 <label className={`mt-3 ${style.titleFileCategory}`}>Documentos Obrigatórios</label>
                                 <div className="col-md-12">
@@ -1283,7 +1293,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 onChange={(event) => {
                                                     actions.handleChange(event);
                                                     const files = event.currentTarget.files;                                                   
-                                                    if(!verifyFileLength(files)) {
+                                                    if(!verifyFileSize(files)) {
                                                         return;
                                                     }
                                                     setCountFiles((prev) => !documentFile && files.length > 0 ? prev + 1 : (documentFile && files.length === 0 ? prev - 1 : prev));
@@ -1320,7 +1330,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                 onChange={(event) => {
                                                     actions.handleChange(event);
                                                     const files = event.currentTarget.files;
-                                                    if(!verifyFileLength(files)) {
+                                                    if(!verifyFileSize(files)) {
                                                         return
                                                     }
                                                     setCountFiles((prev) => !graduationProofFile && files.length > 0 ? prev + 1 : (graduationProofFile && files.length === 0 ? prev - 1 : prev));
@@ -1372,7 +1382,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                                                                 onChange={(event) => {
                                                                                     actions.handleChange(event);
                                                                                     const files = event.currentTarget.files;
-                                                                                    if(!verifyFileLength(files)) {
+                                                                                    if(!verifyFileSize(files)) {
                                                                                         return;
                                                                                     }
                                                                                     handleFile(subcategory.uuid, _idx, files);
@@ -1437,7 +1447,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                                             onChange={(event) => {
                                                 actions.handleChange(event);
                                                 const files = event.currentTarget.files;
-                                                if(!verifyFileLength(files)) {
+                                                if(!verifyFileSize(files)) {
                                                     return;
                                                 }
                                                 handleFileForm(form.name, files);
@@ -1578,7 +1588,8 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     Data de Inscrição: {(new Date(currentSubscription.subscriptionDate)).toLocaleString()}
                 </div>
             }
-            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 50MB"} onClose={closeModal} />
+            <WarningDialog open={openFileModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={() => closeModal('file')} />
+            <ConfirmDialog open={openConfirmationModal} actionButtonText="SIM" title="Concluir Inscrição" text="Ao concluir a inscrição os dados informados não poderão ser alterados. Tem certeza que deseja prosseguir?" onClose={() => closeModal('confirmation')} onConfirm={confirmSubscription} />
         </StudentBase>
     )
 }

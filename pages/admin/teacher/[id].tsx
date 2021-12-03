@@ -13,6 +13,8 @@ import { APIResponse } from '../../../models/api-response';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
+import { FileHelper } from '../../../helpers/file-helper';
+import WarningDialog from '../../../components/warning-dialog';
 
 export default function SaveTeacherLayout() {
 
@@ -27,6 +29,17 @@ export default function SaveTeacherLayout() {
         photo: "",
     });
     const [file, setFile] = useState<FileList>();
+    const [openModal, setOpenModal] = useState<boolean>(false);
+
+    function closeModal() {
+        setOpenModal(false);
+    }
+
+    const verifyFileSize = (file)  => {
+        const check = FileHelper.checkFileSize(file);
+        setOpenModal(!check)
+        return check
+    }
 
     useEffect(() => {
 
@@ -59,7 +72,8 @@ export default function SaveTeacherLayout() {
     const onSubmit = async (values, actions) => {
         try {
             actions.setSubmitting(true);
-            await saveTeacher(values);
+            await saveTeacher(values);                
+            router.push("/admin/teacher");
         } catch (error) {
             console.error(error);
             actions.setSubmitting(false);
@@ -107,7 +121,7 @@ export default function SaveTeacherLayout() {
                                 placeholder="Nome do docente"
                                 value={values.name}
                                 onChange={handleChange} />
-                            <ErrorMessage name="name" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="name" /></p>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="photo" className="form-label">Foto</label>
@@ -118,11 +132,16 @@ export default function SaveTeacherLayout() {
                                 id="photo"
                                 value={values.photo}
                                 onChange={(event) => {
+                                    const files = event.currentTarget.files;                                                   
+                                    if(!verifyFileSize(files)) {
+                                        setFieldValue('photo', '');
+                                        return;
+                                    }
                                     handleChange(event);
-                                    setFile(event.currentTarget.files);
+                                    setFile(files);
                                 }} />
-
-                            <ErrorMessage name="photo" className="input-error" />
+                            <p className="input-info">*Os arquivos devem ter no máximo 5MB</p>
+                            <p className="input-error"><ErrorMessage name="photo" /></p>
                         </div>
                         {teacher.photo &&
                          <div className="mb-3 text-center">
@@ -140,7 +159,7 @@ export default function SaveTeacherLayout() {
                                 value={values.about}
                                 onChange={handleChange}
                             ></textarea>
-                            <ErrorMessage name="about" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="about" /></p>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="name" className="form-label">Email</label>
@@ -152,7 +171,7 @@ export default function SaveTeacherLayout() {
                                 placeholder=""
                                 value={values.email}
                                 onChange={handleChange} />
-                            <ErrorMessage name="email" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="email" /></p>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="name" className="form-label">Telefone</label>
@@ -164,14 +183,15 @@ export default function SaveTeacherLayout() {
                                 placeholder=""
                                 value={values.phone}
                                 onChange={handleChange} />
-                            <ErrorMessage name="phone" className="input-error" />
+                            <p className="input-error"><ErrorMessage name="phone" /></p>
                         </div>
                         <div className="text-right">
                         <button type="submit" className="btn btn-primary mt-3 me-auto" disabled={isSubmitting}>Salvar</button>
                         </div>
                     </form>
                 )}
-            </Formik>
+            </Formik>            
+            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
         </AdminBase>
     )
 }

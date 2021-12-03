@@ -6,6 +6,8 @@ import { SelectiveProcess } from '../../models/selective-process';
 import { v4 as uuidv4 } from 'uuid';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
+import AuthService from '../../lib/auth.service';
+import TreatError from '../../lib/treat-error.service';
 
 const cors = initMiddleware(
   Cors({
@@ -17,13 +19,17 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   await cors(req, res);
 
-
   const selectiveProcessService = SelectiveProcessService();
+  const authService = AuthService();
+  const treatError = TreatError();
 
   switch (req.method) {
 
     case "POST":
       try {
+        if(!await authService.checkAuthentication(req)){
+          return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+        }
         // await multerAny(req, res);
 
         let response: APIResponse = {
@@ -89,19 +95,6 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
       break
 
     case "DELETE":
-      // let newsID = req.query.id.toString();
-      // const deletedNews = await selectiveProcessService.getById(newsID);
-      // let uploadService = FileUploadService();
-      // // await uploadService.remove(deletedNews.coverURL);
-
-      // // await selectiveProcessService.remove(newsID);
-
-      // let deleteResponse: APIResponse = {
-      //   msg: "Notícia removida com sucesso!",
-      //   result: {}
-      // }
-
-      // res.status(200).json(deleteResponse);
       break;
 
     default:

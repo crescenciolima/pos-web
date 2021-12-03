@@ -25,8 +25,6 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
     return res.status(401).send(await treatError.general('Usuário não autorizado.'))
   }
 
-  const authorization = req.headers.authorization;
-
   switch (req.method) {
 
     case "POST":
