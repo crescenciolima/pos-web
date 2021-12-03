@@ -8,9 +8,12 @@ import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-uti
 import { Teacher } from '../../models/teacher';
 import { APIResponse } from '../../models/api-response';
 import Cors from 'cors'
+import AuthService from '../../lib/auth.service';
+import TreatError from '../../lib/treat-error.service';
+import { Constants } from '../../utils/constants';
 
 global.XMLHttpRequest = require('xhr2');
-const upload = multer({ limits: { fileSize: 52428800 } });
+const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
 // for parsing multipart/form-data
 // note that Multer limits to 1MB file size by default
 const multerAny = initMiddleware(
@@ -28,12 +31,18 @@ const cors = initMiddleware(
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   const teacherService = TeacherService();
+  const authService = AuthService();
+  const treatError = TreatError();
 
   switch (req.method) {
 
     case "POST":
       try{
         await multerAny(req, res);
+
+        if(!await authService.checkAuthentication(req)){
+          return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+        }
 
         //Extraindo os dados da requisição
         const blob: BlobCorrected = req.files?.length ? req.files[0] : null;
@@ -100,6 +109,10 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       break
 
     case "DELETE":
+      if(!await authService.checkAuthentication(req)){
+        return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+      }
+      
       let teacherID = req.query.id.toString();
       const deletedTeacher = await teacherService.getById(teacherID);
       let uploadService = FileUploadService();

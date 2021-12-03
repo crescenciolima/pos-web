@@ -7,9 +7,10 @@ import { APIResponse } from '../../models/api-response';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
 import { ProcessDocument, SelectiveProcess } from '../../models/selective-process';
 import { StoragePaths } from '../../utils/storage-path';
+import { Constants } from '../../utils/constants';
 
 global.XMLHttpRequest = require('xhr2');
-const upload = multer();
+const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
 
 // for parsing multipart/form-data
 // note that Multer limits to 1MB file size by default

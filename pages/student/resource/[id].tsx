@@ -21,6 +21,8 @@ import { faFile } from '@fortawesome/free-solid-svg-icons';
 import Loading from '../../../components/loading';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 import ResourceUtil from '../../../lib/resource.util';
+import { FileHelper } from '../../../helpers/file-helper';
+import WarningDialog from '../../../components/warning-dialog';
 
 
 export default function SaveResourceLayout() {
@@ -34,8 +36,18 @@ export default function SaveResourceLayout() {
 
     const [resource, setResource] = useState<SubscriptionResource>();
     const [files, setFiles] = useState<any>([]);
-    const resourceSteps = ResourceStepsHelper.steps();
     const decodeStep = step ? atob(step as string) : null;
+    const [openModal, setOpenModal] = useState<boolean>(false);
+
+    function closeModal() {
+        setOpenModal(false);
+    }
+
+    const verifyFileSize = (file)  => {
+        const check = FileHelper.checkFileSize(file);
+        setOpenModal(!check)
+        return check
+    }
 
     useEffect(() => {   
         const loadData = async () => {
@@ -206,7 +218,12 @@ export default function SaveResourceLayout() {
                                                                     className="form-control"
                                                                     id={`files.${index}`}
                                                                     name={`files.${index}`}
-                                                                    onChange={(event) => {
+                                                                    onChange={(event) => {                                                                        
+                                                                        const files = event.currentTarget.files;                                                   
+                                                                        if(!verifyFileSize(files)) {
+                                                                            setFieldValue(`files.${index}`, '');
+                                                                            return;
+                                                                        }
                                                                         handleChange(event);
                                                                         handleFile(index, event.currentTarget.files);
                                                                     }}
@@ -255,6 +272,7 @@ export default function SaveResourceLayout() {
                     </form>
                 )}
             </Formik>
+            <WarningDialog open={openModal} actionButtonText="OK" title="OK" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
         </StudentBase>
     )
 }
