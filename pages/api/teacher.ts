@@ -10,8 +10,7 @@ import { APIResponse } from '../../models/api-response';
 import Cors from 'cors'
 
 global.XMLHttpRequest = require('xhr2');
-const upload = multer();
-
+const upload = multer({ limits: { fileSize: 52428800 } });
 // for parsing multipart/form-data
 // note that Multer limits to 1MB file size by default
 const multerAny = initMiddleware(
