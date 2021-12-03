@@ -175,7 +175,7 @@ export default function SelectiveProcessDocuments(props: Props) {
                                     handleChange(event);
                                     setFile(files);
                                 }} />
-                            <p className="input-info">*Os arquivos devem ter no máximo 5MB</p>
+                            <p className="input-info">*Os arquivos devem ter no máximo 4MB</p>
                             <p className="input-error"><ErrorMessage name="url" /></p>
                         </div>
 
@@ -251,7 +251,7 @@ export default function SelectiveProcessDocuments(props: Props) {
 
                 </div>
             </div>
-            <WarningDialog open={openModal} actionButtonText="OK" title="Aviso" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
+            <WarningDialog open={openModal} actionButtonText="OK" title="Aviso" text={"O tamanho máximo do arquivo deve ser 4MB"} onClose={closeModal} />
         </>
     );
 

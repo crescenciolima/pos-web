@@ -66,7 +66,7 @@ export default function SaveTeacherLayout() {
         if(teacher.photo != ""){
             values = {...values, photo: teacher.photo};
         }
-        api.postFile(APIRoutes.TEACHER, values, file && file.length > 0 ? file[0] : null);
+        await api.postFile(APIRoutes.TEACHER, values, file && file.length > 0 ? file[0] : null);
     };
 
     const onSubmit = async (values, actions) => {
@@ -140,7 +140,7 @@ export default function SaveTeacherLayout() {
                                     handleChange(event);
                                     setFile(files);
                                 }} />
-                            <p className="input-info">*Os arquivos devem ter no máximo 5MB</p>
+                            <p className="input-info">*Os arquivos devem ter no máximo 4MB</p>
                             <p className="input-error"><ErrorMessage name="photo" /></p>
                         </div>
                         {teacher.photo &&
@@ -191,7 +191,7 @@ export default function SaveTeacherLayout() {
                     </form>
                 )}
             </Formik>            
-            <WarningDialog open={openModal} actionButtonText="OK" title="Aviso" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={closeModal} />
+            <WarningDialog open={openModal} actionButtonText="OK" title="Aviso" text={"O tamanho máximo do arquivo deve ser 4MB"} onClose={closeModal} />
         </AdminBase>
     )
 }

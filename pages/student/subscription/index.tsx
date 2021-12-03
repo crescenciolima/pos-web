@@ -1269,7 +1269,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     {(actions) => (
                     <Form>
                         <div className="row mt-5 justify-content-center">
-                            <p className={style.warningFile}>*Os arquivos devem ter no máximo 5MB</p>
+                            <p className={style.warningFile}>*Os arquivos devem ter no máximo 4MB</p>
                             <div className={style.boxFiles}>
                                 <label className={`mt-3 ${style.titleFileCategory}`}>Documentos Obrigatórios</label>
                                 <div className="col-md-12">
@@ -1588,7 +1588,7 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                     Data de Inscrição: {(new Date(currentSubscription.subscriptionDate)).toLocaleString()}
                 </div>
             }
-            <WarningDialog open={openFileModal} actionButtonText="OK" title="Aviso" text={"O tamanho máximo do arquivo deve ser 5MB"} onClose={() => closeModal('file')} />
+            <WarningDialog open={openFileModal} actionButtonText="OK" title="Aviso" text={"O tamanho máximo do arquivo deve ser 4MB"} onClose={() => closeModal('file')} />
             <ConfirmDialog open={openConfirmationModal} actionButtonText="SIM" title="Concluir Inscrição" text="Ao concluir a inscrição os dados informados não poderão ser alterados. Tem certeza que deseja prosseguir?" onClose={() => closeModal('confirmation')} onConfirm={confirmSubscription} />
         </StudentBase>
     )
