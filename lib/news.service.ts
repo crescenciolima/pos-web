@@ -1,5 +1,5 @@
 import { News } from "../models/news";
-import firestore from "../utils/firestore-util";
+import { firestore } from "../utils/firebase-admin";
 
 
 export default function NewsService() {

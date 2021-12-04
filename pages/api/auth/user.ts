@@ -28,10 +28,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     }
 
     if (req.method === 'GET') {        
-        const currentUserId = await authService.currentUser(authorization);   
-
+        const currentUserId = await authService.currentUser(authorization); 
+        
         if(!currentUserId){            
-          return res.status(401).json(await treatError.general('Usuário não autorizado.'));
+          return res.status(401).json(await treatError.general('Usuário atual não encontrado.'));
         }
 
         try {
@@ -42,8 +42,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             }
             res.status(200).json(response);
         } catch (e) {
-            console.error('Error on get Current User')            
-            return res.status(401).json(await treatError.general('Usuário não autorizado.'));
+            console.error('Error on get Current User', e)            
+            return res.status(401).json(await treatError.general('Erro ao carregar Usuário atual.'));
         }
 
     } else {

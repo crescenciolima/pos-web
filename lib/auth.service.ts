@@ -4,7 +4,6 @@ import fire from "../utils/firebase-util";
 import { authAdmin } from "../utils/firebase-admin";
 import firebase from "firebase";
 import { NextApiRequest, NextApiResponse } from "next";
-import firestore from "../utils/firestore-util";
 import { NextApiRequestWithFormData } from "../utils/types-util";
 
 export default function AuthService() {
@@ -122,9 +121,10 @@ export default function AuthService() {
     
         try {
             const result = await authAdmin.verifyIdToken(authorization);
+            console.log('Current User by verifyIdToken', result);
             return result.uid;
         } catch (err) {
-            console.error('Error on currentUser', err);
+            console.error('Error on verifyIdToken', err);
             return false;
         }
     }

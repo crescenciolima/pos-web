@@ -1,5 +1,5 @@
 import { Works } from "../models/works";
-import firestore from "../utils/firestore-util";
+import { firestore } from "../utils/firebase-admin";
 
 
 export default function WorksService() {
