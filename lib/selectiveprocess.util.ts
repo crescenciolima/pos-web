@@ -143,7 +143,7 @@ export default function SelectiveProcessUtil() {
                     }
                 }
 
-                if (!currentStep.resultURL) {
+                if (!currentStep.resultURL && !ignoreResults) {
                     api.showNotify("Divulge os resultados antes de avançar", "error", "Atenção", 4);
                     return false;
                 }
