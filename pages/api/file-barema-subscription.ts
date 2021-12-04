@@ -68,7 +68,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
             if(subcategoryFound){
               subscriptionFiles = subscription.files.map(subscriptionFile => {
                 if(subscriptionFile.subcategoryID === subcategoryID){
-                  subscriptionFile.files = {...subscriptionFile.files, ...urls}
+                  subscriptionFile.files = subscriptionFile.files ? [...subscriptionFile.files, ...urls] : [...urls]
                 }
                 return subscriptionFile;
               })

@@ -40,6 +40,8 @@ export class APIRoutes {
     
     static RESOURCES:string = APIRoutes.API_URL + "/api/resource"
 
+    static FILE_RESOURCE:string = APIRoutes.API_URL + "/api/file-resource"
+
     static SELECTIVE_PROCESS:string = APIRoutes.API_URL + "/api/selectiveprocess"
 
     static SELECTIVE_PROCESS_FILES:string = APIRoutes.API_URL + "/api/selectiveprocessfiles"

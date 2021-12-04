@@ -288,7 +288,11 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }
 
         for (let i = 0; i < arrayFormFiles.length; i++){
-            await saveFileSubscription({subscriptionID: arrayFormFiles[i].subscriptionID, name: arrayFormFiles[i].name}, arrayFormFiles[i].files, SubscriptionTypeFile.FORM, roundWeight);
+            const form = arrayFormFiles[i];
+            for(let j = 0; j < form.files.length; j++) {
+                const _file = form.files[j];
+                await saveFileSubscription({subscriptionID:form.subscriptionID, name: form.name}, [_file], SubscriptionTypeFile.FORM, roundWeight);
+            }
         }
     }
 
@@ -318,7 +322,12 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
         }
 
         for (let i = 0; i < arraySubcategories.length; i++){
-            await saveFileSubscription({subcategoryID: arraySubcategories[i].subcategoryID, subscriptionID: arraySubcategories[i].subscriptionID}, arraySubcategories[i].files, SubscriptionTypeFile.BAREMA, roundWeight);
+            const subcategory = arraySubcategories[i];
+            for(let j = 0; j < subcategory.files.length; j++) {
+                const _file = subcategory.files[j];
+                await saveFileSubscription({subcategoryID: subcategory.subcategoryID, subscriptionID: subcategory.subscriptionID}, [_file], SubscriptionTypeFile.BAREMA, roundWeight);
+
+            }
         }
     }
 
@@ -1422,10 +1431,10 @@ export default function SubscriptionLayout(props: InferGetServerSidePropsType<ty
                             </div>
                             <div className={style.boxFiles}>  
                                 <label htmlFor="processForms" className={`mt-2 ${style.titleFileCategoryForm}`}>Formulários</label>
-                                <div className={style.instructionsForm}>
+                                {selectiveProcess.processForms && <div className={style.instructionsForm}>
                                     Efetue o download do formulário desejado, preencha-o e digitalize (ou tire uma foto) para efetuar o upload.
-                                </div>                                          
-                                {selectiveProcess.processForms.map((form, index) => (
+                                </div>}                                      
+                                {selectiveProcess.processForms?.map((form, index) => (
                                     <>
                                     <label className="form-label row mt-2 display-inherit" key={index}>{form.name}                               
                                     <a href={form.url} className={style.titleFileForm} target="_blank">
