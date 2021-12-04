@@ -24,7 +24,7 @@ export default function SiteFooter({course}) {
                       </p>
                   </div>
                   <div className="col-md-6">
-                    <p>Campus Viória da Conquista</p>
+                    <p>Campus Vitória da Conquista</p>
                     <p>Av. Sérgio Vieira de Mello, 3150 - Zabelê,<br />
                     Vitória da Conquista - BA, 45078-300
                     </p>

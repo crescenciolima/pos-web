@@ -107,7 +107,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       await worksService.remove(worksID);
 
       let deleteResponse: APIResponse = {
-        msg: "Trabalho removida com sucesso!",
+        msg: "Trabalho removido com sucesso!",
         result: {}
       }
 

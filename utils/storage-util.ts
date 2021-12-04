@@ -1,6 +1,6 @@
 import 'firebase/storage'
-import { firestorage } from './firebase-admin';
+import fire from './firebase-util';
 
-const storage = firestorage;
+const storage = fire.storage();
 
 export default storage;
