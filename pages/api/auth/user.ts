@@ -23,21 +23,28 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     await cors(req, res);
 
     const authorization = req.headers.authorization;
+    if(!await authService.checkAuthentication(req)) {
+        return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+    }
 
     if (req.method === 'GET') {        
-        const currentUserId = await authService.currentUser(authorization);   
-
+        const currentUserId = await authService.currentUser(authorization); 
+        
         if(!currentUserId){            
-          return res.status(401).json(await treatError.general('Usuário não autorizado.'));
+          return res.status(401).json(await treatError.general('Usuário atual não encontrado.'));
         }
 
-        const user = await userService.getById(currentUserId);
-
-        let response: APIResponse = {
-            msg: "Usuário atual encontrado com sucesso!",
-            result: user
+        try {
+            const user = await userService.getById(currentUserId);
+            let response: APIResponse = {
+                msg: "Usuário atual encontrado com sucesso!",
+                result: user
+            }
+            res.status(200).json(response);
+        } catch (e) {
+            console.error('Error on get Current User', e)            
+            return res.status(401).json(await treatError.general('Erro ao carregar Usuário atual.'));
         }
-        res.status(200).json(response);
 
     } else {
         res.status(200).json([]);

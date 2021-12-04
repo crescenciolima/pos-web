@@ -88,8 +88,16 @@ export default function SaveResourceLayout() {
     }
 
     const saveResource = async (values) => {
-        const arrayFiles = await buildArrayFiles(files);
-        await api.postFile(APIRoutes.RESOURCES, { ...values, subscriptionID }, arrayFiles);
+        delete values.files;
+        const result = await api.post(APIRoutes.RESOURCES, { ...values, subscriptionID });
+        if(result){
+            const resourceID  = result.result.id;
+            const arrayFiles = await buildArrayFiles(files);
+            for (let j = 0; j < arrayFiles.length; j++){
+                const file = arrayFiles[j];
+                await api.postFile(APIRoutes.FILE_RESOURCE, { resourceID, subscriptionID }, file);
+            }
+        }
     };
 
     const onSubmit = async (values, actions) => {

@@ -1,5 +1,5 @@
 import { ProcessStep, ProcessStepsState, SelectiveProcess } from "../models/selective-process";
-import firestore from "../utils/firestore-util";
+import { firestore } from "../utils/firebase-admin";
 
 
 export default function SelectiveProcessService() {

@@ -1,5 +1,5 @@
 import { User } from "../models/user";
-import firestore from "../utils/firestore-util";
+import { firestore } from "../utils/firebase-admin";
 
 
 export default function UserService() {
@@ -45,7 +45,7 @@ export default function UserService() {
         userRef.doc(user.id).delete();
     }
 
-    async function getById(id: any) {
+    async function getById(id) {
         let snapshot = await userRef.doc(id).get();
         const doc = snapshot.data();
         const user: User = {

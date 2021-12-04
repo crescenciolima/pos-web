@@ -1,5 +1,4 @@
 import storage from "../utils/storage-util";
-import fire from "../utils/firebase-util";
 import { BlobCorrected } from "../utils/types-util";
 import { StoragePaths } from "../utils/storage-path";
 

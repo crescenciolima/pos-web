@@ -1,4 +1,4 @@
-import { NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors'
 import AuthService from '../../lib/auth.service';
 import FileUploadService from '../../lib/upload.service';
@@ -15,16 +15,7 @@ import SubscriptionService from '../../lib/subscription.service';
 import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';
 import SelectiveProcessService from '../../lib/selectiveprocess.service';
-import { ResourceStepsHelper } from '../../helpers/resource-steps-helper';
 import ResourceUtil from '../../lib/resource.util';
-import { Constants } from '../../utils/constants';
-
-global.XMLHttpRequest = require('xhr2');
-const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
-
-const multerAny = initMiddleware(
-  upload.any()
-);
 
 const cors = initMiddleware(
   Cors({
@@ -32,12 +23,11 @@ const cors = initMiddleware(
   })
 )
 
-async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
+async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   const subscriptionService = SubscriptionService();
   const selectiveProcessService = SelectiveProcessService();
   const treatError = TreatError();
-  const resourceSteps = ResourceStepsHelper.steps();
   const authService = AuthService();
   const resourceUtil = ResourceUtil();
 
@@ -51,8 +41,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
     case "POST":
       try{
-        await multerAny(req, res);
-
+        console.log(req.body);
         const { subscriptionID, justification } = req.body;        
 
         const subscription = await subscriptionService.getById(subscriptionID);
@@ -70,24 +59,11 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         let currentStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
 
         const resource: SubscriptionResource = {
+          id: `${subscriptionID}${uuidv4()}`,
           justification,
           date: (new Date()).toISOString(),
           status: SubscriptionStatus.AGUARDANDO_ANALISE,
           step: currentStep.type
-        }
-
-        if(req.files?.length > 0){                        
-          const uploadService = FileUploadService();
-          const urls = [];      
-  
-          for (let i = 0; i < req.files.length; i++){
-            const blob: BlobCorrected = req.files[i];
-            const path = `${StoragePaths.SUBSCRIPTION}${subscriptionID}/${StoragePaths.RESOURCE}`;
-            const url = await uploadService.upload(path, blob, uuidv4());
-            urls.push(url);
-          }  
-
-          resource.files = urls;
         }
 
         if(subscription.resources){
@@ -119,10 +95,9 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
 }
 
-
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: true,
   },
 }
 

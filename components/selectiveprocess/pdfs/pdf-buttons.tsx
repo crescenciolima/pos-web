@@ -93,7 +93,7 @@ export default function PDFButtons(props: Props) {
     <>
       <div className="row justify-content-end">
         <div className="col-auto">
-          <button className="btn btn-outline-primary" onClick={openDialog} disabled={isLoading}>
+          <button type="button" className="btn btn-outline-primary" onClick={openDialog} disabled={isLoading}>
             {(!isLoading && !instance.loading) && "Disponibilizar Resultados"}
             {(isLoading && !instance.loading) && "Enviando arquivo..."}
             {instance.loading && "Carregando documento..."}

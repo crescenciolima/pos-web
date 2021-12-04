@@ -1,5 +1,5 @@
 import { Subscription } from "../models/subscription";
-import firestore from "../utils/firestore-util";
+import { firestore } from "../utils/firebase-admin";
 
 
 export default function SubscriptionService() {

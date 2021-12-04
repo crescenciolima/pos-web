@@ -186,6 +186,7 @@ export default function API(setLoading?: Function) {
 
             const res = await fetch(url, {
                 method: 'DELETE',
+                headers: await buildHeaders(),
             });
 
             await treatResponse(res);

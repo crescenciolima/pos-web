@@ -1,5 +1,5 @@
 import { Teacher } from "../models/teacher";
-import firestore from "../utils/firestore-util";
+import { firestore } from "../utils/firebase-admin";
 
 
 export default function TeacherService() {

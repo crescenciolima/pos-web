@@ -85,7 +85,7 @@ export enum SubscriptionTypeFile {
 }
 
 export interface SubscriptionResource {
-
+    id?: string,
     justification: string;
     date: string|Date;
     step: ProcessStepsTypes;
