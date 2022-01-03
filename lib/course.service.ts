@@ -1,53 +1,43 @@
 import { id } from "date-fns/locale";
 import { Course } from "../models/course";
 import { firestore } from "../utils/firebase-admin";
+import { CourseServiceInterface } from "./course.service.interface";
+import { inject, injectable } from "inversify";
+import { Repository } from "../repositories/repository";
+import { CourseBuilder } from "../builders/course.builder";
 
+@injectable()
+export class CourseService implements CourseServiceInterface {
 
-export default function CourseService() {
+    constructor(
+        @inject(TYPES.Repository) protected repository: Repository
+    ){}
 
-    const courseRef = firestore.collection("course");
-
-    async function getAll() {
-        let courses = [];
-
-        await courseRef.get().then(
-            (snapshot) => {
-                snapshot.forEach(
-                    (result) => {
-                        const id = result.id;
-                        const doc = result.data();
-                        const course: Course = {
-                            id: id,
-                            name: doc['name'],
-                            description: doc['description'],
-                            coordName: doc['coordName'],
-                            coordMail: doc['coordMail'],
-                            coordPhone: doc['coordPhone']
-                        }
-                        courses.push(course);
-                    });
-
-            }
-        ).catch(
-        );
-
+    async getAll():Promise<Course[]> {
+        let courses:Course[] = [];
+        let listCourseRegister = await this.repository.getAll("course");
+        for(let courseRegister of listCourseRegister){
+            const course: Course = new CourseBuilder()
+                .register(courseRegister)
+            .build();
+            courses.push(course);
+        }
         return courses;
-
     }
 
-    async function save(course: Course) {
+    async save(course: Course) {
         courseRef.add(course);
     }
 
-    async function update(course: Course) {
+    async update(course: Course) {
         courseRef.doc(course.id).set(course);
     }
 
-    async function remove(course: Course) {
+    async remove(course: Course) {
         courseRef.doc(course.id).delete();
     }
 
-    async function getById(id) {
+    async getById(id) {
         let snapshot = await courseRef.doc(id).get();
         const doc = snapshot.data;
         const course: Course = {
@@ -62,7 +52,7 @@ export default function CourseService() {
         return course;
     }
 
-    async function  getFirstCourse() {
+    async getFirstCourse() {
         let snapshot = await courseRef.where('name','!=',null).get()
 
         //pior caso, retorna nada para uma collection vazia
@@ -87,16 +77,5 @@ export default function CourseService() {
 
         return course;
     }
-
-
-    return {
-        getAll,
-        save,
-        update,
-        remove,
-        getById,
-        getFirstCourse
-    }
-
 }
 
