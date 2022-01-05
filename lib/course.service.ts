@@ -5,6 +5,8 @@ import { CourseServiceInterface } from "./course.service.interface";
 import { inject, injectable } from "inversify";
 import { Repository } from "../repositories/repository";
 import { CourseBuilder } from "../builders/course.builder";
+import { Comparator } from "../utils/comparator";
+import { ComparatorEnum } from "../utils/comparator.enum";
 
 @injectable()
 export class CourseService implements CourseServiceInterface {
@@ -26,55 +28,36 @@ export class CourseService implements CourseServiceInterface {
     }
 
     async save(course: Course) {
-        courseRef.add(course);
+        await this.repository.save("course", course);
     }
 
     async update(course: Course) {
-        courseRef.doc(course.id).set(course);
+        await this.repository.update("course", course);
     }
 
     async remove(course: Course) {
-        courseRef.doc(course.id).delete();
+        await this.repository.remove("course", course);
     }
 
     async getById(id) {
-        let snapshot = await courseRef.doc(id).get();
-        const doc = snapshot.data;
-        const course: Course = {
-            id: id,
-            name: doc['name'],
-            description: doc['description'],
-            coordName: doc['coordName'],
-            coordMail: doc['coordMail'],
-            coordPhone: doc['coordPhone']
-        }
-
+        let register = await this.repository.get("course", id);
+        const course: Course = new CourseBuilder()
+            .register(register)
+        .build();
         return course;
     }
 
     async getFirstCourse() {
-        let snapshot = await courseRef.where('name','!=',null).get()
-
-        //pior caso, retorna nada para uma collection vazia
-        if (snapshot.empty){
+        let comparator:Comparator = new Comparator();
+        comparator.add('name', null, ComparatorEnum.DIFFERENT);
+        let courses = await this.repository.find("course", comparator);
+        if (courses.empty){
             return null
         }
-        //melhor caso, se nao está vazia recupera o primeiro doc da collection
-        let name = snapshot.docs[0].data()['name']
-        let description = snapshot.docs[0].data()['description']
-        let coordName = snapshot.docs[0].data()['coordName']
-        let coordMail = snapshot.docs[0].data()['coordMail']
-        let coordPhone = snapshot.docs[0].data()['coordPhone']
-
-        let course: Course = {
-            name: name,
-            description: description,
-            coordName: coordName,
-            coordMail: coordMail,
-            coordPhone: coordPhone
-        }
-
-
+        const course: Course = new CourseBuilder()
+            .register(courses[0])
+        .build();
+        
         return course;
     }
 }
