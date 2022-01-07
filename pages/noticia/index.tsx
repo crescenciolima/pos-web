@@ -7,7 +7,7 @@ import fire from '../../utils/firebase-util'
 import NewsCard from '../../components/news-card'
 import { News } from '../../models/news'
 import style from '../../styles/news.module.css'
-import CourseService from '../../lib/course.service'
+import { CourseService } from '../../lib/course.service';
 import { Course } from '../../models/course'
 import SiteFooter from '../../components/site-footer'
 import { format } from 'date-fns';
@@ -68,7 +68,7 @@ export const getStaticProps: GetStaticProps = async () => {
     }
   }
 
-  const courseService = CourseService();
+  const courseService = new CourseService();
 
   let courseData = await courseService.getFirstCourse();
 

@@ -1,11 +1,8 @@
 import { Repository } from "../repository";
 import { firestore } from "../../utils/firebase-admin";
-import { injectable } from "inversify";
-import { Builder } from "../../builders/builder";
 import { Comparator } from "../../utils/comparator";
 import { FilteredResults } from "../../firebase/filtered-results";
 
-@injectable()
 export class FirebaseRepository implements Repository{
 
     private _collection:FirebaseFirestore.CollectionReference<FirebaseFirestore.DocumentData>;
@@ -19,7 +16,9 @@ export class FirebaseRepository implements Repository{
             (snapshot) => {
                 snapshot.forEach(
                     (result) => {
-                        objects.push(result.data());
+                        let register = result.data();
+                        register.id = result.id;
+                        objects.push(register);
                     }
                 );
             }
@@ -45,7 +44,9 @@ export class FirebaseRepository implements Repository{
     async get(table:string, id:any) {
         this._collection = firestore.collection(table);
         let snapshot = await this._collection.doc(id).get();
-        return snapshot.data();
+        let register = snapshot.data();
+        register.id = snapshot.id;
+        return register;
     }
     
     async find(table:string, comparator:Comparator) {
@@ -55,7 +56,9 @@ export class FirebaseRepository implements Repository{
             (snapshot) => {
                 snapshot.forEach(
                     (result) => {
-                        objects.push(result.data());
+                        let register = result.data();
+                        register.id = result.id;
+                        objects.push(register);
                     }
                 );
             }

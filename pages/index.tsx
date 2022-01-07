@@ -5,7 +5,6 @@ import { GetStaticProps } from 'next'
 import React, { useRef } from 'react'
 import SiteHeader from '../components/site-header'
 import NewsService from '../lib/news.service'
-import CourseService from '../lib/course.service'
 import NewsCard from '../components/news-card'
 import { News } from '../models/news'
 import { Course } from '../models/course'
@@ -15,6 +14,7 @@ import SiteFooter from '../components/site-footer'
 import SelectiveProcessService from '../lib/selectiveprocess.service'
 import { ProcessStepsState, ProcessStepsTypes } from '../models/selective-process'
 import { format, sub } from 'date-fns';
+import { CourseService } from '../lib/course.service'
 
 
 
@@ -151,7 +151,7 @@ export const getStaticProps: GetStaticProps = async () => {
   }
 
   //Recuperando dados do curso
-  const courseService = CourseService();
+  const courseService = new CourseService();
   let courseData = await courseService.getFirstCourse();
   let course: Course = {
     name: '<Nome do Curso>',

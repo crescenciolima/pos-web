@@ -2,18 +2,19 @@ import { id } from "date-fns/locale";
 import { Course } from "../models/course";
 import { firestore } from "../utils/firebase-admin";
 import { CourseServiceInterface } from "./course.service.interface";
-import { inject, injectable } from "inversify";
 import { Repository } from "../repositories/repository";
 import { CourseBuilder } from "../builders/course.builder";
 import { Comparator } from "../utils/comparator";
 import { ComparatorEnum } from "../utils/comparator.enum";
+import { RepositoryFactory } from "../repositories/repository.factory";
 
-@injectable()
 export class CourseService implements CourseServiceInterface {
 
-    constructor(
-        @inject(TYPES.Repository) protected repository: Repository
-    ){}
+    private repository:Repository;
+
+    constructor(){
+        this.repository = RepositoryFactory.repository();
+    }
 
     async getAll():Promise<Course[]> {
         let courses:Course[] = [];
@@ -51,7 +52,7 @@ export class CourseService implements CourseServiceInterface {
         let comparator:Comparator = new Comparator();
         comparator.add('name', null, ComparatorEnum.DIFFERENT);
         let courses = await this.repository.find("course", comparator);
-        if (courses.empty){
+        if (courses.length==0){
             return null
         }
         const course: Course = new CourseBuilder()

@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import CourseService from '../../lib/course.service';
 import AuthService from '../../lib/auth.service';
 import { Course } from '../../models/course';
 import Cors from 'cors'
@@ -7,6 +6,7 @@ import initMiddleware from '../../utils/init-middleware'
 import { authAdmin } from "./../../utils/firebase-admin";
 import TreatError from '../../lib/treat-error.service';
 import { APIResponse } from '../../models/api-response';
+import { CourseService } from '../../lib/course.service';
 
 const authService = AuthService();
 const cors = initMiddleware(
@@ -18,7 +18,7 @@ const cors = initMiddleware(
 )
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const courseService = CourseService();
+    const courseService = new CourseService();
     const treatError = TreatError();
 
     await cors(req, res);
@@ -27,6 +27,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         if (!await authService.checkAuthentication(req)){
             return res.status(401).send(await treatError.general('Usuário não autorizado.'));
         }
+
+        console.log('body = ', req.body)
 
         //Getting all data from the request body
         const {id, name, description, coordName, coordMail, coordPhone} = req.body;

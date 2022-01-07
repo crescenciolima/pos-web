@@ -8,9 +8,10 @@ import { Teacher } from '../models/teacher'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPhoneAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import TeacherService from '../lib/teacher.service'
-import CourseService from '../lib/course.service'
+
 import { Course } from '../models/course'
 import SiteFooter from '../components/site-footer'
+import { CourseService } from '../lib/course.service'
 
 export default function Docentes({ docentes,course }) {
 
@@ -88,7 +89,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const docenteList = await teacherService.getAll();
 
 
-  const courseService = CourseService();
+  const courseService = new CourseService();
 
   let courseData = await courseService.getFirstCourse();
 

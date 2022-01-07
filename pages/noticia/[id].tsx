@@ -8,7 +8,7 @@ import NewsService from '../../lib/news.service'
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons'
-import CourseService from '../../lib/course.service'
+import { CourseService } from '../../lib/course.service';
 import { Course } from '../../models/course'
 import SiteFooter from '../../components/site-footer'
 
@@ -74,7 +74,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   const news = await newsService.getBySlug(newsSlug);
 
-  const courseService = CourseService();
+  const courseService = new CourseService();
 
   let courseData = await courseService.getFirstCourse();
 
