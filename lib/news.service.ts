@@ -1,118 +1,84 @@
+import { NewsBuilder } from "../builders/news.builder";
 import { News } from "../models/news";
-import { firestore } from "../utils/firebase-admin";
+import { Repository } from "../repositories/repository";
+import { RepositoryFactory } from "../repositories/repository.factory";
+import { Comparator } from "../utils/comparator";
+import { ComparatorEnum } from "../utils/comparator.enum";
 
 
-export default function NewsService() {
+export class NewsService {
+    
+    private repository:Repository;
 
-    //Referência a coleção de notícias do banco de dados no FireStore
-    const newsRef = firestore.collection("news");
+    constructor(){
+        this.repository = RepositoryFactory.repository();
+    }
 
     //Salva uma nova notícia
-    async function save(news: News) {
-        newsRef.add(news);
+    async save(news: News) {
+        await this.repository.save("news", news);
     }
 
     //Atualiza uma notícia existente utilizando o ID
-    async function update(news: News) {
-        newsRef.doc(news.id).set(news);
+    async update(news: News) {
+        await this.repository.update("news", news);
     }
 
     //Remove uma notícia existente utilizando o ID
-    async function remove(id: string) {
-        await newsRef.doc(id).delete();
+    async remove(id: any) {
+        await this.repository.remove("news", id);
     }
 
     //Consulta todas as notícias
-    async function getAll() {
-        let newsList = [];
-
-        //Ordena de forma decrescente pela data da notícia
-        await newsRef.orderBy('date', 'desc').get().then(
-            (snapshot) => {
-                //Varrendo os resultados devolvidos
-                snapshot.forEach(
-                    (result) => {
-                        const id = result.id;
-                        const doc = result.data();
-                        const news: News = {
-                            id: id,
-                            title: doc['title'],
-                            text: doc['text'],
-                            coverURL: doc['coverURL'],
-                            date: doc['date'],
-                            slug: doc['slug']
-                        }
-                        newsList.push(news);
-                    });
-
-            }
-        ).catch(
-        );
-        
-        return newsList;
-    }
-
-    async function getFirstResults() {
-        let newsList = [];
-
-        await newsRef.orderBy('date', 'desc').limit(3).get().then(
-            (snapshot) => {
-                snapshot.forEach(
-                    (result) => {
-                        const id = result.id;
-                        const doc = result.data();
-                        const news: News = {
-                            id: id,
-                            title: doc['title'],
-                            text: doc['text'],
-                            coverURL: doc['coverURL'],
-                            date: doc['date'],
-                            slug: doc['slug']
-                        }
-                        newsList.push(news);
-                    });
-
-            }
-        ).catch(
-        );
-
-        return newsList;
-
-    }
-
-
-    async function getById(id) {
-        let snapshot = await newsRef.doc(id).get();
-        const doc = snapshot.data();
-        const news: News = {
-            id: id,
-            title: doc['title'],
-            text: doc['text'],
-            coverURL: doc['coverURL'],
-            date: doc['date'],
-            slug: doc['slug']
+    async getAll() {
+        let listNews:News[] = [];
+        let listNewsRegister = await this.repository.getAll("news");
+        for(let newsRegister of listNewsRegister){
+            const news: News = new NewsBuilder()
+                .register(newsRegister)
+            .build();
+            listNews.push(news);
         }
+        return listNews;
+    }
 
+    async getFirstResults() {
+        let comparator:Comparator = new Comparator();
+        let registerNews:[] = await this.repository.find("news", comparator);
+        if (registerNews.length==0){
+            return [];
+        }
+        let listNews:News[] = [];
+        for(let i=0; i < 3 && i < registerNews.length; i++){
+            let register = registerNews[i];
+            const news: News = new NewsBuilder()
+                .register(register)
+            .build();
+            listNews.push(news);
+        }
+        return listNews;
+    }
+
+
+    async getById(id) {
+        let register = await this.repository.get("news", id);
+        const news: News = new NewsBuilder()
+            .register(register)
+        .build();
         return news;
     }
 
-    async function getBySlug(slug) {
-        let snapshot = await newsRef.where("slug","==",slug).get();
-        const doc = snapshot.docs[0];
-        const data = doc.data();
-        const news: News = {
-            id: doc.id,
-            title: data['title'],
-            text: data['text'],
-            coverURL: data['coverURL'],
-            date: data['date'],
-            slug: data['slug']
-        }
-
+    async getBySlug(slug) {
+        let comparator:Comparator = new Comparator();
+        comparator.add('slug', slug, ComparatorEnum.EQUAL);
+        let snapshot = await this.repository.find('news', comparator);
+        const news: News = new NewsBuilder()
+            .register(snapshot)
+        .build();
         return news;
     }
 
-    function createSlugFromTilte(title: string): string {
+    createSlugFromTilte(title: string): string {
         let slug;
 
         // convert to lower case
@@ -136,18 +102,5 @@ export default function NewsService() {
         slug = slug.replace(/\@\-|\-\@|\@/gi, '');
         return slug;
     }
-
-
-    return {
-        getAll,
-        getFirstResults,
-        save,
-        update,
-        remove,
-        getById,
-        getBySlug,
-        createSlugFromTilte
-    }
-
 }
 

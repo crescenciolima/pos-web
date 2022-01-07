@@ -36,9 +36,9 @@ export class FirebaseRepository implements Repository{
         this._collection.doc(object.id).set(object);
     }
 
-    async remove(table:string, object:any) {
+    async remove(table:string, id:any) {
         this._collection = firestore.collection(table);
-        this._collection.doc(object.id).delete();
+        this._collection.doc(id).delete();
     }
 
     async get(table:string, id:any) {

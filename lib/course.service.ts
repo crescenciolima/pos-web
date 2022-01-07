@@ -16,6 +16,18 @@ export class CourseService implements CourseServiceInterface {
         this.repository = RepositoryFactory.repository();
     }
 
+    async save(course: Course) {
+        await this.repository.save("course", course);
+    }
+
+    async update(course: Course) {
+        await this.repository.update("course", course);
+    }
+
+    async remove(id:any) {
+        await this.repository.remove("course", id);
+    }
+
     async getAll():Promise<Course[]> {
         let courses:Course[] = [];
         let listCourseRegister = await this.repository.getAll("course");
@@ -26,18 +38,6 @@ export class CourseService implements CourseServiceInterface {
             courses.push(course);
         }
         return courses;
-    }
-
-    async save(course: Course) {
-        await this.repository.save("course", course);
-    }
-
-    async update(course: Course) {
-        await this.repository.update("course", course);
-    }
-
-    async remove(course: Course) {
-        await this.repository.remove("course", course);
     }
 
     async getById(id) {
