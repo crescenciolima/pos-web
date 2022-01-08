@@ -4,5 +4,6 @@ export enum ComparatorEnum{
     MINOR,
     MINOR_EQUAL,
     GREATER,
-    GREATER_EQUAL
+    GREATER_EQUAL,
+    IN
 }

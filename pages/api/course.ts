@@ -3,7 +3,7 @@ import AuthService from '../../lib/auth.service';
 import { Course } from '../../models/course';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware'
-import { authAdmin } from "./../../utils/firebase-admin";
+import { authAdmin } from "../../firebase/firebase-admin";
 import TreatError from '../../lib/treat-error.service';
 import { APIResponse } from '../../models/api-response';
 import { CourseService } from '../../lib/course.service';

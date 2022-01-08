@@ -1,12 +1,10 @@
-import { Comparator } from "../utils/comparator";
-import { ComparatorEnum } from "../utils/comparator.enum";
-import { ItemComparator } from "../utils/item-comparator";
+import { Comparator } from "./comparator";
+import { ComparatorEnum } from "./comparator.enum";
 
 export class FilteredResults{
 
     static getResults(collection:any, comparator:Comparator){
         for(let itemComparator of comparator.getItens()){
-
             collection = collection.where(itemComparator.field, this.getComparator(itemComparator.comparator), itemComparator.value);
         }
         return collection.get();
@@ -26,6 +24,8 @@ export class FilteredResults{
                 return '<=';
             case ComparatorEnum.GREATER_EQUAL:
                 return '>=';
+            case ComparatorEnum.IN:
+                return 'in';
             default:
                 return '==';
         }

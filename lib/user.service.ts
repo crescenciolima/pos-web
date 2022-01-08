@@ -1,5 +1,5 @@
 import { User } from "../models/user";
-import { firestore } from "../utils/firebase-admin";
+import { firestore } from "../firebase/firebase-admin";
 
 
 export default function UserService() {

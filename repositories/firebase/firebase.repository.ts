@@ -1,7 +1,7 @@
 import { Repository } from "../repository";
-import { firestore } from "../../utils/firebase-admin";
+import { firestore } from "../../firebase/firebase-admin";
 import { Comparator } from "../../utils/comparator";
-import { FilteredResults } from "../../firebase/filtered-results";
+import { FilteredResults } from "../../utils/filtered-results";
 
 export class FirebaseRepository implements Repository{
 

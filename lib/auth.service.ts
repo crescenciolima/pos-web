@@ -1,7 +1,7 @@
 import { Course } from "../models/course";
 import { User } from "../models/user";
 import fire from "../utils/firebase-util";
-import { authAdmin } from "../utils/firebase-admin";
+import { authAdmin } from "../firebase/firebase-admin";
 import firebase from "firebase";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextApiRequestWithFormData } from "../utils/types-util";

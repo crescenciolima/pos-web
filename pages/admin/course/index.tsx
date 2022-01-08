@@ -10,7 +10,7 @@ import { Course } from "../../../models/course";
 import { APIRoutes } from '../../../utils/api.routes'
 import API from '../../../lib/api.service';
 import Cookies from '../../../lib/cookies.service';
-import { authAdmin } from '../../../utils/firebase-admin';
+import { authAdmin } from '../../../firebase/firebase-admin';
 import Permission from '../../../lib/permission.service';
 import { UserType } from '../../../enum/type-user.enum';
 

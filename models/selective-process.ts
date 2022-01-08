@@ -1,4 +1,4 @@
-export interface SelectiveProcess {
+export class SelectiveProcess {
     id?: string;
     title?: string;
     state?: ProcessStepsState;

@@ -1,6 +1,6 @@
 import { id } from "date-fns/locale";
 import { Course } from "../models/course";
-import { firestore } from "../utils/firebase-admin";
+import { firestore } from "../firebase/firebase-admin";
 import { CourseServiceInterface } from "./course.service.interface";
 import { Repository } from "../repositories/repository";
 import { CourseBuilder } from "../builders/course.builder";

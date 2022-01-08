@@ -1,5 +1,5 @@
 import * as admin from 'firebase-admin';
-import FirebaseAdminSdkCredentials from '../firebase/credentials-firebase-adminsdk';
+import FirebaseAdminSdkCredentials from './credentials-firebase-adminsdk';
 
 if (!admin.apps.length) {
   admin.initializeApp({

@@ -1,139 +1,77 @@
-import { ProcessStep, ProcessStepsState, SelectiveProcess } from "../models/selective-process";
-import { firestore } from "../utils/firebase-admin";
+import { SelectiveProcessBuilder } from "../builders/selective-process.builder";
+import { ProcessStepsState, SelectiveProcess } from "../models/selective-process";
+import { Repository } from "../repositories/repository";
+import { RepositoryFactory } from "../repositories/repository.factory";
+import { Comparator } from "../utils/comparator";
+import { ComparatorEnum } from "../utils/comparator.enum";
 
 
-export default function SelectiveProcessService() {
+export class SelectiveProcessService {
 
-    const selectiveProcessRef = firestore.collection("selectiveprocess");
+    private repository:Repository;
 
-    async function getInConstruction() {
-        let snapshot = await selectiveProcessRef.where('state', "in", [ProcessStepsState.IN_CONSTRUCTION, ProcessStepsState.OPEN]).get();
-        if (snapshot.size > 0) {
-            const doc = snapshot.docs[0];
-            const data = doc.data();
-            const selectiveProcess: SelectiveProcess = {
-                id: doc.id,
-                title: data['title'],
-                state: data['state'],
-                numberPlaces: data['numberPlaces'],
-                description: data['description'],
-                reservedPlaces: data['reservedPlaces'],
-                baremaCategories: data['baremaCategories'],
-                processForms: data['processForms'],
-                processNotices: data['processNotices'],
-                steps: data['steps'],
-                currentStep: data['currentStep']
+    constructor(){
+        this.repository = RepositoryFactory.repository();
+    }
 
-            }
-
+    async getInConstruction() {
+        let comparator:Comparator = new Comparator();
+        comparator.add('state', [ProcessStepsState.IN_CONSTRUCTION, ProcessStepsState.OPEN], ComparatorEnum.IN);
+        let listSelectiveProcess = await this.repository.find('selectiveprocess', comparator);
+        if (listSelectiveProcess.length > 0) {
+            const selectiveProcess:SelectiveProcess = new SelectiveProcessBuilder()
+                .register(listSelectiveProcess[0])
+            .build();
             return selectiveProcess;
         }
         return null;
     }
 
 
-    async function getOpen() {
-        let snapshot = await selectiveProcessRef.where('state', "==", ProcessStepsState.OPEN).get();
-        if (snapshot.size > 0) {
-            const doc = snapshot.docs[0];
-            const data = doc.data();
-            const selectiveProcess: SelectiveProcess = {
-                id: doc.id,
-                title: data['title'],
-                state: data['state'],
-                numberPlaces: data['numberPlaces'],
-                description: data['description'],
-                reservedPlaces: data['reservedPlaces'],
-                baremaCategories: data['baremaCategories'],
-                processForms: data['processForms'],
-                processNotices: data['processNotices'],
-                steps: data['steps'],
-                currentStep: data['currentStep']
-
-            }
-
+    async getOpen() {
+        let comparator:Comparator = new Comparator();
+        comparator.add('state', ProcessStepsState.OPEN, ComparatorEnum.EQUAL);
+        let listSelectiveProcess = await this.repository.find('selectiveprocess', comparator);
+        if (listSelectiveProcess.length > 0) {
+            const selectiveProcess:SelectiveProcess = new SelectiveProcessBuilder()
+                .register(listSelectiveProcess[0])
+            .build();
             return selectiveProcess;
         }
         return null;
     }
 
-    async function getAll() {
-        let processList = [];
-
-        await selectiveProcessRef.get().then(
-            (snapshot) => {
-                snapshot.forEach(
-                    (result) => {
-                        const id = result.id;
-                        const doc = result.data();
-                        const selectiveProcess: SelectiveProcess = {
-                            id: id,
-                            title: doc['title'],
-                            creationDate: doc['creationDate'],
-                            state: doc['state'],
-                            numberPlaces: doc['numberPlaces'],
-                            description: doc['description'],
-                            reservedPlaces: doc['reservedPlaces'],
-                            baremaCategories: doc['baremaCategories'],
-                            processForms: doc['processForms'],
-                            processNotices: doc['processNotices'],
-                            steps: doc['steps'],
-                            currentStep: doc['currentStep']
-
-                        }
-                        processList.push(selectiveProcess);
-                    });
-
-            }
-        ).catch(
-        );
-
-        return processList;
-    }
-
-
-    async function save(process: SelectiveProcess): Promise<any> {
-        return selectiveProcessRef.add(process);
-    }
-
-    async function update(process: SelectiveProcess) {
-        selectiveProcessRef.doc(process.id).update(process);
-    }
-
-    async function remove(process: SelectiveProcess) {
-        selectiveProcessRef.doc(process.id).delete();
-    }
-
-    async function getById(id) {
-        let snapshot = await selectiveProcessRef.doc(id).get();
-        const doc = snapshot.data();
-        const process: SelectiveProcess = {
-            id: id,
-            title: doc['title'],
-            state: doc['state'],
-            numberPlaces: doc['numberPlaces'],
-            description: doc['description'],
-            reservedPlaces: doc['reservedPlaces'],
-            baremaCategories: doc['baremaCategories'],
-            processForms: doc['processForms'],
-            processNotices: doc['processNotices'],
-            steps: doc['steps'],
-            currentStep: doc['currentStep']
-
+    async getAll() {
+        let listSelectiveProcess:SelectiveProcess[] = [];
+        let listSelectiveProcessRegister = await this.repository.getAll("selectiveprocess");
+        for(let selectiveProcessRegister of listSelectiveProcessRegister){
+            const selectiveProcess: SelectiveProcess = new SelectiveProcessBuilder()
+                .register(selectiveProcessRegister)
+            .build();
+            listSelectiveProcess.push(selectiveProcess);
         }
+        return listSelectiveProcess;
+    }
+
+
+    async save(process: SelectiveProcess): Promise<any> {
+        return await this.repository.save("selectiveprocess", process);
+    }
+
+    async update(process: SelectiveProcess) {
+        await this.repository.update("selectiveprocess", process);
+    }
+
+    async remove(process: SelectiveProcess) {
+        await this.repository.remove("selectiveprocess", process.id);
+    }
+
+    async getById(id) {
+        let selectiveProcessRegister = await this.repository.get("selectiveprocess", id);
+        const process: SelectiveProcess = new SelectiveProcessBuilder()
+            .register(selectiveProcessRegister)
+        .build();
         return process;
     }
-
-
-    return {
-        getInConstruction,
-        save,
-        update,
-        remove,
-        getById,
-        getOpen,
-        getAll
-    }
-
 }
 

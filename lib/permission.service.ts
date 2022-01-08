@@ -3,7 +3,7 @@
 import { GetServerSidePropsContext } from "next";
 import { parseCookies, setCookie, destroyCookie } from "nookies";
 import Cookies from "./cookies.service";
-import { authAdmin } from '../utils/firebase-admin';
+import { authAdmin } from '../firebase/firebase-admin';
 import API from "./api.service";
 import { APIResponse } from "../models/api-response";
 import { User } from "../models/user";
