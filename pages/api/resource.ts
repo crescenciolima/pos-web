@@ -1,21 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors'
 import AuthService from '../../lib/auth.service';
-import FileUploadService from '../../lib/upload.service';
-import { StoragePaths } from '../../utils/storage-path';
-import multer from 'multer';
 import initMiddleware from '../../utils/init-middleware'
-import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { APIResponse } from '../../models/api-response';
-import NewsService from '../../lib/news.service';
-import { News } from '../../models/news';
-import fire from '../../utils/firebase-util';
-import { SubscriptionResource, SubscriptionStatus } from '../../models/subscription';
 import SubscriptionService from '../../lib/subscription.service';
 import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';
-import SelectiveProcessService from '../../lib/selectiveprocess.service';
 import ResourceUtil from '../../lib/resource.util';
+import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
+import { SubscriptionResource } from '../../models/subscription/subscription-resource';
+import { SubscriptionStatus } from '../../models/subscription/subscription-resource.enum';
 
 const cors = initMiddleware(
   Cors({
@@ -26,7 +20,7 @@ const cors = initMiddleware(
 async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   const subscriptionService = SubscriptionService();
-  const selectiveProcessService = SelectiveProcessService();
+  const selectiveProcessService = new SelectiveProcessService();
   const treatError = TreatError();
   const authService = AuthService();
   const resourceUtil = ResourceUtil();

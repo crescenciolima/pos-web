@@ -3,7 +3,6 @@ import Cors from 'cors'
 import multer from 'multer';
 import { APIResponse } from '../../models/api-response';
 import SubscriptionService from '../../lib/subscription.service';
-import { Subscription, SubscriptionStatus } from '../../models/subscription';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import initMiddleware from '../../utils/init-middleware';
@@ -12,6 +11,7 @@ import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../utils/storage-path';
 import { v4 as uuidv4 } from 'uuid';
 import { Constants } from '../../utils/constants';
+import { SubscriptionStatus } from '../../models/subscription/subscription-resource.enum';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });

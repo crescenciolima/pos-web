@@ -1,16 +1,16 @@
-import { ErrorMessage, Field, Formik } from 'formik'
 import React, { useEffect, useState } from "react";
-import * as Yup from 'yup'
 import { useRouter } from 'next/router';
-import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
-import { APIResponse } from '../../../models/api-response';
-import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
-import { Subscription, SubscriptionStatus } from '../../../models/subscription';
-import { faTrash, faClock, faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { SelectiveProcess } from "../../../models/subscription-process/selective-process";
+import { ProcessStep } from "../../../models/subscription-process/process-step";
+import { Subscription } from "../../../models/subscription/subscription";
+import { ProcessStepsState } from "../../../models/subscription-process/process-steps-state.enum";
+import { ProcessStepsTypes } from "../../../models/subscription-process/process-steps-types.enum";
+import { SubscriptionStatus } from "../../../models/subscription/subscription-resource.enum";
 
 interface Props {
     process: SelectiveProcess;

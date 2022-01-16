@@ -2,7 +2,6 @@ import { ErrorMessage, FieldArray, Formik } from 'formik'
 import React, { useEffect, useState } from "react";
 import * as Yup from 'yup'
 import adminStyle from '../../styles/admin.module.css';
-import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
 import { APIRoutes } from '../../utils/api.routes';
@@ -18,7 +17,10 @@ registerLocale('pt-BR', ptBR)
 
 
 import "react-datepicker/dist/react-datepicker.css";
-import fire from '../../utils/firebase-util';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
+import { ProcessStep } from '../../models/subscription-process/process-step';
+import fire from '../../firebase/firebase-util';
+import { ProcessStepsTypes } from '../../models/subscription-process/process-steps-types.enum';
 
 interface Props {
     process: SelectiveProcess;
@@ -71,10 +73,8 @@ export default function SelectiveProcessSteps(props: Props) {
 
             actions.setSubmitting(true);
 
-            const body = {
-                id: props.process.id,
-                steps: steps,
-            }
+            let body = props.process;
+            body.steps = steps;
 
             const result: APIResponse = await api.post(APIRoutes.SELECTIVE_PROCESS, body);
 

@@ -1,7 +1,7 @@
 
 
+import FirebaseMessage from "../firebase/firebase-message-util";
 import { APIResponse } from "../models/api-response";
-import FirebaseMessage from "../utils/firebase-message-util";
 
 export default function TreatError() {
 

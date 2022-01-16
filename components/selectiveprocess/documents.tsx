@@ -2,7 +2,6 @@ import { ErrorMessage, Field, FieldArray, Formik } from 'formik'
 import React, { useEffect, useState } from "react";
 import teacher from "../../pages/api/teacher";
 import * as Yup from 'yup'
-import { BaremaCategory, ProcessDocument, ReservedPlace, SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
 import { APIRoutes } from '../../utils/api.routes';
@@ -12,6 +11,8 @@ import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import style from '../../styles/selectiveprocess.module.css'
 import { FileHelper } from '../../helpers/file-helper';
 import WarningDialog from '../warning-dialog';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
+import { ProcessDocument } from '../../models/subscription-process/process-document';
 // import { toast } from 'react-nextjs-toast'
 
 interface Props {

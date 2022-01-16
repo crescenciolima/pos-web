@@ -1,4 +1,4 @@
-import { SubscriptionFile, SubscriptionStatus } from "../../../models/subscription";
+import { SubscriptionFile, SubscriptionStatus } from "../../../models/subscription/subscription";
 import { Document, Page, pdfjs } from "react-pdf";
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

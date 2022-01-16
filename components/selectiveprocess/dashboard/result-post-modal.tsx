@@ -1,19 +1,14 @@
-import { SubscriptionFile, SubscriptionStatus } from "../../../models/subscription";
-import { Document, Page, pdfjs } from "react-pdf";
 import React, { useEffect, useRef, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFile } from "@fortawesome/free-solid-svg-icons";
-import { AnalysisSubCategory, AnalysisCategory } from "../subscription/subscription-barema-analysis";
 import { Formik, ErrorMessage } from "formik";
 import SunEditor from "suneditor-react";
-import news from "../../../pages/api/news";
 import * as Yup from 'yup'
 import { News } from "../../../models/news";
-import fire from "../../../utils/firebase-util";
 import 'suneditor/dist/css/suneditor.min.css';
-import { SelectiveProcess } from "../../../models/selective-process";
+import { SelectiveProcess } from "../../../models/subscription-process/selective-process";
 import { APIRoutes } from "../../../utils/api.routes";
 import API from "../../../lib/api.service";
+import { SubscriptionFile } from "../../../models/subscription/subscription-file";
+import { SubscriptionStatus } from "../../../models/subscription/subscription-resource.enum";
 
 interface Props {
     onClose?: Function;

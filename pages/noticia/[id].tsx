@@ -4,13 +4,13 @@ import { GetStaticPaths, GetStaticProps } from 'next'
 import React from 'react'
 import SiteHeader from '../../components/site-header'
 import Image from 'next/image'
-import NewsService from '../../lib/news.service'
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowAltCircleLeft } from '@fortawesome/free-solid-svg-icons'
 import { CourseService } from '../../lib/course.service';
 import { Course } from '../../models/course'
 import SiteFooter from '../../components/site-footer'
+import { NewsService } from '../../lib/news.service'
 
 export default function Docentes({ news,course }) {
 
@@ -68,7 +68,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
 
-  const newsService = NewsService();
+  const newsService = new NewsService();
 
   const newsSlug = context.params.id;
 

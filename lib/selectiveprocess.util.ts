@@ -1,5 +1,8 @@
-import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from "../models/selective-process";
-import { Subscription, SubscriptionStatus } from "../models/subscription";
+import { ProcessStep } from "../models/subscription-process/process-step";
+import { ProcessStepsTypes } from "../models/subscription-process/process-steps-types.enum";
+import { SelectiveProcess } from "../models/subscription-process/selective-process";
+import { Subscription } from "../models/subscription/subscription";
+import { SubscriptionStatus } from "../models/subscription/subscription-resource.enum";
 import API from "./api.service";
 
 

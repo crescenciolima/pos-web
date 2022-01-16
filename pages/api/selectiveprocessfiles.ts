@@ -1,13 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiResponse } from 'next'
 import FileUploadService from '../../lib/upload.service';
 import multer from 'multer';
 import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { APIResponse } from '../../models/api-response';
-import SelectiveProcessService from '../../lib/selectiveprocess.service';
-import { ProcessDocument, SelectiveProcess } from '../../models/selective-process';
 import { StoragePaths } from '../../utils/storage-path';
 import { Constants } from '../../utils/constants';
+import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
+import { ProcessDocument } from '../../models/subscription-process/process-document';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -21,7 +22,7 @@ const multerAny = initMiddleware(
 
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
-  const selectiveProcessService = SelectiveProcessService();
+  const selectiveProcessService = new SelectiveProcessService();
 
   switch (req.method) {
 
@@ -45,12 +46,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
 
         let process = await selectiveProcessService.getById(id);
-        let updateProcess: SelectiveProcess = {
-          id: id,
-          title: process.title,
-          state: process.state
-        }
-
+        
         switch (type) {
           case "Edital":
             let docs = process.processNotices;
@@ -58,8 +54,8 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
               docs = [];
             }
             docs.push(doc);
-            updateProcess.processNotices = docs;
-            await selectiveProcessService.update(updateProcess);
+            process.processNotices = docs;
+            await selectiveProcessService.update(process);
             break;
           case "Formulário":
             let forms = process.processForms;
@@ -67,8 +63,8 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
               forms = [];
             }
             forms.push(doc);
-            updateProcess.processForms = forms;
-            await selectiveProcessService.update(updateProcess);
+            process.processForms = forms;
+            await selectiveProcessService.update(process);
             break;
         }
 
@@ -76,7 +72,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
         let response: APIResponse = {
           msg: "Processo seletivo salvo com sucesso!",
-          result: updateProcess
+          result: process
         }
 
 
@@ -105,23 +101,17 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       }
 
 
-      let updateProcess: SelectiveProcess = {
-        id: id,
-        title: process.title,
-        state: process.state
-      }
-
       if (processNotices) {
-        updateProcess.processNotices = JSON.parse(processNotices);
-        await selectiveProcessService.update(updateProcess);
+        process.processNotices = JSON.parse(processNotices);
+        await selectiveProcessService.update(process);
       } else if (processForms) {
-        updateProcess.processForms = JSON.parse(processForms);
-        await selectiveProcessService.update(updateProcess);
+        process.processForms = JSON.parse(processForms);
+        await selectiveProcessService.update(process);
       }
 
       let deleteResponse: APIResponse = {
         msg: "Arquivo removido com sucesso!",
-        result: updateProcess
+        result: process
       }
 
       res.status(200).json(deleteResponse);

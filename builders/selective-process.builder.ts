@@ -1,4 +1,4 @@
-import { SelectiveProcess } from "../models/selective-process";
+import { SelectiveProcess } from "../models/subscription-process/selective-process";
 import { Builder } from "./builder";
 
 export class SelectiveProcessBuilder implements Builder<SelectiveProcess>{

@@ -2,7 +2,7 @@ import { ErrorMessage, Field, Formik } from 'formik'
 import React from "react";
 import teacher from "../../pages/api/teacher";
 import * as Yup from 'yup'
-import { SelectiveProcess } from '../../models/selective-process';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
 import { APIRoutes } from '../../utils/api.routes';
@@ -23,11 +23,9 @@ export default function SelectiveProcessBasicInfo(props: Props) {
         try {
             actions.setSubmitting(true);
 
-            const body = {
-                id: props.process.id,
-                title: values.title,
-                description: values.description
-            }
+            let body = props.process;
+            body.title = values.title;
+            body.description = values.description;
 
             const result: APIResponse = await api.post(APIRoutes.SELECTIVE_PROCESS, body);
 

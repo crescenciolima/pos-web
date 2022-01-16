@@ -2,16 +2,12 @@ import React, { useEffect, useState } from 'react'
 
 import { APIRoutes } from '../../../utils/api.routes'
 import AdminBase from '../../../components/admin/admin-base'
-import { Teacher } from '../../../models/teacher';
-import Link from 'next/link';
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
 import Loading from '../../../components/loading';
 import ConfirmDialog from '../../../components/confirm-dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRocket } from '@fortawesome/free-solid-svg-icons'
-import { ProcessStepsState, SelectiveProcess } from '../../../models/selective-process';
-import fire from '../../../utils/firebase-util';
 import SelectiveProcessBasicInfo from '../../../components/selectiveprocess/basic-info';
 import SelectiveProcessPlaces from '../../../components/selectiveprocess/places';
 import SelectiveProcessBarema from '../../../components/selectiveprocess/barema';
@@ -20,6 +16,8 @@ import SelectiveProcessSteps from '../../../components/selectiveprocess/steps';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
+import { SelectiveProcess } from '../../../models/subscription-process/selective-process';
+import { ProcessStepsState } from '../../../models/subscription-process/process-steps-state.enum';
 
 
 
@@ -99,13 +97,10 @@ export default function SelectiveProcessLayout() {
 
   async function confirmOpenProcess() {
 
-    let body = {
-      id: selectiveProcess.id,
-      state: ProcessStepsState.OPEN,
-      currentStep: 0
-    }
+    selectiveProcess.state = ProcessStepsState.OPEN;
+    selectiveProcess.currentStep = 0;
 
-    const result = await api.post(APIRoutes.SELECTIVE_PROCESS, body);
+    const result = await api.post(APIRoutes.SELECTIVE_PROCESS, selectiveProcess);
 
     setSelectiveProcess(result.result);
     closeModal();

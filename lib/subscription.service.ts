@@ -1,4 +1,4 @@
-import { Subscription } from "../models/subscription";
+import { Subscription } from "../models/subscription/subscription";
 import { firestore } from "../firebase/firebase-admin";
 
 

@@ -10,7 +10,7 @@ import { APIResponse } from '../../models/api-response';
 import NewsService from '../../lib/news.service';
 import { News } from '../../models/news';
 import fire from '../../utils/firebase-util';
-import { SubscriptionResource, SubscriptionStatus } from '../../models/subscription';
+import { SubscriptionResource, SubscriptionStatus } from '../../models/subscription/subscription';
 import SubscriptionService from '../../lib/subscription.service';
 import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';

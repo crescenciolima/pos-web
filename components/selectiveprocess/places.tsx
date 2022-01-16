@@ -1,8 +1,6 @@
 import { ErrorMessage, Field, Formik } from 'formik'
 import React, { useEffect, useState } from "react";
-import teacher from "../../pages/api/teacher";
 import * as Yup from 'yup'
-import { ReservedPlace, SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
 import { APIRoutes } from '../../utils/api.routes';
@@ -10,6 +8,8 @@ import { APIResponse } from '../../models/api-response';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { v4 as uuidv4 } from 'uuid';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
+import { ReservedPlace } from '../../models/subscription-process/reserved-place';
 
 interface Props {
     process: SelectiveProcess;
@@ -40,11 +40,9 @@ export default function SelectiveProcessPlaces(props: Props) {
         try {
             actions.setSubmitting(true);
 
-            const body = {
-                id: props.process.id,
-                numberPlaces: values.numberPlaces,
-                reservedPlaces: reservedPlaces
-            }
+            let body = props.process;
+            body.numberPlaces = values.numberPlaces;
+            body.reservedPlaces = reservedPlaces;
 
             const result: APIResponse = await api.post(APIRoutes.SELECTIVE_PROCESS, body);
 

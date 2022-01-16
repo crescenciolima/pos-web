@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import ReactPDF, { Page, Text, View, Document, StyleSheet, PDFDownloadLink, Font, usePDF, pdf } from '@react-pdf/renderer';
-import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/selective-process';
+import React from 'react';
+import { Page, Document, StyleSheet } from '@react-pdf/renderer';
 import PDFHeader from './components/pdf-header';
 import PDFTable, { PDFTableInfo } from './components/pdf-table';
-import { FinalListGroup } from '../dashboard/final-result';
-import { Subscription, SubscriptionStatus } from '../../../models/subscription';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
+import { SelectiveProcess } from '../../../models/subscription-process/selective-process';
+import { ProcessStep } from '../../../models/subscription-process/process-step';
+import { Subscription } from '../../../models/subscription/subscription';
+import { ProcessStepsTypes } from '../../../models/subscription-process/process-steps-types.enum';
+import { SubscriptionStatus } from '../../../models/subscription/subscription-resource.enum';
 
 interface Props {
   process: SelectiveProcess;

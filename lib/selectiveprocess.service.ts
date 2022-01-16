@@ -1,5 +1,6 @@
 import { SelectiveProcessBuilder } from "../builders/selective-process.builder";
-import { ProcessStepsState, SelectiveProcess } from "../models/selective-process";
+import { ProcessStepsState } from "../models/subscription-process/process-steps-state.enum";
+import { SelectiveProcess } from "../models/subscription-process/selective-process";
 import { Repository } from "../repositories/repository";
 import { RepositoryFactory } from "../repositories/repository.factory";
 import { Comparator } from "../utils/comparator";

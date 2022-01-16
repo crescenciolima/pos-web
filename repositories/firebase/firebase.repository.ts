@@ -28,12 +28,17 @@ export class FirebaseRepository implements Repository{
 
     async save(table:string, object:any){
         this._collection = firestore.collection(table);
-        this._collection.add(object);
+        return this._collection.add(object);
     }
 
     async update(table:string, object:any) {
+        let objectFirebase = {};
+        for(var [key, value] of Object.entries(object)){
+            if(value == 0 || value != undefined)
+                objectFirebase[key] = value;
+        }
         this._collection = firestore.collection(table);
-        this._collection.doc(object.id).set(object);
+        this._collection.doc(objectFirebase['id']).set(objectFirebase);
     }
 
     async remove(table:string, id:any) {

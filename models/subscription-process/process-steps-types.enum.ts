@@ -1,64 +1,3 @@
-export class SelectiveProcess {
-    id?: string;
-    title?: string;
-    state?: ProcessStepsState;
-    creationDate?: number;
-    numberPlaces?: number;
-    description?: string;
-    reservedPlaces?: ReservedPlace[];
-    baremaCategories?: BaremaCategory[];
-    processForms?: ProcessDocument[];
-    processNotices?: ProcessDocument[];
-    steps?: ProcessStep[];
-    currentStep?: number;
-}
-
-
-export interface ReservedPlace {
-
-    name: string;
-    numberPlaces: number;
-    uuid: string;
-
-}
-
-
-export interface BaremaCategory {
-
-    name: string;
-    maxPoints: number;
-    subcategories: BaremaSubCategory[];
-}
-
-
-export interface BaremaSubCategory {
-
-    uuid: string;
-    name: string;
-    points: number;
-
-}
-
-export interface ProcessDocument {
-
-    name: string;
-    url: string;
-
-}
-
-
-export interface ProcessStep {
-
-    order: number;
-    startDate: number;
-    finishDate: number;
-    weight: number;
-    passingScore: number;
-    type: ProcessStepsTypes;
-    resultURL?:string;
-
-}
-
 export enum ProcessStepsTypes {
     INSCRICAO = "Inscrição",
     HOMOLOGACAO_PRELIMINAR_INSCRICAO = "Homologação Preliminar Inscrição",
@@ -77,11 +16,4 @@ export enum ProcessStepsTypes {
     INTERPOSICAO_RECURSO_AVALIACAO_CURRICULAR = "Interposição de Recursos da Avaliação Curricular",
     RESULTADO_DEFINITIVO_AVALIACAO_CURRICULAR = "Resultado Definitivo da Avaliação Curricular",
     RESULTADO_DEFINITIVO_PROCESSO_SELETIVO = "Resultado Definitivo do Processo Seletivo"
-}
-
-
-export enum ProcessStepsState {
-    IN_CONSTRUCTION = "in_construction",
-    OPEN = "open",
-    FINISHED = "finished",
 }

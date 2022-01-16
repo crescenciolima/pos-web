@@ -4,17 +4,16 @@ import Link from 'next/link'
 import { GetStaticProps } from 'next'
 import React, { useRef } from 'react'
 import SiteHeader from '../components/site-header'
-import NewsService from '../lib/news.service'
 import NewsCard from '../components/news-card'
 import { News } from '../models/news'
 import { Course } from '../models/course'
-import fire from '../utils/firebase-util'
-import Image from 'next/image'
 import SiteFooter from '../components/site-footer'
-import SelectiveProcessService from '../lib/selectiveprocess.service'
-import { ProcessStepsState, ProcessStepsTypes } from '../models/selective-process'
-import { format, sub } from 'date-fns';
+import { format } from 'date-fns';
 import { CourseService } from '../lib/course.service'
+import { NewsService } from '../lib/news.service'
+import { SelectiveProcessService } from '../lib/selectiveprocess.service'
+import { ProcessStepsState } from '../models/subscription-process/process-steps-state.enum'
+import { ProcessStepsTypes } from '../models/subscription-process/process-steps-types.enum'
 
 
 
@@ -140,7 +139,7 @@ export default function Home({ newsList, course, hasOpenProcess, title, acceptin
 export const getStaticProps: GetStaticProps = async () => {
 
   //Recuperando as ultimas notícias
-  const newsService = NewsService();
+  const newsService = new NewsService();
   const newsList = await newsService.getFirstResults();
   for (let news of newsList) {
     try {
@@ -153,7 +152,7 @@ export const getStaticProps: GetStaticProps = async () => {
   //Recuperando dados do curso
   const courseService = new CourseService();
   let courseData = await courseService.getFirstCourse();
-  let course: Course = {
+  let course:any = {
     name: '<Nome do Curso>',
     description: '<Descrição do Curso>',
     coordName: '<Nome do Coordenador>',
@@ -164,8 +163,10 @@ export const getStaticProps: GetStaticProps = async () => {
     course = courseData
   }
 
+  
+
   //Recuperando dados do processo seletivo
-  const processService = SelectiveProcessService();
+  const processService = new SelectiveProcessService();
   const process = await processService.getOpen();
   let title = "", subscriptionDate = "", editalURL = "";
   let hasOpenProcess = false, acceptingSubscription = false;
@@ -185,6 +186,7 @@ export const getStaticProps: GetStaticProps = async () => {
     }
   }
 
+  course = JSON.stringify(course);
 
   return {
     props: {

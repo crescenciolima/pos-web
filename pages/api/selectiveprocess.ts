@@ -1,13 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import FileUploadService from '../../lib/upload.service';
 import { APIResponse } from '../../models/api-response';
-import SelectiveProcessService from '../../lib/selectiveprocess.service';
-import { SelectiveProcess } from '../../models/selective-process';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
 import { v4 as uuidv4 } from 'uuid';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
+import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
 
 const cors = initMiddleware(
   Cors({
@@ -19,7 +18,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   await cors(req, res);
 
-  const selectiveProcessService = SelectiveProcessService();
+  const selectiveProcessService = new SelectiveProcessService();
   const authService = AuthService();
   const treatError = TreatError();
 

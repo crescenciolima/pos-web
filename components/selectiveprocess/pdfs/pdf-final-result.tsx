@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import ReactPDF, { Page, Text, View, Document, StyleSheet, PDFDownloadLink, Font, usePDF, pdf } from '@react-pdf/renderer';
-import { ProcessStep, SelectiveProcess } from '../../../models/selective-process';
+import { ProcessStep, SelectiveProcess } from '../../../models/subscription-process/selective-process';
 import PDFHeader from './components/pdf-header';
 import PDFTable, { PDFTableInfo } from './components/pdf-table';
 import { FinalListGroup } from '../dashboard/final-result';

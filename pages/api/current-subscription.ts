@@ -1,12 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { APIResponse } from '../../models/api-response';
 import SubscriptionService from '../../lib/subscription.service';
-import { Subscription, SubscriptionStatus } from '../../models/subscription';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
-import SelectiveProcessService from '../../lib/selectiveprocess.service';
+import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
 
 
 const cors = initMiddleware(
@@ -37,7 +36,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
           return res.status(401).json(await treatError.general('Usuário não autorizado.'));
         }
 
-        const selectiveProcessService = SelectiveProcessService();
+        const selectiveProcessService = new SelectiveProcessService();
         
         const process = await selectiveProcessService.getOpen();
         

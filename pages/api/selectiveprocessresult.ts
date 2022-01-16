@@ -4,10 +4,10 @@ import multer from 'multer';
 import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { APIResponse } from '../../models/api-response';
-import SelectiveProcessService from '../../lib/selectiveprocess.service';
-import { ProcessDocument, SelectiveProcess } from '../../models/selective-process';
 import { StoragePaths } from '../../utils/storage-path';
 import { Constants } from '../../utils/constants';
+import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -21,7 +21,7 @@ const multerAny = initMiddleware(
 
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
-  const selectiveProcessService = SelectiveProcessService();
+  const selectiveProcessService = new SelectiveProcessService();
 
   switch (req.method) {
 
@@ -48,14 +48,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
        
         step.resultURL = url;
 
-        let updateProcess: SelectiveProcess = {
-          id: id,
-          title: process.title,
-          state: process.state,
-          steps: steps
-        }
-
-        await selectiveProcessService.update(updateProcess);
+        await selectiveProcessService.update(process);
 
 
         let response: APIResponse = {

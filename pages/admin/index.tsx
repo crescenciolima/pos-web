@@ -1,15 +1,13 @@
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next'
+import { GetServerSidePropsContext } from 'next'
 import React, { useEffect, useState } from 'react'
 import AdminBase from '../../components/admin/admin-base'
-import Head from 'next/head'
 import API from '../../lib/api.service';
 import { APIRoutes } from '../../utils/api.routes';
 import { APIResponse } from '../../models/api-response';
-import { SelectiveProcess, ProcessStepsState, ProcessStep, ProcessStepsTypes } from '../../models/selective-process';
 import Loading from '../../components/loading';
 import { format } from 'date-fns';
 import SelectiveProcessSubscriptionList from '../../components/selectiveprocess/dashboard/subscription-list';
-import { Subscription } from '../../models/subscription';
+import { Subscription } from '../../models/subscription/subscription';
 import SelectiveProcessResourceList from '../../components/selectiveprocess/dashboard/resource-list';
 import SelectiveProcessUtil from '../../lib/selectiveprocess.util';
 import SelectiveProcessSubscriptionGrading from '../../components/selectiveprocess/dashboard/grading';
@@ -19,6 +17,10 @@ import ConfirmDialog from '../../components/confirm-dialog';
 import SelectiveBaremaAnalysisList from '../../components/selectiveprocess/dashboard/barema-analysis';
 import SelectiveBaremaResults from '../../components/selectiveprocess/dashboard/barema-results';
 import SelectiveProcessFinalResult from '../../components/selectiveprocess/dashboard/final-result';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
+import { ProcessStepsState } from '../../models/subscription-process/process-steps-state.enum';
+import { ProcessStepsTypes } from '../../models/subscription-process/process-steps-types.enum';
+import { ProcessStep } from '../../models/subscription-process/process-step';
 
 export default function Admin() {
 
@@ -38,19 +40,14 @@ export default function Admin() {
   const processUtil = SelectiveProcessUtil();
 
   useEffect(() => {
-
     api.get(APIRoutes.SELECTIVE_PROCESS, { 'open': "true" }).then(
       async (result: APIResponse) => {
         if (result.result) {
           const process: SelectiveProcess = result.result;
-
           let subsResult: APIResponse = await api.get(APIRoutes.SUBSCRIPTION, { 'processID': process.id });
           let subsList: Subscription[] = subsResult.result || [];
-
           setSubscriptionList(subsList);
-
           setSelectiveProcess(process);
-
           let placesMap = {};
           //Mapa de vagas
           for (let place of process.reservedPlaces) {
@@ -73,8 +70,9 @@ export default function Admin() {
   }, []);
 
   const getCurrentStep = (process: SelectiveProcess, subsList: Subscription[]) => {
+    console.log('process = ', process)
     const step = processUtil.getCurrentStep(process);
-
+    console.log('step = ', step)
     const startDate = new Date(step.startDate);
     const finishDate = new Date(step.finishDate);
     setCurrentStep(step);

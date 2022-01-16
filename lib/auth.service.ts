@@ -1,10 +1,10 @@
 import { Course } from "../models/course";
 import { User } from "../models/user";
-import fire from "../utils/firebase-util";
 import { authAdmin } from "../firebase/firebase-admin";
 import firebase from "firebase";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextApiRequestWithFormData } from "../utils/types-util";
+import fire from "../firebase/firebase-util";
 
 export default function AuthService() {
 
@@ -121,7 +121,6 @@ export default function AuthService() {
     
         try {
             const result = await authAdmin.verifyIdToken(authorization);
-            console.log('Current User by verifyIdToken', result);
             return result.uid;
         } catch (err) {
             console.error('Error on verifyIdToken', err);

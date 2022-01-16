@@ -3,9 +3,10 @@ import AdminBase from '../../components/admin/admin-base';
 import Loading from '../../components/loading';
 import API from '../../lib/api.service';
 import { APIResponse } from '../../models/api-response';
-import { SelectiveProcess, ProcessStepsState } from '../../models/selective-process';
 import { APIRoutes } from '../../utils/api.routes';
 import { format } from 'date-fns';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
+import { ProcessStepsState } from '../../models/subscription-process/process-steps-state.enum';
 
 
 export default function ResultsLayout() {

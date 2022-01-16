@@ -6,7 +6,7 @@ import StudentBase from "../../components/student/student-base";
 import { APIRoutes } from '../../utils/api.routes';
 import API from '../../lib/api.service';
 import { APIResponse } from '../../models/api-response';
-import { SelectiveProcess } from '../../models/selective-process';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import style from '../../styles/subscription.module.css';

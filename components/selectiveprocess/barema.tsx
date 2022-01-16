@@ -2,7 +2,6 @@ import { ErrorMessage, Field, FieldArray, Formik } from 'formik'
 import React, { useEffect, useState } from "react";
 import teacher from "../../pages/api/teacher";
 import * as Yup from 'yup'
-import { BaremaCategory, ReservedPlace, SelectiveProcess } from '../../models/selective-process';
 import { useRouter } from 'next/router';
 import API from '../../lib/api.service';
 import { APIRoutes } from '../../utils/api.routes';
@@ -12,6 +11,8 @@ import { faTrash, faPlus } from '@fortawesome/free-solid-svg-icons';
 import style from '../../styles/selectiveprocess.module.css'
 // import { toast } from 'react-nextjs-toast'
 import { v4 as uuidv4 } from 'uuid';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
+import { BaremaCategory } from '../../models/subscription-process/barema-category';
 
 interface Props {
     process: SelectiveProcess;
@@ -70,10 +71,8 @@ export default function SelectiveProcessBarema(props: Props) {
         try {
             actions.setSubmitting(true);
 
-            const body = {
-                id: props.process.id,
-                baremaCategories: baremaCategories,
-            }
+            let body = props.process;
+            body.baremaCategories = baremaCategories;
 
             const result: APIResponse = await api.post(APIRoutes.SELECTIVE_PROCESS, body);
 

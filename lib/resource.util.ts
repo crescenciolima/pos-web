@@ -1,7 +1,11 @@
-import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from "../models/selective-process";
-import { Subscription, SubscriptionResource, SubscriptionStatus } from "../models/subscription";
 import SelectiveProcessUtil from './selectiveprocess.util';
 import { ResourceStepsHelper } from '../helpers/resource-steps-helper';
+import { Subscription } from '../models/subscription/subscription';
+import { SelectiveProcess } from '../models/subscription-process/selective-process';
+import { ProcessStepsTypes } from '../models/subscription-process/process-steps-types.enum';
+import { SubscriptionStatus } from '../models/subscription/subscription-resource.enum';
+import { ProcessStep } from '../models/subscription-process/process-step';
+import { SubscriptionResource } from '../models/subscription/subscription-resource';
 
 
 export default function ResourceUtil() {

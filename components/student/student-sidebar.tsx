@@ -4,8 +4,8 @@ import { faChartLine, faBookReader, faChalkboardTeacher, faFile, faFileAlt, faFi
 import adminStyle from '../../styles/admin.module.css';
 import React, { useState, useEffect } from 'react';
 import { APIResponse } from '../../models/api-response';
-import { SelectiveProcess } from '../../models/selective-process';
-import { Subscription } from '../../models/subscription';
+import { SelectiveProcess } from '../../models/subscription-process/selective-process';
+import { Subscription } from '../../models/subscription/subscription';
 import { APIRoutes } from '../../utils/api.routes';
 import { css } from "@emotion/core";
 import API from '../../lib/api.service';

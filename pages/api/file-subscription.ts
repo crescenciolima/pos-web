@@ -3,7 +3,7 @@ import Cors from 'cors'
 import multer from 'multer';
 import { APIResponse } from '../../models/api-response';
 import SubscriptionService from '../../lib/subscription.service';
-import { Subscription, SubscriptionStatus, SubscriptionTypeFile } from '../../models/subscription';
+import { Subscription, SubscriptionStatus, SubscriptionTypeFile } from '../../models/subscription/subscription';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import initMiddleware from '../../utils/init-middleware';
