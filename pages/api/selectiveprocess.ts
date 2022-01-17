@@ -4,9 +4,9 @@ import { SelectiveProcess } from '../../models/subscription-process/selective-pr
 import { v4 as uuidv4 } from 'uuid';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
-import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
+import { AuthService } from '../../lib/auth.service';
 
 const cors = initMiddleware(
   Cors({
@@ -19,7 +19,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
   await cors(req, res);
 
   const selectiveProcessService = new SelectiveProcessService();
-  const authService = AuthService();
+  const authService = new AuthService();
   const treatError = TreatError();
 
   switch (req.method) {

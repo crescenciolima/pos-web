@@ -1,7 +1,6 @@
 import { User } from "../models/user";
-import { Builder } from "./builder";
 
-export class UserBuilder implements Builder<User>{
+export class UserBuilder{
 
     private _user:User;
 
@@ -9,7 +8,7 @@ export class UserBuilder implements Builder<User>{
         this._user = new User();
     }
 
-    register(register: any): Builder<User> {
+    register(register: any): UserBuilder {
         this._user.id = register['id'];
         this._user.uid = register['uid'];
         this._user.name = register['name'];
@@ -20,6 +19,16 @@ export class UserBuilder implements Builder<User>{
         return this;
     }
     
+    public id(id:string): UserBuilder{
+        this._user.id = id;
+        return this;
+    }
+
+    public token(token:string): UserBuilder{
+        this._user.token = token;
+        return this;
+    }
+
     build(): User {
         return this._user;
     }

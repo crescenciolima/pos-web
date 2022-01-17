@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import AuthService from '../../lib/auth.service';
 import { Course } from '../../models/course';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware'
@@ -7,8 +6,9 @@ import { authAdmin } from "../../firebase/firebase-admin";
 import TreatError from '../../lib/treat-error.service';
 import { APIResponse } from '../../models/api-response';
 import { CourseService } from '../../lib/course.service';
+import { AuthService } from '../../lib/auth.service';
 
-const authService = AuthService();
+const authService = new AuthService();
 const cors = initMiddleware(
     // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
     Cors({

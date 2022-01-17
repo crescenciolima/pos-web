@@ -1,11 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import CourseService from '../../../lib/course.service';
-import { Course } from '../../../models/course';
 import Cors from 'cors'
 import { APIResponse } from '../../../models/api-response';
-import AuthService from '../../../lib/auth.service';
-import { User } from '../../../models/user';
 import initMiddleware from '../../../utils/init-middleware';
+import { AuthService } from '../../../lib/auth.service';
 
 const cors = initMiddleware(
     Cors({
@@ -14,7 +11,7 @@ const cors = initMiddleware(
 )
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const authService = AuthService();
+    const authService = new AuthService();
 
     await cors(req, res);
 

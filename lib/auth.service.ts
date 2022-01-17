@@ -1,160 +1,55 @@
-import { Course } from "../models/course";
 import { User } from "../models/user";
-import { authAdmin } from "../firebase/firebase-admin";
-import firebase from "firebase";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextApiRequestWithFormData } from "../utils/types-util";
-import fire from "../firebase/firebase-util";
+import { AuthRepository } from "../repositories/auth.repository";
+import { RepositoryFactory } from "../repositories/repository.factory";
 
-export default function AuthService() {
-
-    async function signUp(user: User,  res: NextApiResponse) {
-        return fire.auth().createUserWithEmailAndPassword(user.email, user.password)
-            .then(async (response) => {
-                return await formatUser(response.user);
-            })
-            .catch(async (err) => {
-                console.error('Error on signUp', err);
-                return {
-                    error: true,
-                    message: err.code
-                }
-            });
-    }
-
-    async function signIn(user: User) {
-        return fire.auth().signInWithEmailAndPassword(user.email, user.password).then(async (userCredential) => {
-            return await formatUser(userCredential.user);
-        })
-        .catch(async (err) => {
-            console.error('Error on signIn', err);
-            return {
-                error: true,
-                message: err.code
-            }
-        });
-    }
-
+export class AuthService {
     
-    async function signOut() {
-        return fire.auth().signOut().then(async () => {
-            return true;
-        })
-        .catch(async (err) => {
-            console.error('Error on signOut', err);
-            return {
-                error: true,
-                message: err.code
-            }
-        });
+    private authRepository:AuthRepository;
+
+    constructor(){
+        this.authRepository = RepositoryFactory.authRepository();
     }
 
-    async function removeUser(user: User) {
-        return authAdmin.deleteUser(user.id).then(async () => {
-            return true;
-        })
-        .catch(async (err) => {
-            console.error('Error on removeUser', err);
-            return {
-                error: true,
-                message: err.code
-            }
-        });
+    async signUp(user: User,  res: NextApiResponse) {
+        return await this.authRepository.signUp(user);
     }
 
-    async function forgotPassword(user: User) {
-        return fire.auth().sendPasswordResetEmail(user.email, {url: `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/reset-password`}).then(async (userCredential) => {
-            return true;
-        })
-        .catch(async (err) => {
-            console.error('Error on forgotPassword', err);
-            return {
-                error: true,
-                message: err.code
-            }
-        });
+    async signIn(user: User) {
+       return await this.authRepository.signIn(user);
     }
 
-    async function verifyPasswordResetCode(code: string) {
-        return fire.auth().verifyPasswordResetCode(code).then(async (email) => {
-            return email;
-        })
-        .catch(async (err) => {
-            console.error('Error on verifyPasswordResetCode', err);
-            return {
-                error: true,
-                message: err.code
-            }
-        });
+    async signOut() {
+        return await this.authRepository.signOut();
     }
 
-    async function confirmPasswordReset(code: string, newPassword: string) {
-        return fire.auth().confirmPasswordReset(code, newPassword).then(async (userCredential) => {
-            return true;
-        })
-        .catch(async (err) => {
-            console.error('Error on confirmPasswordReset', err);
-            return {
-                error: true,
-                message: err.code
-            }
-        });
+    async removeUser(user: User) {
+        return await this.authRepository.removeUser(user);
     }
 
-    async function updateUser(user: User) {
-        return authAdmin.updateUser(user.id, {password: user.password}).then(async () => {
-            return true;
-        })
-        .catch(async (err) => {
-            console.error('Error on updateUser', err);
-            return {
-                error: true,
-                message: err.code
-            }
-        });
+    async forgotPassword(user: User) {
+        return await this.authRepository.forgotPassword(user);
     }
 
-    async function currentUser(authorization: string) {
-        if (!authorization){
-            return false;
-        }
-    
-        try {
-            const result = await authAdmin.verifyIdToken(authorization);
-            return result.uid;
-        } catch (err) {
-            console.error('Error on verifyIdToken', err);
-            return false;
-        }
+    async verifyPasswordResetCode(code: string) {
+        return await this.authRepository.verifyPasswordResetCode(code);
     }
 
-    const checkAuthentication = async (req: NextApiRequest|NextApiRequestWithFormData) => {
-        return await currentUser(req.headers.authorization);
+    async confirmPasswordReset(code: string, newPassword: string) {
+        return await this.authRepository.confirmPasswordReset(code, newPassword);
     }
 
-    const formatUser = async (user: firebase.User) => {
-        const decodedToken = await user.getIdTokenResult(true);
-        const { token } = decodedToken;
-        const userFormat: User = {
-          id: user.uid,
-          email: user.email,
-          token,
-        };
-        return userFormat;
-    };
-
-    return {
-        signUp,
-        signIn,
-        checkAuthentication,
-        signOut,
-        removeUser,
-        forgotPassword,
-        currentUser,
-        verifyPasswordResetCode,
-        confirmPasswordReset,
-        updateUser,
+    async updateUser(user: User) {
+        return await this.authRepository.updateUser(user);
     }
 
+    async currentUser(authorization: string) {
+        return await this.authRepository.currentUser(authorization);
+    }
+
+    async checkAuthentication(req: NextApiRequest|NextApiRequestWithFormData){
+        return await this.authRepository.currentUser(req.headers.authorization);
+    }
 }
 

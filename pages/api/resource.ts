@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors'
-import AuthService from '../../lib/auth.service';
 import initMiddleware from '../../utils/init-middleware'
 import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
@@ -10,6 +9,7 @@ import ResourceUtil from '../../lib/resource.util';
 import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
 import { SubscriptionResource } from '../../models/subscription/subscription-resource';
 import { SubscriptionStatus } from '../../models/subscription/subscription-resource.enum';
+import { AuthService } from '../../lib/auth.service';
 
 const cors = initMiddleware(
   Cors({
@@ -22,7 +22,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
   const subscriptionService = new SubscriptionService();
   const selectiveProcessService = new SelectiveProcessService();
   const treatError = TreatError();
-  const authService = AuthService();
+  const authService = new AuthService();
   const resourceUtil = ResourceUtil();
 
   await cors(req, res);

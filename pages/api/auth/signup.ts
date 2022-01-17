@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors'
-import AuthService from '../../../lib/auth.service';
 import { User } from '../../../models/user';
 import { APIResponse } from '../../../models/api-response';
 import initMiddleware from '../../../utils/init-middleware';
 import TreatError from '../../../lib/treat-error.service';
 import { UserService } from '../../../lib/user.service';
+import { AuthService } from '../../../lib/auth.service';
 
 const cors = initMiddleware(
     // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -16,7 +16,7 @@ const cors = initMiddleware(
 )
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-    const authService = AuthService();
+    const authService = new AuthService();
     const userService = new UserService();
 
     await cors(req, res);

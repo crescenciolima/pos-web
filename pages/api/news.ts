@@ -6,10 +6,10 @@ import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { APIResponse } from '../../models/api-response';
 import { News } from '../../models/news';
-import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import { Constants } from '../../utils/constants';
 import { NewsService } from '../../lib/news.service';
+import { AuthService } from '../../lib/auth.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -24,7 +24,7 @@ const multerAny = initMiddleware(
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   const newsService = new NewsService();
-  const authService = AuthService();
+  const authService = new AuthService();
   const treatError = TreatError();
 
   switch (req.method) {

@@ -3,7 +3,6 @@ import Cors from 'cors'
 import multer from 'multer';
 import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
-import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import initMiddleware from '../../utils/init-middleware';
 import { BlobCorrected, NextApiRequestWithFormData } from '../../utils/types-util';
@@ -12,6 +11,7 @@ import { StoragePaths } from '../../utils/storage-path';
 import { v4 as uuidv4 } from 'uuid';
 import { Constants } from '../../utils/constants';
 import { SubscriptionStatus } from '../../models/subscription/subscription-resource.enum';
+import { AuthService } from '../../lib/auth.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -29,7 +29,7 @@ const cors = initMiddleware(
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   const subscriptionService = new SubscriptionService();
-  const authService = AuthService();
+  const authService = new AuthService();
   const treatError = TreatError();
 
   await cors(req, res);  

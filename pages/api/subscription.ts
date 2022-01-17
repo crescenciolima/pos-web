@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
-import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from '../../models/subscription/subscription';
 import { SubscriptionStatus } from '../../models/subscription/subscription-resource.enum';
+import { AuthService } from '../../lib/auth.service';
 
 const cors = initMiddleware(
   Cors({
@@ -18,7 +18,7 @@ const cors = initMiddleware(
 async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   const subscriptionService = new SubscriptionService();
-  const authService = AuthService();
+  const authService = new AuthService();
   const treatError = TreatError();
 
   await cors(req, res);
