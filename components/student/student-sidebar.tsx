@@ -10,7 +10,7 @@ import { APIRoutes } from '../../utils/api.routes';
 import { css } from "@emotion/core";
 import API from '../../lib/api.service';
 import { ClipLoader } from 'react-spinners';
-import ResourceUtil from '../../lib/resource.util';
+import ResourceUtil from '../../utils/resource.util';
 import Link from 'next/link'
 
 export default function StudentSidebar({toogleLoading}) {

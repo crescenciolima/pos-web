@@ -5,7 +5,7 @@ import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
 import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';
-import ResourceUtil from '../../lib/resource.util';
+import ResourceUtil from '../../utils/resource.util';
 import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
 import { SubscriptionResource } from '../../models/subscription/subscription-resource';
 import { SubscriptionStatus } from '../../models/subscription/subscription-resource.enum';

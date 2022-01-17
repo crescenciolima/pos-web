@@ -1,4 +1,4 @@
-import SelectiveProcessUtil from './selectiveprocess.util';
+import SelectiveProcessUtil from '../lib/selectiveprocess.util';
 import { ResourceStepsHelper } from '../helpers/resource-steps-helper';
 import { Subscription } from '../models/subscription/subscription';
 import { SelectiveProcess } from '../models/subscription-process/selective-process';

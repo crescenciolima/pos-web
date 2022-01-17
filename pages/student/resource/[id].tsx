@@ -20,7 +20,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import Loading from '../../../components/loading';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
-import ResourceUtil from '../../../lib/resource.util';
+import ResourceUtil from '../../../utils/resource.util';
 import { FileHelper } from '../../../helpers/file-helper';
 import WarningDialog from '../../../components/warning-dialog';
 

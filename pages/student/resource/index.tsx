@@ -10,7 +10,7 @@ import Permission from '../../../lib/permission.service';
 import { APIResponse } from '../../../models/api-response';
 import { UserType } from '../../../enum/type-user.enum';
 import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
-import ResourceUtil from '../../../lib/resource.util';
+import ResourceUtil from '../../../utils/resource.util';
 import { Subscription } from '../../../models/subscription/subscription';
 import { SelectiveProcess } from '../../../models/subscription-process/selective-process';
 
