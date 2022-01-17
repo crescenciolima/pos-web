@@ -3,7 +3,7 @@ import Cors from 'cors'
 import AuthService from '../../lib/auth.service';
 import initMiddleware from '../../utils/init-middleware'
 import { APIResponse } from '../../models/api-response';
-import SubscriptionService from '../../lib/subscription.service';
+import { SubscriptionService } from '../../lib/subscription.service';
 import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';
 import ResourceUtil from '../../lib/resource.util';
@@ -19,7 +19,7 @@ const cors = initMiddleware(
 
 async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
-  const subscriptionService = SubscriptionService();
+  const subscriptionService = new SubscriptionService();
   const selectiveProcessService = new SelectiveProcessService();
   const treatError = TreatError();
   const authService = AuthService();

@@ -1,4 +1,4 @@
-import { ProcessStepsTypes } from "../models/subscription-process/selective-process";
+import { ProcessStepsTypes } from "../models/subscription-process/process-steps-types.enum"
 
 export const ResourceStepsHelper = {
     steps: (): string[] => {

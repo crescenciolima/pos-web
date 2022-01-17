@@ -46,7 +46,7 @@ export default function ResourceUtil() {
         const currentStep: ProcessStep = processUtil.getCurrentStep(selectiveProcess);
         const firstResourceStep = processUtil.getStepByType(selectiveProcess, ProcessStepsTypes.INTERPOSICAO_RECURSO_INSCRICAO);
 
-        return currentStep.order >= firstResourceStep.order;
+        return firstResourceStep == undefined || currentStep.order >= firstResourceStep.order;
     }
 
     return {

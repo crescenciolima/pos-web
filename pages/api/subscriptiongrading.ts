@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { APIResponse } from '../../models/api-response';
-import SubscriptionService from '../../lib/subscription.service';
-import { Subscription } from '../../models/subscription/subscription';
+import { SubscriptionService } from '../../lib/subscription.service';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import Cors from 'cors'
@@ -15,7 +14,7 @@ const cors = initMiddleware(
 
 async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
-  const subscriptionService = SubscriptionService();
+  const subscriptionService = new SubscriptionService();
   const authService = AuthService();
   const treatError = TreatError();
 
@@ -24,8 +23,6 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
   if (!await authService.checkAuthentication(req)) {
     return res.status(401).send(await treatError.general('Usuário não autorizado.'))
   }
-
-  const authorization = req.headers.authorization;
 
   switch (req.method) {
 

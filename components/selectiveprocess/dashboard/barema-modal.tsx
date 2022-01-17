@@ -1,9 +1,10 @@
-import { SubscriptionFile, SubscriptionStatus } from "../../../models/subscription/subscription";
 import { Document, Page, pdfjs } from "react-pdf";
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFile } from "@fortawesome/free-solid-svg-icons";
 import { AnalysisSubCategory, AnalysisCategory } from "../subscription/subscription-barema-analysis";
+import { SubscriptionFile } from "../../../models/subscription/subscription-file";
+import { SubscriptionStatus } from "../../../models/subscription/subscription-resource.enum";
 
 interface Props {
     onClose?: Function;

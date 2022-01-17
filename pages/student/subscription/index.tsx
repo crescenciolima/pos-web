@@ -11,7 +11,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import style from '../../../styles/subscription.module.css';
-import { Subscription, SubscriptionStatus, SubscriptionTypeFile } from "../../../models/subscription/subscription";
 import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
@@ -19,7 +18,6 @@ import { UserType } from '../../../enum/type-user.enum';
 import StudentBase from '../../../components/student/student-base';
 import { APIResponse } from '../../../models/api-response';
 import { User } from '../../../models/user';
-import { ProcessStepsTypes, SelectiveProcess } from '../../../models/subscription-process/selective-process';
 import { MaskHelper } from '../../../helpers/mask-helper';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 import { DocumentValidateHelper } from '../../../helpers/document-validate-helper';
@@ -28,6 +26,11 @@ import { PostalCodeField } from '../../../components/postal-code-field';
 import WarningDialog from '../../../components/warning-dialog';
 import { FileHelper } from '../../../helpers/file-helper';
 import ConfirmDialog from '../../../components/confirm-dialog';
+import { Subscription } from '../../../models/subscription/subscription';
+import { SelectiveProcess } from '../../../models/subscription-process/selective-process';
+import { SubscriptionTypeFile } from '../../../models/subscription/subscription-type-file.enum';
+import { ProcessStepsTypes } from '../../../models/subscription-process/process-steps-types.enum';
+import { SubscriptionStatus } from '../../../models/subscription/subscription-resource.enum';
 registerLocale('pt-BR', ptBR);
 
 export default function SubscriptionLayout(props: InferGetServerSidePropsType<typeof getServerSideProps>) {

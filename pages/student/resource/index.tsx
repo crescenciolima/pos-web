@@ -8,11 +8,11 @@ import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import Permission from '../../../lib/permission.service';
 import { APIResponse } from '../../../models/api-response';
-import { Subscription, SubscriptionResource } from '../../../models/subscription/subscription';
 import { UserType } from '../../../enum/type-user.enum';
-import { ProcessStep, SelectiveProcess } from '../../../models/subscription-process/selective-process';
 import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
 import ResourceUtil from '../../../lib/resource.util';
+import { Subscription } from '../../../models/subscription/subscription';
+import { SelectiveProcess } from '../../../models/subscription-process/selective-process';
 
 export default function ResourceLayout() {
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -37,7 +37,6 @@ export default function ResourceLayout() {
         if(resourceUtil.canRequestResource(subscription, selectiveProcess)) {
           setCanAddResource(true);
         }
-
         setCurrentSubscription(resultSubscription.result);
         setLoading(false);
     };    

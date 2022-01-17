@@ -2,27 +2,25 @@ import React, { useEffect, useState } from 'react'
 
 import AdminBase from '../../../components/admin/admin-base'
 import { APIRoutes } from '../../../utils/api.routes'
-import { News } from '../../../models/news';
 import { useRouter } from 'next/router'
 import Link from 'next/link';
-import * as Yup from 'yup'
-import { ErrorMessage, Formik } from 'formik'
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
-import fire from '../../../utils/firebase-util';
-import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
 import style from '../../../styles/subscription.module.css';
-import { Subscription, SubscriptionStatus } from '../../../models/subscription/subscription';
 import { faClock, faFile, faTimes, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/subscription-process/selective-process';
 import { format } from 'date-fns';
 import SelectiveBaremaAnalysis from '../../../components/selectiveprocess/subscription/subscription-barema-analysis';
 import SelectiveResourcesAnalysis from '../../../components/selectiveprocess/subscription/subscription-resources';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
+import { Subscription } from '../../../models/subscription/subscription';
+import { SubscriptionStatus } from '../../../models/subscription/subscription-resource.enum';
+import { ProcessStepsTypes } from '../../../models/subscription-process/process-steps-types.enum';
+import { SelectiveProcess } from '../../../models/subscription-process/selective-process';
+import { ProcessStepsState } from '../../../models/subscription-process/process-steps-state.enum';
 
 export default function ProcessSubscriprionLayout() {
 

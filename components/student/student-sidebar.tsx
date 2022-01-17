@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faChartLine, faBookReader, faChalkboardTeacher, faFile, faFileAlt, faFileInvoice, faFolder, faCopy, faUser, faHome, faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
+import { faBookReader, faHome, faQuestionCircle } from '@fortawesome/free-solid-svg-icons'
 import adminStyle from '../../styles/admin.module.css';
 import React, { useState, useEffect } from 'react';
 import { APIResponse } from '../../models/api-response';
@@ -11,7 +11,6 @@ import { css } from "@emotion/core";
 import API from '../../lib/api.service';
 import { ClipLoader } from 'react-spinners';
 import ResourceUtil from '../../lib/resource.util';
-import SelectiveProcessUtil from '../../lib/selectiveprocess.util';
 import Link from 'next/link'
 
 export default function StudentSidebar({toogleLoading}) {

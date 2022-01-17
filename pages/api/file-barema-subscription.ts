@@ -2,7 +2,7 @@ import { NextApiResponse } from 'next'
 import Cors from 'cors'
 import multer from 'multer';
 import { APIResponse } from '../../models/api-response';
-import SubscriptionService from '../../lib/subscription.service';
+import { SubscriptionService } from '../../lib/subscription.service';
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import initMiddleware from '../../utils/init-middleware';
@@ -28,7 +28,7 @@ const cors = initMiddleware(
 
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
-  const subscriptionService = SubscriptionService();
+  const subscriptionService = new SubscriptionService();
   const authService = AuthService();
   const treatError = TreatError();
 
