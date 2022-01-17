@@ -1,5 +1,4 @@
 import { NextApiResponse } from 'next'
-import TeacherService from '../../lib/teacher.service'
 import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../utils/storage-path';
 import multer from 'multer';
@@ -11,6 +10,7 @@ import Cors from 'cors'
 import AuthService from '../../lib/auth.service';
 import TreatError from '../../lib/treat-error.service';
 import { Constants } from '../../utils/constants';
+import { TeacherService } from '../../lib/teacher.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -30,7 +30,7 @@ const cors = initMiddleware(
 
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
-  const teacherService = TeacherService();
+  const teacherService = new TeacherService();
   const authService = AuthService();
   const treatError = TreatError();
 

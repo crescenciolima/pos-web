@@ -1,75 +1,47 @@
 import { Teacher } from "../models/teacher";
-import { firestore } from "../firebase/firebase-admin";
+import { Repository } from "../repositories/repository";
+import { RepositoryFactory } from "../repositories/repository.factory";
+import { TeacherBuilder } from "../builders/teacher.builder";
 
 
-export default function TeacherService() {
+export class TeacherService {
 
-    const docenteRef = firestore.collection("teacher");
+    private repository:Repository;
 
-    async function getAll() {
-        let docentes = [];
-
-        await docenteRef.get().then(
-            (snapshot) => {
-
-                snapshot.forEach(
-                    (result) => {
-                        const id = result.id;
-                        const doc = result.data();
-                        const teacher: Teacher = {
-                            id: id,
-                            name: doc['name'],
-                            about: doc['about'],
-                            photo: doc['photo'],
-                            phone: doc['phone'],
-                            email: doc['email'],
-                        }
-                        docentes.push(teacher);
-                    });
-
-            }
-        ).catch(
-        );
-
-        return docentes;
-
+    constructor(){
+        this.repository = RepositoryFactory.repository();
     }
 
-    async function save(teacher: Teacher) {
-        docenteRef.add(teacher);
-    }
-
-    async function update(teacher: Teacher) {
-        docenteRef.doc(teacher.id).set(teacher);
-    }
-
-    async function remove(teacherID: string) {
-        await docenteRef.doc(teacherID).delete();
-    }
-
-    async function getById(id) {
-        let snapshot = await docenteRef.doc(id).get();
-        const doc = snapshot.data();
-        const teacher: Teacher = {
-            id: id,
-            name: doc['name'],
-            about: doc['about'],
-            photo: doc['photo'],
-            phone: doc['phone'],
-            email: doc['email'],
+    async getAll() {
+        let listTeacher:Teacher[] = [];
+        let listTeacherRegister = await this.repository.getAll('teacher');
+        for (let subscriptionRegister of listTeacherRegister) {
+            const subscription:Teacher = new TeacherBuilder()
+                .register(subscriptionRegister)
+            .build();
+            listTeacher.push(subscription);
         }
+        return listTeacher;
+    }
 
+    async save(teacher: Teacher) {
+        return await this.repository.save("teacher", teacher);
+    }
+
+    async update(teacher: Teacher) {
+        return await this.repository.update("teacher", teacher);
+    }
+
+    async remove(teacherID: string) {
+        await this.repository.remove("teacher", teacherID);
+    }
+
+    async getById(id) {
+        let teacherRegister = await this.repository.get('teacher', id);
+        const teacher: Teacher = new TeacherBuilder()
+            .register(teacherRegister)
+        .build();
         return teacher;
     }
-
-
-    return {
-        getAll,
-        save,
-        update,
-        remove,
-        getById
-    }
-
 }
 

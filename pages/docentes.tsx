@@ -7,11 +7,11 @@ import Image from 'next/image'
 import { Teacher } from '../models/teacher'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faPhoneAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons'
-import TeacherService from '../lib/teacher.service'
 
 import { Course } from '../models/course'
 import SiteFooter from '../components/site-footer'
 import { CourseService } from '../lib/course.service'
+import { TeacherService } from '../lib/teacher.service'
 
 export default function Docentes({ docentes,course }) {
 
@@ -84,7 +84,7 @@ export default function Docentes({ docentes,course }) {
 
 export const getStaticProps: GetStaticProps = async () => {
 
-  const teacherService = TeacherService();
+  const teacherService = new TeacherService();
 
   const docenteList = await teacherService.getAll();
 

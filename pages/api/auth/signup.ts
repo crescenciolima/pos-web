@@ -1,15 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import CourseService from '../../../lib/course.service';
-import { Course } from '../../../models/course';
 import Cors from 'cors'
 import AuthService from '../../../lib/auth.service';
-import UserService from '../../../lib/user.service';
 import { User } from '../../../models/user';
 import { APIResponse } from '../../../models/api-response';
 import initMiddleware from '../../../utils/init-middleware';
-import { string } from 'yup/lib/locale';
-import FirebaseMessage from '../../../utils/firebase-message-util';
 import TreatError from '../../../lib/treat-error.service';
+import { UserService } from '../../../lib/user.service';
 
 const cors = initMiddleware(
     // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -21,7 +17,7 @@ const cors = initMiddleware(
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const authService = AuthService();
-    const userService = UserService();
+    const userService = new UserService();
 
     await cors(req, res);
 

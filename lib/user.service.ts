@@ -1,71 +1,47 @@
 import { User } from "../models/user";
-import { firestore } from "../firebase/firebase-admin";
+import { Repository } from "../repositories/repository";
+import { RepositoryFactory } from "../repositories/repository.factory";
+import { UserBuilder } from "../builders/user.builder";
 
 
-export default function UserService() {
+export class UserService {
 
-    const userRef = firestore.collection("user");
+    private repository:Repository;
 
-    async function getAll() {
-        let users = [];
-
-        await userRef.get().then(
-            (snapshot) => {
-
-                snapshot.forEach(
-                    (result) => {
-                        const id = result.id;
-                        const doc = result.data();
-                        const user: User = {
-                            id: id,
-                            email: doc['email'],
-                            name: doc['name'],
-                            type: doc['type'],
-                        }
-                        users.push(user);
-                    });
-
-            }
-        ).catch(
-        );
-
-        return users;
-
+    constructor(){
+        this.repository = RepositoryFactory.repository();
     }
 
-    async function save(user: User) {
-        userRef.add(user);
-    }
-
-    async function update(user: User) {
-        userRef.doc(user.id).set(user);
-    }
-
-    async function remove(user: User) {
-        userRef.doc(user.id).delete();
-    }
-
-    async function getById(id) {
-        let snapshot = await userRef.doc(id).get();
-        const doc = snapshot.data();
-        const user: User = {
-            id: id,
-            email: doc['email'],
-            name: doc['name'],
-            type: doc['type'],
+    async getAll() {
+        let listUser:User[] = [];
+        let listUserRegister = await this.repository.getAll('user');
+        for (let subscriptionRegister of listUserRegister) {
+            const subscription:User = new UserBuilder()
+                .register(subscriptionRegister)
+            .build();
+            listUser.push(subscription);
         }
+        return listUser;
+    }
 
+    async save(user: User) {
+        return await this.repository.save("user", user);
+    }
+
+    async update(user: User) {
+        return await this.repository.update("user", user);
+    }
+
+    async remove(user: User) {
+        await this.repository.remove("user", user.id);
+    }
+
+    async getById(id) {
+        let userRegister = await this.repository.get('user', id);
+        const user: User = new UserBuilder()
+            .register(userRegister)
+        .build();
         return user;
     }
-
-
-    return {
-        getAll,
-        save,
-        update,
-        remove,
-        getById
-    }
-
 }
 
