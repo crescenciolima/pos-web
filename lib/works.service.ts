@@ -1,73 +1,47 @@
 import { Works } from "../models/works";
-import { firestore } from "../firebase/firebase-admin";
+import { Repository } from "../repositories/repository";
+import { RepositoryFactory } from "../repositories/repository.factory";
+import { WorksBuilder } from "../builders/works.builder";
 
 
-export default function WorksService() {
+export class WorksService {
 
-    const worksRef = firestore.collection("works");
+    private repository:Repository;
 
-    async function getAll() {
-        let worksList = [];
-
-        await worksRef.orderBy('date', 'desc').get().then(
-            (snapshot) => {
-                snapshot.forEach(
-                    (result) => {
-                        const id = result.id;
-                        const doc = result.data();
-                        const works: Works = {
-                            id: id,
-                            title: doc['title'],
-                            text: doc['text'],
-                            url: doc['url'],
-                            date: doc['date'],
-                            authors: doc['authors']
-                        }
-                        worksList.push(works);
-                    });
-
-            }
-        ).catch(
-        );
-
-        return worksList;
-
+    constructor(){
+        this.repository = RepositoryFactory.repository();
     }
 
-    async function save(works: Works) {
-       return worksRef.add(works);
-    }
-
-    async function update(works: Works) {
-        worksRef.doc(works.id).set(works);
-    }
-
-    async function remove(teacherID: string) {
-        await worksRef.doc(teacherID).delete();
-    }
-
-    async function getById(id) {
-        let snapshot = await worksRef.doc(id).get();
-        const doc = snapshot.data();
-        const works: Works = {
-            id: id,
-            title: doc['title'],
-            text: doc['text'],
-            url: doc['url'],
-            date: doc['date'],
-            authors: doc['authors']
+    async getAll() {
+        let listWorks:Works[] = [];
+        let listWorksRegister = await this.repository.getAll('works');
+        for (let subscriptionRegister of listWorksRegister) {
+            const subscription:Works = new WorksBuilder()
+                .register(subscriptionRegister)
+            .build();
+            listWorks.push(subscription);
         }
+        return listWorks;
+    }
 
+    async save(works: Works) {
+        return await this.repository.save("works", works);
+    }
+
+    async update(works: Works) {
+        return await this.repository.update("works", works);
+    }
+
+    async remove(worksId: string) {
+        await this.repository.remove("works", worksId);
+    }
+
+    async getById(id) {
+        let worksRegister = await this.repository.get('works', id);
+        const works: Works = new WorksBuilder()
+            .register(worksRegister)
+        .build();
         return works;
     }
-
-    return {
-        getAll,
-        save,
-        update,
-        remove,
-        getById,
-    }
-
 }
 
