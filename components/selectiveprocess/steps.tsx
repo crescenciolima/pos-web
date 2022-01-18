@@ -19,7 +19,6 @@ registerLocale('pt-BR', ptBR)
 import "react-datepicker/dist/react-datepicker.css";
 import { SelectiveProcess } from '../../models/subscription-process/selective-process';
 import { ProcessStep } from '../../models/subscription-process/process-step';
-import fire from '../../firebase/firebase-util';
 import { ProcessStepsTypes } from '../../models/subscription-process/process-steps-types.enum';
 
 interface Props {
@@ -38,7 +37,6 @@ export default function SelectiveProcessSteps(props: Props) {
 
         let steps: ProcessStep[] = props.process.steps ? props.process.steps : [];
         for (let step of steps) {
-
             step['selectedStartDate'] = new Date(step.startDate);
             step['selectedFinishDate'] = new Date(step.finishDate);
         }
@@ -65,8 +63,7 @@ export default function SelectiveProcessSteps(props: Props) {
             let steps: ProcessStep[] = values.steps;
             let index = 0;
             for (let step of steps) {
-                step.startDate = fire.firestore.Timestamp.fromDate(step['selectedStartDate']).toMillis();
-                step.finishDate = fire.firestore.Timestamp.fromDate(step['selectedFinishDate']).toMillis();
+
                 step.order = index;
                 index++;
             }

@@ -140,13 +140,15 @@ export const getStaticProps: GetStaticProps = async () => {
 
   //Recuperando as ultimas notícias
   const newsService = new NewsService();
-  const newsList = await newsService.getFirstResults();
-  for (let news of newsList) {
+  let newsList:any[] = await newsService.getFirstResults();
+  for (let i = 0; i < newsList.length; i++) {
+    let news = newsList[i];
     try {
       news.dateString = format(new Date(news.date), 'dd/MM/yyyy')
     } catch (error) {
       news.dateString = "-"
     }
+    newsList[i] = Object.assign({}, news);
   }
 
   //Recuperando dados do curso
