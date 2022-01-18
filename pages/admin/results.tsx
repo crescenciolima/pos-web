@@ -27,8 +27,10 @@ export default function ResultsLayout() {
                     const processList = result.result;
 
                     for (let process of processList) {
-                        const data = new Date(process.creationDate);
-                        process['data'] = format(data, 'dd/MM/yyyy')
+                        if(process.creationDate){
+                            const data = new Date(process.creationDate);
+                            process['data'] = format(data, 'dd/MM/yyyy')
+                        }
                     }
                     setSelectiveProcessList(processList);
                     setSelectedProcess(processList[0]);
