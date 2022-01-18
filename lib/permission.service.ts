@@ -1,23 +1,22 @@
-
-
 import { GetServerSidePropsContext } from "next";
-import { parseCookies, setCookie, destroyCookie } from "nookies";
 import Cookies from "./cookies.service";
-import { authAdmin } from '../firebase/firebase-admin';
 import API from "./api.service";
 import { APIResponse } from "../models/api-response";
 import { User } from "../models/user";
 import { UserType } from "../enum/type-user.enum";
 import { Message } from "../enum/message.enum";
 import { APIRoutes } from "../utils/api.routes";
+import { AuthRepository } from "../repositories/auth.repository";
+import { RepositoryFactory } from "../repositories/repository.factory";
 
 export default function Permission() {
     const api = API();
     const cookie = Cookies();
+    const authRepository:AuthRepository = RepositoryFactory.authRepository();
 
     async function checkToken(ctx: GetServerSidePropsContext){
         const token = await cookie.getTokenServer(ctx);
-        await authAdmin.verifyIdToken(token);
+        await authRepository.verifyIdToken(token);
     }
 
     async function getCurrentUser(ctx: GetServerSidePropsContext){

@@ -1,5 +1,4 @@
 import { NextApiResponse } from 'next'
-import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../utils/storage-path';
 import multer from 'multer';
 import initMiddleware from '../../utils/init-middleware'
@@ -10,6 +9,7 @@ import { Constants } from '../../utils/constants';
 import { NewsService } from '../../lib/news.service';
 import { AuthService } from '../../lib/auth.service';
 import { TreatError } from '../../lib/treat-error.service';
+import { FileUploadService } from '../../lib/upload.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -49,7 +49,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         }
   
         if(blob){
-          const uploadService = FileUploadService();
+          const uploadService = new FileUploadService();
           let url = await uploadService.upload(StoragePaths.NEWS_COVER, blob, date.toString());
   
           news.coverURL = url;
@@ -100,7 +100,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
       
       let newsID = req.query.id.toString();
       const deletedNews = await newsService.getById(newsID);
-      let uploadService = FileUploadService();
+      let uploadService = new FileUploadService();
       await uploadService.remove(deletedNews.coverURL);
 
       await newsService.remove(newsID);

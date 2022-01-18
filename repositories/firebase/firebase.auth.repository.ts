@@ -7,6 +7,7 @@ import { User } from "../../models/user";
 import { AuthRepository } from "../auth.repository";
 
 export class FirebaseAuthRepository implements AuthRepository{
+   
     async signUp(user: User): Promise<User | AuthError> {
         return fire.auth().createUserWithEmailAndPassword(user.email, user.password)
             .then(async (response) => {
@@ -112,12 +113,16 @@ export class FirebaseAuthRepository implements AuthRepository{
         }
     
         try {
-            const result = await authAdmin.verifyIdToken(authorization);
+            const result = await this.verifyIdToken(authorization);
             return result.uid;
         } catch (err) {
             console.error('Error on verifyIdToken', err);
             return false;
         }
+    }
+    
+    async verifyIdToken(token: string) {
+        return await authAdmin.verifyIdToken(token);
     }
 
     private async getToken(user){

@@ -11,4 +11,5 @@ export interface AuthRepository{
     confirmPasswordReset(code: string, newPassword: string):Promise<boolean|AuthError>;
     updateUser(user: User):Promise<boolean|AuthError>;
     currentUser(authorization: string):Promise<boolean|string>;
+    verifyIdToken(token:string);
 }

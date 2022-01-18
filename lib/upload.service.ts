@@ -1,12 +1,18 @@
-import storage from "../utils/storage-util";
 import { BlobCorrected } from "../utils/types-util";
 import { StoragePaths } from "../utils/storage-path";
+import { StorageRepository } from "../repositories/storage-repository";
+import { RepositoryFactory } from "../repositories/repository.factory";
 
-export default function FileUploadService() {
+export class FileUploadService {
 
+    private storageRepository:StorageRepository;
 
+    constructor(){
+        this.storageRepository = RepositoryFactory.storageRepository();
+    }
+ 
 
-    async function upload(folder: StoragePaths, blob: BlobCorrected, fileName: string): Promise<string> {
+    async upload(folder: StoragePaths, blob: BlobCorrected, fileName: string): Promise<string> {
 
         //Removendo espaços em branco do nome
         fileName= fileName.trim().replace(" ","");
@@ -16,7 +22,7 @@ export default function FileUploadService() {
 
         try {
             //Envia e aguarda a referência do arquivo enviado
-            let uploadRef = await storage.ref().child(`${folder}${fileName}`).put(blob.buffer, {contentType: blob['mimetype']});
+            let uploadRef = await this.storageRepository.storage(folder, blob, fileName);
             //Recupera e devolve a URL de acesso
             const downloadURL = await uploadRef.ref.getDownloadURL();
             return downloadURL;
@@ -27,15 +33,8 @@ export default function FileUploadService() {
 
     }
 
-    async function remove(downloadURL: string) {
-        await storage.refFromURL(downloadURL).delete();
-    }
-
-
-
-    return {
-        upload,
-        remove
+    async remove(downloadURL: string) {
+        await this.storageRepository.remove(downloadURL);
     }
 
 }

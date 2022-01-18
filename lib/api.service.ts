@@ -3,7 +3,6 @@ import { APIResponse } from '../models/api-response';
 import Cookies from '../lib/cookies.service';
 import { GetServerSidePropsContext } from 'next';
 import { APIRoutes } from '../utils/api.routes';
-import { useRouter } from 'next/router';
 
 export default function API(setLoading?: Function) {
     const cookies = Cookies();

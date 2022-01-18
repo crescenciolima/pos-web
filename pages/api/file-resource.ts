@@ -1,6 +1,5 @@
 import { NextApiResponse } from 'next'
 import Cors from 'cors'
-import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../utils/storage-path';
 import multer from 'multer';
 import initMiddleware from '../../utils/init-middleware'
@@ -11,6 +10,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Constants } from '../../utils/constants';
 import { AuthService } from '../../lib/auth.service';
 import { TreatError } from '../../lib/treat-error.service';
+import { FileUploadService } from '../../lib/upload.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -61,7 +61,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           return res.status(404).json(await treatError.message("Recurso não encontrado."));
         }
                               
-        const uploadService = FileUploadService();
+        const uploadService = new FileUploadService();
         const urls = [];    
         let subscriptionResources = [];  
 

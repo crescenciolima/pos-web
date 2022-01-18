@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import FileUploadService from '../../lib/upload.service';
 import multer from 'multer';
 import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
@@ -8,6 +7,7 @@ import { StoragePaths } from '../../utils/storage-path';
 import { Constants } from '../../utils/constants';
 import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
 import { SelectiveProcess } from '../../models/subscription-process/selective-process';
+import { FileUploadService } from '../../lib/upload.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -34,7 +34,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
 
 
-        const uploadService = FileUploadService();
+        const uploadService = new FileUploadService();
         let process = await selectiveProcessService.getById(id);
         let steps = process.steps;
       

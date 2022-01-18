@@ -5,13 +5,13 @@ import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
 import initMiddleware from '../../utils/init-middleware';
 import { BlobCorrected, NextApiRequestWithFormData } from '../../utils/types-util';
-import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../utils/storage-path';
 import { v4 as uuidv4 } from 'uuid';
 import { Constants } from '../../utils/constants';
 import { SubscriptionTypeFile } from '../../models/subscription/subscription-type-file.enum';
 import { AuthService } from '../../lib/auth.service';
 import { TreatError } from '../../lib/treat-error.service';
+import { FileUploadService } from '../../lib/upload.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -48,7 +48,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
             return res.status(400).json(await treatError.message("Arquivo não encontrado."));
           }
           
-          const uploadService = FileUploadService();
+          const uploadService = new FileUploadService();
           const { subscriptionID, type } = req.body; 
 
           const blob: BlobCorrected = req.files[0];

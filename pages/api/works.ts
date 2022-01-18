@@ -1,7 +1,6 @@
 import { NextApiResponse } from 'next'
 import multer from 'multer';
 import Cors from 'cors'
-import FileUploadService from '../../lib/upload.service';
 import { StoragePaths } from '../../utils/storage-path';
 import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
@@ -11,6 +10,7 @@ import { Constants } from '../../utils/constants';
 import { WorksService } from '../../lib/works.service';
 import { AuthService } from '../../lib/auth.service';
 import { TreatError } from '../../lib/treat-error.service';
+import { FileUploadService } from '../../lib/upload.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -56,7 +56,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         }
 
         if(blob){
-          const uploadService = FileUploadService();
+          const uploadService = new FileUploadService();
           const url = await uploadService.upload(StoragePaths.WORKS, blob, work.id);  
           work.url = url;
         }
@@ -101,7 +101,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
       let worksID = req.query.id.toString();
       const deletedWorks = await worksService.getById(worksID);
-      let uploadService = FileUploadService();
+      let uploadService = new FileUploadService();
       await uploadService.remove(deletedWorks.url);
 
       await worksService.remove(worksID);
