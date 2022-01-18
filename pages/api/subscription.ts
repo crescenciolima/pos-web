@@ -1,13 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
-import TreatError from '../../lib/treat-error.service';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
 import { v4 as uuidv4 } from 'uuid';
 import { Subscription } from '../../models/subscription/subscription';
 import { SubscriptionStatus } from '../../models/subscription/subscription-resource.enum';
 import { AuthService } from '../../lib/auth.service';
+import { TreatError } from '../../lib/treat-error.service';
 
 const cors = initMiddleware(
   Cors({
@@ -19,12 +19,12 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   const subscriptionService = new SubscriptionService();
   const authService = new AuthService();
-  const treatError = TreatError();
+  const treatError = new TreatError();
 
   await cors(req, res);
 
   if(!await authService.checkAuthentication(req)){
-    return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+    return res.status(401).send(await treatError.message('Usuário não autorizado.'))
   }
 
   const authorization = req.headers.authorization;
@@ -58,7 +58,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         
                 res.status(200).json(response);
             }catch(e){
-                return res.status(400).json(await treatError.general("Erro ao salvar inscrição."));
+                return res.status(400).json(await treatError.message("Erro ao salvar inscrição."));
             }
 
             break;

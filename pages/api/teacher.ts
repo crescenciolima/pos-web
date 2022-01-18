@@ -7,10 +7,10 @@ import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-uti
 import { Teacher } from '../../models/teacher';
 import { APIResponse } from '../../models/api-response';
 import Cors from 'cors'
-import TreatError from '../../lib/treat-error.service';
 import { Constants } from '../../utils/constants';
 import { TeacherService } from '../../lib/teacher.service';
 import { AuthService } from '../../lib/auth.service';
+import { TreatError } from '../../lib/treat-error.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -32,7 +32,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   const teacherService = new TeacherService();
   const authService = new AuthService();
-  const treatError = TreatError();
+  const treatError = new TreatError();
 
   switch (req.method) {
 
@@ -41,7 +41,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         await multerAny(req, res);
 
         if(!await authService.checkAuthentication(req)){
-          return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+          return res.status(401).send(await treatError.message('Usuário não autorizado.'))
         }
 
         //Extraindo os dados da requisição
@@ -110,7 +110,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
     case "DELETE":
       if(!await authService.checkAuthentication(req)){
-        return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+        return res.status(401).send(await treatError.message('Usuário não autorizado.'))
       }
       
       let teacherID = req.query.id.toString();

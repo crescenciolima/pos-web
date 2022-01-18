@@ -10,7 +10,6 @@ import ConfirmDialog from '../../../components/confirm-dialog';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons'
 import { News } from '../../../models/news';
-import fire from '../../../utils/firebase-util';
 import { format } from 'date-fns';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';

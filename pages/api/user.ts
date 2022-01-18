@@ -3,9 +3,9 @@ import initMiddleware from '../../utils/init-middleware';
 import { User } from '../../models/user';
 import { APIResponse } from '../../models/api-response';
 import Cors from 'cors'
-import TreatError from '../../lib/treat-error.service';
 import { UserService } from '../../lib/user.service';
 import { AuthService } from '../../lib/auth.service';
+import { TreatError } from '../../lib/treat-error.service';
 
 const cors = initMiddleware(
   // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -19,12 +19,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   const userService = new UserService();
   const authService = new AuthService();
-  const treatError = TreatError();
+  const treatError = new TreatError();
 
   await cors(req, res);
 
   if (!await authService.checkAuthentication(req)){
-    return res.status(401).send(await treatError.general('Usuário não autorizado.'));
+    return res.status(401).send(await treatError.message('Usuário não autorizado.'));
 }
 
   switch (req.method) {
@@ -47,7 +47,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           const result: any = await authService.signUp(user, res);
           
           if(result.error){        
-            return res.status(400).json(await treatError.firebase(result));
+            return res.status(400).json(await treatError.message(result));
           }
 
           user.id = result.id;
@@ -64,7 +64,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(200).json(response);
       }catch(e){
         console.log(e);
-        return res.status(400).json(await treatError.general("Erro ao salvar usuário"));
+        return res.status(400).json(await treatError.message("Erro ao salvar usuário"));
       }
 
       break;
@@ -97,7 +97,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const result: any = await authService.removeUser(deletedUser);
 
         if(result.error){        
-          return res.status(400).json(treatError.firebase(result));
+          return res.status(400).json(treatError.message(result));
         }
 
         let deleteResponse: APIResponse = {
@@ -108,7 +108,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(200).json(deleteResponse);
       }catch(e){
         console.log(e);
-        return res.status(400).json(treatError.general("Erro ao salvar remover usuário"));
+        return res.status(400).json(treatError.message("Erro ao salvar remover usuário"));
       }
     default:
       res.status(405);

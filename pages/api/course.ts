@@ -2,11 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { Course } from '../../models/course';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware'
-import { authAdmin } from "../../firebase/firebase-admin";
-import TreatError from '../../lib/treat-error.service';
 import { APIResponse } from '../../models/api-response';
 import { CourseService } from '../../lib/course.service';
 import { AuthService } from '../../lib/auth.service';
+import { TreatError } from '../../lib/treat-error.service';
 
 const authService = new AuthService();
 const cors = initMiddleware(
@@ -19,13 +18,13 @@ const cors = initMiddleware(
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const courseService = new CourseService();
-    const treatError = TreatError();
+    const treatError = new TreatError();
 
     await cors(req, res);
 
     if (req.method === 'POST') {
         if (!await authService.checkAuthentication(req)){
-            return res.status(401).send(await treatError.general('Usuário não autorizado.'));
+            return res.status(401).send(await treatError.message('Usuário não autorizado.'));
         }
 
         //Getting all data from the request body

@@ -3,9 +3,9 @@ import Cors from 'cors'
 import { User } from '../../../models/user';
 import { APIResponse } from '../../../models/api-response';
 import initMiddleware from '../../../utils/init-middleware';
-import TreatError from '../../../lib/treat-error.service';
 import { UserService } from '../../../lib/user.service';
 import { AuthService } from '../../../lib/auth.service';
+import { TreatError } from '../../../lib/treat-error.service';
 
 const cors = initMiddleware(
     // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -50,9 +50,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
             res.status(200).json(response);
         } else {
-            const treatError = TreatError();
+            const treatError = new TreatError();
 
-            const errorMsg = await treatError.firebase(result);
+            const errorMsg = await treatError.message(result);
 
             let response: APIResponse = errorMsg
             

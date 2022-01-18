@@ -3,7 +3,6 @@ import Cors from 'cors'
 import multer from 'multer';
 import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
-import TreatError from '../../lib/treat-error.service';
 import initMiddleware from '../../utils/init-middleware';
 import { BlobCorrected, NextApiRequestWithFormData } from '../../utils/types-util';
 import FileUploadService from '../../lib/upload.service';
@@ -12,6 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Constants } from '../../utils/constants';
 import { SubscriptionTypeFile } from '../../models/subscription/subscription-type-file.enum';
 import { AuthService } from '../../lib/auth.service';
+import { TreatError } from '../../lib/treat-error.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -30,7 +30,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   const subscriptionService = new SubscriptionService();
   const authService = new AuthService();
-  const treatError = TreatError();
+  const treatError = new TreatError();
 
   await cors(req, res);  
 
@@ -41,11 +41,11 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           await multerAny(req, res);
 
           if(!await authService.checkAuthentication(req)){
-            return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+            return res.status(401).send(await treatError.message('Usuário não autorizado.'))
           }
 
           if(!req.files?.length){                
-            return res.status(400).json(await treatError.general("Arquivo não encontrado."));
+            return res.status(400).json(await treatError.message("Arquivo não encontrado."));
           }
           
           const uploadService = FileUploadService();
@@ -73,7 +73,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           res.status(200).json(response);
         }catch(e){
           console.log(e);
-          return res.status(400).json(await treatError.general("Erro ao salvar arquivo"));
+          return res.status(400).json(await treatError.message("Erro ao salvar arquivo"));
         }
         break;
     default:

@@ -1,11 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { APIResponse } from '../../models/api-response';
-import TreatError from '../../lib/treat-error.service';
 import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware';
 import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
 import { SubscriptionService } from '../../lib/subscription.service';
 import { AuthService } from '../../lib/auth.service';
+import { TreatError } from '../../lib/treat-error.service';
 
 
 const cors = initMiddleware(
@@ -18,12 +18,12 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   const subscriptionService = new SubscriptionService();
   const authService = new AuthService();
-  const treatError = TreatError();
+  const treatError = new TreatError();
 
   await cors(req, res);
 
   if(!await authService.checkAuthentication(req)){
-    return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+    return res.status(401).send(await treatError.message('Usuário não autorizado.'))
   }
 
   const authorization = req.headers.authorization;
@@ -33,7 +33,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         const currentUserId = await authService.currentUser(authorization);   
 
         if(!currentUserId){            
-          return res.status(401).json(await treatError.general('Usuário não autorizado.'));
+          return res.status(401).json(await treatError.message('Usuário não autorizado.'));
         }
 
         const selectiveProcessService = new SelectiveProcessService();
@@ -41,7 +41,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         const process = await selectiveProcessService.getOpen();
         
         if(!process){            
-          return res.status(404).json(await treatError.general('Processo seletivo não encontrado.'));
+          return res.status(404).json(await treatError.message('Processo seletivo não encontrado.'));
         }
 
         const subs = await subscriptionService.getByUserAndProcess(currentUserId, process.id);

@@ -2,8 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'cors'
 import initMiddleware from '../../../utils/init-middleware';
 import { APIResponse } from '../../../models/api-response';
-import TreatError from '../../../lib/treat-error.service';
 import { AuthService } from '../../../lib/auth.service';
+import { TreatError } from '../../../lib/treat-error.service';
 
 const cors = initMiddleware(
     // You can read more about the available options here: https://github.com/expressjs/cors#configuration-options
@@ -15,7 +15,7 @@ const cors = initMiddleware(
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     const authService = new AuthService();
-    const treatError = TreatError();
+    const treatError = new TreatError();
 
     await cors(req, res);
 
@@ -26,7 +26,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const result: any = await authService.verifyPasswordResetCode(code);
           
         if(result.error){        
-          return res.status(400).json(await treatError.firebase(result));
+          return res.status(400).json(await treatError.message(result));
         }
 
         let response: APIResponse = {

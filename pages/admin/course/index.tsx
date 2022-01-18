@@ -2,15 +2,11 @@ import { GetServerSidePropsContext, GetStaticProps, InferGetServerSidePropsType 
 import React, { useEffect, useState, useRef } from 'react'
 import * as Yup from 'yup'
 import { ErrorMessage, Field, Formik } from 'formik'
-import ClipLoader from "react-spinners/ClipLoader";
-import { css } from "@emotion/core";
 
 import AdminBase from '../../../components/admin/admin-base';
 import { Course } from "../../../models/course";
 import { APIRoutes } from '../../../utils/api.routes'
 import API from '../../../lib/api.service';
-import Cookies from '../../../lib/cookies.service';
-import { authAdmin } from '../../../firebase/firebase-admin';
 import Permission from '../../../lib/permission.service';
 import { UserType } from '../../../enum/type-user.enum';
 

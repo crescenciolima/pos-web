@@ -3,13 +3,13 @@ import Cors from 'cors'
 import initMiddleware from '../../utils/init-middleware'
 import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
-import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';
 import ResourceUtil from '../../utils/resource.util';
 import { SelectiveProcessService } from '../../lib/selectiveprocess.service';
 import { SubscriptionResource } from '../../models/subscription/subscription-resource';
 import { SubscriptionStatus } from '../../models/subscription/subscription-resource.enum';
 import { AuthService } from '../../lib/auth.service';
+import { TreatError } from '../../lib/treat-error.service';
 
 const cors = initMiddleware(
   Cors({
@@ -21,14 +21,14 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
 
   const subscriptionService = new SubscriptionService();
   const selectiveProcessService = new SelectiveProcessService();
-  const treatError = TreatError();
+  const treatError = new TreatError();
   const authService = new AuthService();
   const resourceUtil = ResourceUtil();
 
   await cors(req, res);
 
   if(!await authService.checkAuthentication(req)){
-    return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+    return res.status(401).send(await treatError.message('Usuário não autorizado.'))
   }
 
   switch (req.method) {
@@ -41,13 +41,13 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         const subscription = await subscriptionService.getById(subscriptionID);
         
         if(!subscription) {
-          return res.status(404).json(await treatError.general("Inscrição não encontrada."));
+          return res.status(404).json(await treatError.message("Inscrição não encontrada."));
         }
 
         const selectiveProcess = await selectiveProcessService.getById(subscription.selectiveProcessID)
 
         if(!resourceUtil.canRequestResource(subscription, selectiveProcess)){
-          return res.status(400).json(await treatError.general("A etapa atual não permite recurso."));
+          return res.status(400).json(await treatError.message("A etapa atual não permite recurso."));
         }
         
         let currentStep = selectiveProcess.steps.find((step) => selectiveProcess.currentStep === step.order);
@@ -76,7 +76,7 @@ async function endpoint(req: NextApiRequest, res: NextApiResponse) {
         res.status(200).json(response);
       }catch(e){
         console.log(e);
-        return res.status(400).json(await treatError.general("Erro ao salvar recurso."));
+        return res.status(400).json(await treatError.message("Erro ao salvar recurso."));
       }
 
       break;

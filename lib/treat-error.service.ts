@@ -1,37 +1,17 @@
 
 
-import FirebaseMessage from "../firebase/firebase-message-util";
-import { APIResponse } from "../models/api-response";
+import { RepositoryFactory } from "../repositories/repository.factory";
+import { TreatErrorRepository } from "../repositories/treat-error.repository";
 
-export default function TreatError() {
+export class TreatError {
 
-    async function firebase(result: any){    
-      const defaultMessage = 'Erro no Firebase.';
-      const translatedMessage = FirebaseMessage()[result.message];
+  private treatErrorRepository:TreatErrorRepository;
 
-      const response: APIResponse = {
-        error: true,
-        msg: translatedMessage ? translatedMessage : defaultMessage,
-        result: null
-      }
+  constructor(){
+      this.treatErrorRepository = RepositoryFactory.treatErrorRepository();
+  }
 
-      return response;
-    }
-
-    async function general(message: any){    
-        const defaultMessage = 'Ocorreu um erro ao efetuar ação.';
-  
-        const response: APIResponse = {
-          error: true,
-          msg: message ? message : defaultMessage,
-          result: null
-        }
-  
-        return response;
-    }
-
-    return {
-        firebase,
-        general, 
-    }
+  async message(result: any){    
+      return await this.treatErrorRepository.message(result);
+  }
 }

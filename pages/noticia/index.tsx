@@ -2,8 +2,6 @@ import Head from 'next/head'
 import { GetStaticProps } from 'next'
 import React from 'react'
 import SiteHeader from '../../components/site-header'
-import NewsService from '../../lib/news.service'
-import fire from '../../utils/firebase-util'
 import NewsCard from '../../components/news-card'
 import { News } from '../../models/news'
 import style from '../../styles/news.module.css'
@@ -11,6 +9,7 @@ import { CourseService } from '../../lib/course.service';
 import { Course } from '../../models/course'
 import SiteFooter from '../../components/site-footer'
 import { format } from 'date-fns';
+import { NewsService } from '../../lib/news.service'
 
 export default function Noticias({ newsList, course }) {
 
@@ -57,7 +56,7 @@ export default function Noticias({ newsList, course }) {
 
 export const getStaticProps: GetStaticProps = async () => {
 
-  const newsService = NewsService();
+  const newsService = new NewsService();
   const newsList = await newsService.getAll();
 
   for (let news of newsList) {

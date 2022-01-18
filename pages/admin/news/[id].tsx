@@ -9,7 +9,6 @@ import * as Yup from 'yup'
 import { ErrorMessage, Formik } from 'formik'
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
-import fire from '../../../utils/firebase-util';
 import SunEditor from 'suneditor-react';
 import 'suneditor/dist/css/suneditor.min.css';
 import { FileHelper } from '../../../helpers/file-helper';

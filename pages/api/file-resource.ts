@@ -7,10 +7,10 @@ import initMiddleware from '../../utils/init-middleware'
 import { NextApiRequestWithFormData, BlobCorrected } from '../../utils/types-util';
 import { APIResponse } from '../../models/api-response';
 import { SubscriptionService } from '../../lib/subscription.service';
-import TreatError from '../../lib/treat-error.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Constants } from '../../utils/constants';
 import { AuthService } from '../../lib/auth.service';
+import { TreatError } from '../../lib/treat-error.service';
 
 global.XMLHttpRequest = require('xhr2');
 const upload = multer({ limits: { fileSize: Constants.MAX_FILE_SIZE } });
@@ -28,13 +28,13 @@ const cors = initMiddleware(
 async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
 
   const subscriptionService = new SubscriptionService();
-  const treatError = TreatError();
+  const treatError = new TreatError();
   const authService = new AuthService();
   
   await cors(req, res);
 
   if(!await authService.checkAuthentication(req)){
-    return res.status(401).send(await treatError.general('Usuário não autorizado.'))
+    return res.status(401).send(await treatError.message('Usuário não autorizado.'))
   }
 
   switch (req.method) {
@@ -48,17 +48,17 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         let subscription = await subscriptionService.getById(subscriptionID);
         
         if(!subscription) {
-          return res.status(404).json(await treatError.general("Inscrição não encontrada."));
+          return res.status(404).json(await treatError.message("Inscrição não encontrada."));
         }
 
         if(!req.files?.length){                
-          return res.status(400).json(await treatError.general("Arquivo não encontrado."));
+          return res.status(400).json(await treatError.message("Arquivo não encontrado."));
         }
 
         const resourceFound = subscription.resources.find((resource) => resource.id === resourceID);
 
         if(!resourceFound) {          
-          return res.status(404).json(await treatError.general("Recurso não encontrado."));
+          return res.status(404).json(await treatError.message("Recurso não encontrado."));
         }
                               
         const uploadService = FileUploadService();
@@ -95,7 +95,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         res.status(200).json(response);
       }catch(e){
         console.log(e);
-        return res.status(400).json(await treatError.general("Erro ao salvar arquivo do Recurso."));
+        return res.status(400).json(await treatError.message("Erro ao salvar arquivo do Recurso."));
       }
 
       break;
