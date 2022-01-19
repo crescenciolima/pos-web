@@ -60,7 +60,6 @@ export default function SelectiveProcessFinalResult(props: Props) {
 
         //Filtrando a lista com somente quem não foi eliminado
         for (let sub of list) {
-            console.log(sub)
             if (sub.status == SubscriptionStatus.DEFERIDA) {
                 sub['formatedDate'] = format(new Date(sub.subscriptionDate), 'dd/MM/yyyy')
                 if (processUtil.isSubscriberApproved(sub, process)) {

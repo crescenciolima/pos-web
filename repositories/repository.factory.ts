@@ -3,15 +3,18 @@ import { FirebaseAuthRepository } from "./firebase/firebase.auth.repository";
 import { FirebaseRepository } from "./firebase/firebase.repository";
 import { FirebaseStorageRepository } from "./firebase/firebase.storage-repository";
 import { FirebaseTreatErrorRepository } from "./firebase/firebase.treat-error.repository";
+import { MongoDbAuthRepository } from "./mongodb/mongodb.auth.repository";
+import { MongoDbRepository } from "./mongodb/mongodb.repository";
+import { MongoDbTreatErrorRepository } from "./mongodb/mongodb.treat-error.repository";
 import { Repository } from "./repository";
 import { StorageRepository } from "./storage-repository";
 import { TreatErrorRepository } from "./treat-error.repository";
 
 export class RepositoryFactory{
 
-    private static _repository:Repository = new FirebaseRepository();
-    private static _authRepository:AuthRepository = new FirebaseAuthRepository();
-    private static _treatErrorRepository:TreatErrorRepository = new FirebaseTreatErrorRepository();
+    private static _repository:Repository = new MongoDbRepository();
+    private static _authRepository:AuthRepository = new MongoDbAuthRepository();
+    private static _treatErrorRepository:TreatErrorRepository = new MongoDbTreatErrorRepository();
     private static _storageRepository:StorageRepository = new FirebaseStorageRepository();
 
     static repository():Repository{

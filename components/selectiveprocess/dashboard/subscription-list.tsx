@@ -40,7 +40,6 @@ export default function SelectiveProcessSubscriptionList(props: Props) {
     useEffect(() => {
         setSelectiveProcess(props.process);
         setCurrentStep(props.currentStep);
-        console.log('props = ', props);
         const list: Subscription[] = props.subscriptionList;
 
         let checked = true;

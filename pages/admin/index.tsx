@@ -70,9 +70,7 @@ export default function Admin() {
   }, []);
 
   const getCurrentStep = (process: SelectiveProcess, subsList: Subscription[]) => {
-    console.log('process = ', process)
     const step = processUtil.getCurrentStep(process);
-    console.log('step = ', step)
     const startDate = new Date(step.startDate);
     const finishDate = new Date(step.finishDate);
     setCurrentStep(step);

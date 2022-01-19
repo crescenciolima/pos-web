@@ -1,5 +1,5 @@
-import { Comparator } from "./comparator";
-import { ComparatorEnum } from "./comparator.enum";
+import { Comparator } from "../utils/comparator";
+import { ComparatorEnum } from "../utils/comparator.enum";
 
 export class FilteredResults{
 

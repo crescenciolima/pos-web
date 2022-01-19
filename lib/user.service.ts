@@ -25,7 +25,8 @@ export class UserService {
     }
 
     async save(user: User) {
-        return await this.repository.save("user", user);
+        let ret = await this.repository.save("user", user);
+        return ret;
     }
 
     async update(user: User) {

@@ -24,6 +24,11 @@ export class UserBuilder{
         return this;
     }
 
+    public uid(uid:string): UserBuilder{
+        this._user.uid = uid;
+        return this;
+    }
+
     public token(token:string): UserBuilder{
         this._user.token = token;
         return this;

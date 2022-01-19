@@ -71,9 +71,7 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
           const url = await uploadService.upload(path, blob, uuidv4());
           urls.push(url);
         }
-        console.log(subscription.resources);
         subscriptionResources = subscription.resources.map(subscriptionResource => {
-          console.log(subscriptionResource);
           if(subscriptionResource.id === resourceID){
             subscriptionResource.files = subscriptionResource.files ? [...subscriptionResource.files, ...urls] : [...urls]
           }
