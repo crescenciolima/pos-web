@@ -21,11 +21,11 @@ export class MongoDbAuthRepository implements AuthRepository{
     }
 
     async signUp(user: User): Promise<User | AuthError> {
+        user.password = await bcrypt.hash(user.password, 10);
         return await this.mongoDbRepository.save('user', user);
     }
 
     async signIn(user: User): Promise<User | AuthError> {
-        
         if(!user.email || !user.password){
             return new AuthErrorBuilder()
                 .message("Deve-se informar email e senha")
@@ -36,14 +36,13 @@ export class MongoDbAuthRepository implements AuthRepository{
         comparator.add('email', user.email, ComparatorEnum.EQUAL);
         
         let users:User[] = await this.mongoDbRepository.find('user', comparator);
-
         if(users.length == 0){
             return new AuthErrorBuilder()
                 .message("Usuário não existente")
             .build();
         }
 
-        return bcrypt.compare(user.password, users[0].password).then(isMatch => {
+        return bcrypt.compare(user.password, users[0].password).then(async (isMatch) => {
             if (isMatch) {
                 const payload = {
                     id: users[0].id,
@@ -56,12 +55,16 @@ export class MongoDbAuthRepository implements AuthRepository{
                     }
                 );
 
-                return new UserBuilder()
+                let user = new UserBuilder()
                     .register(users[0])
                     .id(users[0]['_id'])
                     .uid(users[0]['_id'])
                     .token(token)
                 .build();
+
+                await this.mongoDbRepository.update('user', user);
+
+                return user;
             }
         })
         .catch(async (err) => {
@@ -71,23 +74,29 @@ export class MongoDbAuthRepository implements AuthRepository{
         });
 
     }
-    signOut(): Promise<boolean | AuthError> {
+
+    async signOut(): Promise<boolean | AuthError> {
+        return true;
+    }
+
+    async removeUser(user: User): Promise<boolean | AuthError> {
+        await this.mongoDbRepository.remove('user', user.id);
+        return true;
+    }
+    
+    async forgotPassword(user: User): Promise<boolean | AuthError> {
         throw new Error("Method not implemented.");
     }
-    removeUser(user: User): Promise<boolean | AuthError> {
+
+    async verifyPasswordResetCode(code: string): Promise<string | AuthError> {
         throw new Error("Method not implemented.");
     }
-    forgotPassword(user: User): Promise<boolean | AuthError> {
+    async confirmPasswordReset(code: string, newPassword: string): Promise<boolean | AuthError> {
         throw new Error("Method not implemented.");
     }
-    verifyPasswordResetCode(code: string): Promise<string | AuthError> {
-        throw new Error("Method not implemented.");
-    }
-    confirmPasswordReset(code: string, newPassword: string): Promise<boolean | AuthError> {
-        throw new Error("Method not implemented.");
-    }
-    updateUser(user: User): Promise<boolean | AuthError> {
-        throw new Error("Method not implemented.");
+    async updateUser(user: User): Promise<boolean | AuthError> {
+        await this.mongoDbRepository.update('user', user);
+        return true;
     }
     async currentUser(authorization: string): Promise<string | boolean> {
         if (!authorization){
