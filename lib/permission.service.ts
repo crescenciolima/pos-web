@@ -74,6 +74,7 @@ export default function Permission() {
         
             return redirectTo("/error/not-authorized");        
         } catch (err) {
+            console.log('err = ', err)
             return redirectTo("/login");
         }
     }

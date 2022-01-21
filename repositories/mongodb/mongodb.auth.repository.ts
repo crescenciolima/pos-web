@@ -42,7 +42,7 @@ export class MongoDbAuthRepository implements AuthRepository{
             .build();
         }
 
-        return bcrypt.compare(user.password, users[0].password).then(async (isMatch) => {
+        return await bcrypt.compare(user.password, users[0].password).then(async (isMatch) => {
             if (isMatch) {
                 const payload = {
                     id: users[0].id,
@@ -54,17 +54,20 @@ export class MongoDbAuthRepository implements AuthRepository{
                       expiresIn: (5 * 60 * 60),
                     }
                 );
-
                 let user = new UserBuilder()
                     .register(users[0])
                     .id(users[0]['_id'])
                     .uid(users[0]['_id'])
                     .token(token)
                 .build();
-
                 await this.mongoDbRepository.update('user', user);
 
                 return user;
+            }
+            else{
+                return new AuthErrorBuilder()
+                    .message("Usuário não existente")
+                .build();
             }
         })
         .catch(async (err) => {
@@ -72,6 +75,8 @@ export class MongoDbAuthRepository implements AuthRepository{
                 .message("Usuário não existente")
             .build();
         });
+
+        
 
     }
 
