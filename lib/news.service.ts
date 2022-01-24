@@ -33,7 +33,6 @@ export class NewsService {
     async getAll() {
         let listNews:News[] = [];
         let listNewsRegister = await this.repository.getAll("news");
-        console.log('listNewsRegister = ', listNewsRegister)
         for(let newsRegister of listNewsRegister){
             const news: News = new NewsBuilder()
                 .register(newsRegister)
@@ -46,7 +45,6 @@ export class NewsService {
     async getFirstResults() {
         let comparator:Comparator = new Comparator();
         let registerNews:[] = await this.repository.find("news", comparator);
-        console.log('registerNews = ', registerNews)
         if (registerNews.length==0){
             return [];
         }
