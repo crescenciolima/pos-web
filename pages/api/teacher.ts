@@ -58,21 +58,16 @@ async function endpoint(req: NextApiRequestWithFormData, res: NextApiResponse) {
         }
         
         //Verificando se um arquivo foi enviado e se deve sobrescreve-lo
-        console.log('1')
         if(blob){
-          console.log('2')
           const uploadService = new FileUploadService();
           if(id){
-            console.log('3')
             try{
               await uploadService.remove(photo);
             } catch(error){}
             
           }
-          console.log('4')
           //Envia o arquivo usando o serviço de upload
           let url = await uploadService.upload(StoragePaths.TEACHERS, blob, teacher.name);
-          console.log('5 = ', url)
           teacher.photo = url;
         }
         

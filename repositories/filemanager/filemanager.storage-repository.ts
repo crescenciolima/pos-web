@@ -23,8 +23,6 @@ export class FilemanagerStorageRepository implements StorageRepository{
         arquivo.dtInsercao = new Date();
         arquivo.nmArquivo = fileName;
         arquivo.idArquivo = fileName; 
-        console.log('url = ', this.FILE_MANAGER_URL)
-        console.log('key = ', this.FILE_MANAGER_KEY)
         arquivo = await this.filemanager.insertArquivo(arquivo);
         
         let uploadRef:UploadReferency = new UploadReferency();
