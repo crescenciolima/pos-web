@@ -3,14 +3,14 @@ import { Repository } from "../repositories/repository";
 import { CourseBuilder } from "../builders/course.builder";
 import { Comparator } from "../utils/comparator";
 import { ComparatorEnum } from "../utils/comparator.enum";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 
 export class CourseService {
 
     private repository:Repository;
 
     constructor(){
-        this.repository = RepositoryFactory.repository();
+        this.repository = GenerateFactory.getInstance().repository();
     }
 
     async save(course: Course) {

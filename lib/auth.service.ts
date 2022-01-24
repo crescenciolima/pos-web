@@ -2,14 +2,14 @@ import { User } from "../models/user";
 import { NextApiRequest, NextApiResponse } from "next";
 import { NextApiRequestWithFormData } from "../utils/types-util";
 import { AuthRepository } from "../repositories/auth.repository";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 
 export class AuthService {
     
     private authRepository:AuthRepository;
 
     constructor(){
-        this.authRepository = RepositoryFactory.authRepository();
+        this.authRepository = GenerateFactory.getInstance().authRepository();
     }
 
     async signUp(user: User,  res: NextApiResponse) {

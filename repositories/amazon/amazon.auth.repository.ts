@@ -4,11 +4,10 @@ import { AuthRepository } from "../auth.repository";
 import {  CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails, CognitoUserSession } from 'amazon-cognito-identity-js';
 import * as AWS from "aws-sdk/global";
 import STS from "aws-sdk/clients/sts";
-import { CognitoCallback, CognitoUtil } from "./cognito.serivce";
+import { CognitoCallback, CognitoUtil } from "./cognito.service";
 import { UserBuilder } from "../../builders/user.builder";
 import { AuthErrorBuilder } from "../../builders/auth-error.builder";
 import { Repository } from '../repository';
-import { RepositoryFactory } from '../repository.factory';
 import { Comparator } from "../../utils/comparator";
 import { ComparatorEnum } from "../../utils/comparator.enum";
 
@@ -16,9 +15,9 @@ export class AmazonAuthRepository implements AuthRepository{
 
     public cognitoUtil: CognitoUtil;
     public repository: Repository;
-    constructor(){
+    constructor(repository:Repository){
         this.cognitoUtil = new CognitoUtil();
-        this.repository = RepositoryFactory.repository();
+        this.repository = repository;
     }
 
     async signUp(user: User): Promise<User | AuthError> {

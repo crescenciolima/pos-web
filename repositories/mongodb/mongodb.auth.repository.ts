@@ -4,11 +4,11 @@ import { Comparator } from "../../utils/comparator";
 import { ComparatorEnum } from "../../utils/comparator.enum";
 import { AuthRepository } from "../auth.repository";
 import { Repository } from "../repository";
-import { RepositoryFactory } from "../repository.factory";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { UserBuilder } from "../../builders/user.builder";
 import { AuthErrorBuilder } from "../../builders/auth-error.builder";
+import { GenerateFactory } from "../generate.factory";
 
 const KEY = process.env.JWT_KEY;
 
@@ -16,8 +16,8 @@ export class MongoDbAuthRepository implements AuthRepository{
 
     private mongoDbRepository:Repository;
 
-    constructor(){
-        this.mongoDbRepository = RepositoryFactory.repository();
+    constructor(repository:Repository){
+        this.mongoDbRepository = repository;
     }
 
     async signUp(user: User): Promise<User | AuthError> {

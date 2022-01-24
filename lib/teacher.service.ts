@@ -1,6 +1,6 @@
 import { Teacher } from "../models/teacher";
 import { Repository } from "../repositories/repository";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 import { TeacherBuilder } from "../builders/teacher.builder";
 
 
@@ -9,7 +9,7 @@ export class TeacherService {
     private repository:Repository;
 
     constructor(){
-        this.repository = RepositoryFactory.repository();
+        this.repository = GenerateFactory.getInstance().repository();
     }
 
     async getAll() {

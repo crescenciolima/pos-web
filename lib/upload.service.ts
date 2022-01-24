@@ -1,14 +1,14 @@
 import { BlobCorrected } from "../utils/types-util";
 import { StoragePaths } from "../utils/storage-path";
 import { StorageRepository } from "../repositories/storage-repository";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 
 export class FileUploadService {
 
     private storageRepository:StorageRepository;
 
     constructor(){
-        this.storageRepository = RepositoryFactory.storageRepository();
+        this.storageRepository = GenerateFactory.getInstance().storageRepository();
     }
  
 
@@ -27,7 +27,7 @@ export class FileUploadService {
             const downloadURL = await uploadRef.ref.getDownloadURL();
             return downloadURL;
         } catch (err) {
-            console.log(err)
+            //console.log(err)
             return "";
         }
 

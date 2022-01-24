@@ -1,6 +1,6 @@
 import { User } from "../models/user";
 import { Repository } from "../repositories/repository";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 import { UserBuilder } from "../builders/user.builder";
 
 
@@ -9,7 +9,7 @@ export class UserService {
     private repository:Repository;
 
     constructor(){
-        this.repository = RepositoryFactory.repository();
+        this.repository = GenerateFactory.getInstance().repository();
     }
 
     async getAll() {

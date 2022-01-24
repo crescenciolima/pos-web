@@ -2,7 +2,7 @@ import { SelectiveProcessBuilder } from "../builders/selective-process.builder";
 import { ProcessStepsState } from "../models/subscription-process/process-steps-state.enum";
 import { SelectiveProcess } from "../models/subscription-process/selective-process";
 import { Repository } from "../repositories/repository";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 import { Comparator } from "../utils/comparator";
 import { ComparatorEnum } from "../utils/comparator.enum";
 
@@ -12,7 +12,7 @@ export class SelectiveProcessService {
     private repository:Repository;
 
     constructor(){
-        this.repository = RepositoryFactory.repository();
+        this.repository = GenerateFactory.getInstance().repository();
     }
 
     async getInConstruction() {

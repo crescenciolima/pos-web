@@ -7,12 +7,12 @@ import { UserType } from "../enum/type-user.enum";
 import { Message } from "../enum/message.enum";
 import { APIRoutes } from "../utils/api.routes";
 import { AuthRepository } from "../repositories/auth.repository";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 
 export default function Permission() {
     const api = API();
     const cookie = Cookies();
-    const authRepository:AuthRepository = RepositoryFactory.authRepository();
+    const authRepository:AuthRepository = GenerateFactory.getInstance().authRepository();
 
     async function checkToken(ctx: GetServerSidePropsContext){
         const token = await cookie.getTokenServer(ctx);

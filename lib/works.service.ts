@@ -1,6 +1,6 @@
 import { Works } from "../models/works";
 import { Repository } from "../repositories/repository";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 import { WorksBuilder } from "../builders/works.builder";
 
 
@@ -9,7 +9,7 @@ export class WorksService {
     private repository:Repository;
 
     constructor(){
-        this.repository = RepositoryFactory.repository();
+        this.repository = GenerateFactory.getInstance().repository();
     }
 
     async getAll() {

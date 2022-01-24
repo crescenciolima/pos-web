@@ -1,6 +1,6 @@
 
 
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 import { TreatErrorRepository } from "../repositories/treat-error.repository";
 
 export class TreatError {
@@ -8,7 +8,7 @@ export class TreatError {
   private treatErrorRepository:TreatErrorRepository;
 
   constructor(){
-      this.treatErrorRepository = RepositoryFactory.treatErrorRepository();
+      this.treatErrorRepository = GenerateFactory.getInstance().treatErrorRepository();
   }
 
   async message(result: any){    

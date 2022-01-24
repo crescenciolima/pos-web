@@ -1,7 +1,7 @@
 import { NewsBuilder } from "../builders/news.builder";
 import { News } from "../models/news";
 import { Repository } from "../repositories/repository";
-import { RepositoryFactory } from "../repositories/repository.factory";
+import { GenerateFactory } from "../repositories/generate.factory";
 import { Comparator } from "../utils/comparator";
 import { ComparatorEnum } from "../utils/comparator.enum";
 
@@ -11,7 +11,7 @@ export class NewsService {
     private repository:Repository;
 
     constructor(){
-        this.repository = RepositoryFactory.repository();
+        this.repository = GenerateFactory.getInstance().repository();
     }
 
     //Salva uma nova notícia
@@ -33,6 +33,7 @@ export class NewsService {
     async getAll() {
         let listNews:News[] = [];
         let listNewsRegister = await this.repository.getAll("news");
+        console.log('listNewsRegister = ', listNewsRegister)
         for(let newsRegister of listNewsRegister){
             const news: News = new NewsBuilder()
                 .register(newsRegister)
@@ -45,6 +46,7 @@ export class NewsService {
     async getFirstResults() {
         let comparator:Comparator = new Comparator();
         let registerNews:[] = await this.repository.find("news", comparator);
+        console.log('registerNews = ', registerNews)
         if (registerNews.length==0){
             return [];
         }
@@ -56,7 +58,7 @@ export class NewsService {
             .build();
             listNews.push(news);
         }
-        return listNews;
+        return [];
     }
 
 
