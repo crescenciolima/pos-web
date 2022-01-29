@@ -106,8 +106,8 @@ export const getStaticProps: GetStaticProps = async () => {
   }
   return {
     props: {
-      docentes: docenteList,
-      course:course
+      docentes: JSON.parse(JSON.stringify(docenteList)),
+      course:JSON.stringify(course)
     },
     revalidate: 86400
   }

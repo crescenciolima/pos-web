@@ -1,7 +1,7 @@
 import { Repository } from "../repository";
-import { firestore } from "../../firebase/firebase-admin";
 import { Comparator } from "../../utils/comparator";
 import { FilteredResults } from "../../firebase/filtered-results";
+import { FirebaseAdmin } from "../../firebase/firebase-admin";
 
 export class FirebaseRepository implements Repository{
 
@@ -10,7 +10,7 @@ export class FirebaseRepository implements Repository{
     constructor(){}
 
     async getAll(table:string):Promise<any[]>{
-        this._collection = firestore.collection(table);
+        this._collection = FirebaseAdmin.getInstance().firestore.collection(table);
         let objects = [];
         await this._collection.get().then(
             (snapshot) => {
@@ -27,7 +27,7 @@ export class FirebaseRepository implements Repository{
     }
 
     async save(table:string, object:any){
-        this._collection = firestore.collection(table);
+        this._collection = FirebaseAdmin.getInstance().firestore.collection(table);
         return this._collection.add(object);
     }
 
@@ -37,17 +37,17 @@ export class FirebaseRepository implements Repository{
             if(value == 0 || value != undefined)
                 objectFirebase[key] = value;
         }
-        this._collection = firestore.collection(table);
+        this._collection = FirebaseAdmin.getInstance().firestore.collection(table);
         this._collection.doc(objectFirebase['id']).set(objectFirebase);
     }
 
     async remove(table:string, id:any) {
-        this._collection = firestore.collection(table);
+        this._collection = FirebaseAdmin.getInstance().firestore.collection(table);
         this._collection.doc(id).delete();
     }
 
     async get(table:string, id:any) {
-        this._collection = firestore.collection(table);
+        this._collection = FirebaseAdmin.getInstance().firestore.collection(table);
         let snapshot = await this._collection.doc(id).get();
         let register = snapshot.data();
         register.id = snapshot.id;
@@ -55,7 +55,7 @@ export class FirebaseRepository implements Repository{
     }
     
     async find(table:string, comparator:Comparator) {
-        this._collection = firestore.collection(table);
+        this._collection = FirebaseAdmin.getInstance().firestore.collection(table);
         let objects = [];
         await FilteredResults.getResults(this._collection, comparator).then(
             (snapshot) => {

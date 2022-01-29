@@ -87,8 +87,8 @@ export const getStaticProps: GetStaticProps = async () => {
 
   return {
     props: {
-      newsList: newsList,
-      course: course
+      newsList: JSON.parse(JSON.stringify(newsList)),
+      course: JSON.stringify(course)
     },
     revalidate: 600
   }

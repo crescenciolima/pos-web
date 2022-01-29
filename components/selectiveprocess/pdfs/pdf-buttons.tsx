@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import ReactPDF, { Page, Text, View, Document, StyleSheet, PDFDownloadLink, Font, usePDF, pdf } from '@react-pdf/renderer';
-import { ProcessStep, SelectiveProcess } from '../../../models/subscription-process/selective-process';
-import PDFHeader from './components/pdf-header';
-import PDFTable, { PDFTableInfo } from './components/pdf-table';
-import { FinalListGroup } from '../dashboard/final-result';
+import React, { useState } from 'react';
+import { PDFDownloadLink, Font, usePDF, pdf } from '@react-pdf/renderer';
 import API from '../../../lib/api.service';
 import { APIRoutes } from '../../../utils/api.routes';
 import { APIResponse } from '../../../models/api-response';
-import { DocumentProps } from 'next/document';
 import ResultPostModal from '../dashboard/result-post-modal';
 import ConfirmDialog from '../../confirm-dialog';
 import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 import { Subscription } from '../../../models/subscription/subscription';
+import { SelectiveProcess } from '../../../models/subscription-process/selective-process';
+import { ProcessStep } from '../../../models/subscription-process/process-step';
 
 // Create styles
 

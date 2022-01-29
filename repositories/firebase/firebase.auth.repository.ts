@@ -1,7 +1,6 @@
 import { AuthErrorBuilder } from "../../builders/auth-error.builder";
 import { UserBuilder } from "../../builders/user.builder";
-import { authAdmin } from "../../firebase/firebase-admin";
-import fire from "../../firebase/firebase-util";
+import { FirebaseAdmin } from "../../firebase/firebase-admin";
 import { AuthError } from "../../models/auth.error";
 import { User } from "../../models/user";
 import { AuthRepository } from "../auth.repository";
@@ -9,7 +8,7 @@ import { AuthRepository } from "../auth.repository";
 export class FirebaseAuthRepository implements AuthRepository{
    
     async signUp(user: User): Promise<User | AuthError> {
-        return fire.auth().createUserWithEmailAndPassword(user.email, user.password)
+        return FirebaseAdmin.getInstance().fire.auth().createUserWithEmailAndPassword(user.email, user.password)
             .then(async (response) => {
                 return new UserBuilder()
                     .register(response.user)
@@ -26,7 +25,7 @@ export class FirebaseAuthRepository implements AuthRepository{
     }
 
     async signIn(user: User): Promise<User | AuthError> {
-        return fire.auth().signInWithEmailAndPassword(user.email, user.password).then(async (userCredential) => {
+        return FirebaseAdmin.getInstance().fire.auth().signInWithEmailAndPassword(user.email, user.password).then(async (userCredential) => {
             return new UserBuilder()
                 .register(userCredential.user)
                 .id(userCredential.user.uid)
@@ -42,7 +41,7 @@ export class FirebaseAuthRepository implements AuthRepository{
     }
 
     async signOut(): Promise<boolean | AuthError> {
-        return fire.auth().signOut().then(async () => {
+        return FirebaseAdmin.getInstance().fire.auth().signOut().then(async () => {
             return true;
         })
         .catch(async (err) => {
@@ -53,7 +52,7 @@ export class FirebaseAuthRepository implements AuthRepository{
         });
     }
     async removeUser(user: User): Promise<boolean | AuthError> {
-        return authAdmin.deleteUser(user.id).then(async () => {
+        return FirebaseAdmin.getInstance().authAdmin.deleteUser(user.id).then(async () => {
             return true;
         })
         .catch(async (err) => {
@@ -64,7 +63,7 @@ export class FirebaseAuthRepository implements AuthRepository{
         });
     }
     async forgotPassword(user: User): Promise<boolean | AuthError> {
-        return fire.auth().sendPasswordResetEmail(user.email, {url: `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/reset-password`}).then(async (userCredential) => {
+        return FirebaseAdmin.getInstance().fire.auth().sendPasswordResetEmail(user.email, {url: `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/reset-password`}).then(async (userCredential) => {
             return true;
         })
         .catch(async (err) => {
@@ -75,7 +74,7 @@ export class FirebaseAuthRepository implements AuthRepository{
         });
     }
     async verifyPasswordResetCode(code: string): Promise<string | AuthError> {
-        return fire.auth().verifyPasswordResetCode(code).then(async (email) => {
+        return FirebaseAdmin.getInstance().fire.auth().verifyPasswordResetCode(code).then(async (email) => {
             return email;
         })
         .catch(async (err) => {
@@ -86,7 +85,7 @@ export class FirebaseAuthRepository implements AuthRepository{
         });
     }
     async confirmPasswordReset(code: string, newPassword: string): Promise<boolean | AuthError> {
-        return fire.auth().confirmPasswordReset(code, newPassword).then(async (userCredential) => {
+        return FirebaseAdmin.getInstance().fire.auth().confirmPasswordReset(code, newPassword).then(async (userCredential) => {
             return true;
         })
         .catch(async (err) => {
@@ -97,7 +96,7 @@ export class FirebaseAuthRepository implements AuthRepository{
         });
     }
     async updateUser(user: User): Promise<boolean | AuthError> {
-        return authAdmin.updateUser(user.id, {password: user.password}).then(async () => {
+        return FirebaseAdmin.getInstance().authAdmin.updateUser(user.id, {password: user.password}).then(async () => {
             return true;
         })
         .catch(async (err) => {
@@ -122,7 +121,7 @@ export class FirebaseAuthRepository implements AuthRepository{
     }
     
     async verifyIdToken(token: string) {
-        return await authAdmin.verifyIdToken(token);
+        return await FirebaseAdmin.getInstance().authAdmin.verifyIdToken(token);
     }
 
     private async getToken(user){

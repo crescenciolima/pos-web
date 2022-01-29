@@ -11,18 +11,17 @@ import API from '../../../lib/api.service';
 import { GetServerSidePropsContext } from 'next';
 import { UserType } from '../../../enum/type-user.enum';
 import Permission from '../../../lib/permission.service';
-import { Subscription, SubscriptionResource, SubscriptionStatus } from '../../../models/subscription/subscription';
 import StudentBase from '../../../components/student/student-base';
 import { APIResponse } from '../../../models/api-response';
-import { ProcessStep, ProcessStepsTypes, SelectiveProcess } from '../../../models/subscription-process/selective-process';
-import { ResourceStepsHelper } from '../../../helpers/resource-steps-helper';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile } from '@fortawesome/free-solid-svg-icons';
 import Loading from '../../../components/loading';
-import SelectiveProcessUtil from '../../../lib/selectiveprocess.util';
 import ResourceUtil from '../../../utils/resource.util';
 import { FileHelper } from '../../../helpers/file-helper';
 import WarningDialog from '../../../components/warning-dialog';
+import { SubscriptionResource } from '../../../models/subscription/subscription-resource';
+import { Subscription } from '../../../models/subscription/subscription';
+import { SelectiveProcess } from '../../../models/subscription-process/selective-process';
 
 
 export default function SaveResourceLayout() {

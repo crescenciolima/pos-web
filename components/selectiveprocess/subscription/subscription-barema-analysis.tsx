@@ -1,17 +1,12 @@
-import { ErrorMessage, Field, Formik } from 'formik'
 import React, { useEffect, useState } from "react";
-import * as Yup from 'yup'
 import { useRouter } from 'next/router';
 import { APIRoutes } from '../../../utils/api.routes';
 import API from '../../../lib/api.service';
 import { APIResponse } from '../../../models/api-response';
-import { ProcessStep, ProcessStepsState, ProcessStepsTypes, SelectiveProcess } from '../../../models/subscription-process/selective-process';
-import { Subscription, SubscriptionFile, SubscriptionStatus } from '../../../models/subscription/subscription';
-import { faTrash, faClock, faCheck, faTimes, faFile, faIgloo } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import Link from 'next/link';
-import { format } from 'date-fns';
 import BaremaModal from '../dashboard/barema-modal';
+import { Subscription } from "../../../models/subscription/subscription";
+import { SelectiveProcess } from "../../../models/subscription-process/selective-process";
+import { SubscriptionFile } from "../../../models/subscription/subscription-file";
 
 interface Props {
     subscription: Subscription;

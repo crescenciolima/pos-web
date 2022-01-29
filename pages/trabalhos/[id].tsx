@@ -3,14 +3,13 @@ import style from '../../styles/news.module.css'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import React from 'react'
 import SiteHeader from '../../components/site-header'
-import Image from 'next/image'
-import WorkService from '../../lib/works.service'
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowAltCircleLeft, faFile } from '@fortawesome/free-solid-svg-icons'
 import { CourseService } from '../../lib/course.service';
 import { Course } from '../../models/course'
 import SiteFooter from '../../components/site-footer'
+import { WorksService } from '../../lib/works.service'
 
 export default function Trabalho({ work, course }) {
 
@@ -68,7 +67,7 @@ export const getStaticPaths: GetStaticPaths<{ slug: string }> = async () => {
 
 export const getStaticProps: GetStaticProps = async (context) => {
 
-  const workService = WorkService();
+  const workService = new WorksService();
 
   const workId = context.params.id;
 

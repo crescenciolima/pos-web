@@ -18,13 +18,10 @@ export class GenerateFactory{
         return GenerateFactory.generateFactory;
     }
 
-
-    REPOSITORY = process.env.REPOSITORY;
-
     private repositoryFactory:RepositoryFactory;
 
     constructor(){
-        switch(this.REPOSITORY){
+        switch(process.env.REPOSITORY){
             case 'AMAZON':
                 this.repositoryFactory = new AmazonRepositoryFactory();
                 break;
