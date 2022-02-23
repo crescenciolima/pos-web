@@ -1,10 +1,8 @@
 import { AuthError } from "../../models/auth.error";
 import { User } from "../../models/user";
 import { AuthRepository } from "../auth.repository";
-import {  CognitoUserPool, CognitoUserAttribute, CognitoUser, AuthenticationDetails, CognitoUserSession } from 'amazon-cognito-identity-js';
-import * as AWS from "aws-sdk/global";
-import STS from "aws-sdk/clients/sts";
-import { CognitoCallback, CognitoUtil } from "./cognito.service";
+import { CognitoUserAttribute, CognitoUser, AuthenticationDetails } from 'amazon-cognito-identity-js';
+import { CognitoUtil } from "./cognito.service";
 import { UserBuilder } from "../../builders/user.builder";
 import { AuthErrorBuilder } from "../../builders/auth-error.builder";
 import { Repository } from '../repository';
@@ -13,8 +11,9 @@ import { ComparatorEnum } from "../../utils/comparator.enum";
 
 export class AmazonAuthRepository implements AuthRepository{
 
-    public cognitoUtil: CognitoUtil;
-    public repository: Repository;
+    private cognitoUtil: CognitoUtil;
+    private repository: Repository;
+    
     constructor(repository:Repository){
         this.cognitoUtil = new CognitoUtil();
         this.repository = repository;
@@ -91,22 +90,27 @@ export class AmazonAuthRepository implements AuthRepository{
             });        
         });
     }
+
     async signOut(): Promise<boolean | AuthError> {
-        this.cognitoUtil.getCurrentUser().signOut();
         return true;
     }
+    
     removeUser(user: User): Promise<boolean | AuthError> {
         throw new Error("Method not implemented.");
     }
+    
     forgotPassword(user: User): Promise<boolean | AuthError> {
         throw new Error("Method not implemented.");
     }
+    
     verifyPasswordResetCode(code: string): Promise<string | AuthError> {
         throw new Error("Method not implemented.");
     }
+    
     confirmPasswordReset(code: string, newPassword: string): Promise<boolean | AuthError> {
         throw new Error("Method not implemented.");
     }
+    
     updateUser(user: User): Promise<boolean | AuthError> {
         throw new Error("Method not implemented.");
     }
@@ -126,13 +130,9 @@ export class AmazonAuthRepository implements AuthRepository{
     }
 
     async verifyIdToken(token: string) {
-        let accessToken = await this.cognitoUtil.getAccessToken();
-        let payload = accessToken.payload;
         let comparator:Comparator = new Comparator();
-        comparator.add('email', payload.email, ComparatorEnum.EQUAL);
-        
+        comparator.add('token', token, ComparatorEnum.EQUAL);
         let users:User[] = await this.repository.find('user', comparator);
-
         return new UserBuilder()
             .register(users[0])
             .id(users[0]['_id'])
