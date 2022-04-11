@@ -2,13 +2,13 @@ import { AuthRepository } from "../auth.repository";
 import { Repository } from "../repository";
 import { StorageRepository } from "../storage-repository";
 import { TreatErrorRepository } from "../treat-error.repository";
-import { FirebaseAuthRepository } from "../firebase/firebase.auth.repository";
-import { FirebaseRepository } from "../firebase/firebase.repository";
-import { FirebaseStorageRepository } from "../firebase/firebase.storage-repository";
-import { FirebaseTreatErrorRepository } from "../firebase/firebase.treat-error.repository";
+import { MongoDbRepository } from "../mongodb/mongodb.repository";
+import { AmazonAuthRepository } from '../amazon/amazon.auth.repository'
+import { AmazonTreatErrorRepository } from '../amazon/amazon.treat-error.repository'
+import { FilemanagerStorageRepository } from '../filemanager/filemanager.storage-repository'
 import { RepositoryFactory } from "./repository.factory";
 
-export class FirebaseRepositoryFactory implements RepositoryFactory{
+export class AlternativeRepositoryFactory implements RepositoryFactory{
 
     private _repository:Repository;
     private _authRepository:AuthRepository;
@@ -16,10 +16,10 @@ export class FirebaseRepositoryFactory implements RepositoryFactory{
     private _storageRepository:StorageRepository;
 
     constructor(){
-        this._repository = new FirebaseRepository();
-        this._authRepository = new FirebaseAuthRepository();
-        this._treatErrorRepository = new FirebaseTreatErrorRepository();
-        this._storageRepository = new FirebaseStorageRepository();
+        this._repository = new MongoDbRepository();
+        this._authRepository = new AmazonAuthRepository(this._repository);
+        this._treatErrorRepository = new AmazonTreatErrorRepository();
+        this._storageRepository = new FilemanagerStorageRepository();
     }
 
     repository():Repository{

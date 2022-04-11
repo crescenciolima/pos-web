@@ -31,6 +31,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }
 
         const result: any = await authService.signIn(user);
+        
         if(result.error){        
           return res.status(400).json(await treatError.message(result));
         }

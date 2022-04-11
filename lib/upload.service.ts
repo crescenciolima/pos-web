@@ -21,8 +21,12 @@ export class FileUploadService {
         }
 
         try {
-            //Envia e aguarda a referência do arquivo enviado
+            console.log('-----------------------------');
+            console.log('UploadService.upload');
+            console.log('inicial: ', new Date());
             let uploadRef = await this.storageRepository.storage(folder, blob, fileName);
+            console.log('final: ', new Date());
+            console.log('-----------------------------');
             //Recupera e devolve a URL de acesso
             const downloadURL = await uploadRef.ref.getDownloadURL();
             return downloadURL;

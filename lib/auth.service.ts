@@ -17,7 +17,13 @@ export class AuthService {
     }
 
     async signIn(user: User) {
-       return await this.authRepository.signIn(user);
+        console.log('-----------------------------');
+        console.log('AuthService.signIn');
+        console.log('inicial: ', new Date());
+        let ret = await this.authRepository.signIn(user);
+        console.log('final: ', new Date());
+        console.log('-----------------------------');
+        return ret;
     }
 
     async signOut() {

@@ -1,7 +1,6 @@
 import { AuthRepository } from "./auth.repository";
-import { AmazonRepositoryFactory } from "./factories/amazon-repository.factory";
+import { AlternativeRepositoryFactory } from "./factories/alternative-repository.factory";
 import { FirebaseRepositoryFactory } from "./factories/firebase-repository.factory";
-import { MongoDbRepositoryFactory } from "./factories/mongodb-repository.factory";
 import { RepositoryFactory } from "./factories/repository.factory";
 import { Repository } from "./repository";
 import { StorageRepository } from "./storage-repository";
@@ -22,14 +21,11 @@ export class GenerateFactory{
 
     constructor(){
         switch(process.env.REPOSITORY){
-            case 'AMAZON':
-                this.repositoryFactory = new AmazonRepositoryFactory();
+            case 'ALTERNATIVE':
+                this.repositoryFactory = new AlternativeRepositoryFactory();
                 break;
             case 'FIREBASE':
                 this.repositoryFactory = new FirebaseRepositoryFactory();
-                break;
-            case 'MONGODB':
-                this.repositoryFactory = new MongoDbRepositoryFactory();
                 break;
         }
     }

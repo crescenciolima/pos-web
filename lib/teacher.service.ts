@@ -14,7 +14,12 @@ export class TeacherService {
 
     async getAll() {
         let listTeacher:Teacher[] = [];
+        console.log('-----------------------------');
+        console.log('TeacherService.getAll');
+        console.log('inicial: ', new Date());
         let listTeacherRegister = await this.repository.getAll('teacher');
+        console.log('final: ', new Date());
+        console.log('-----------------------------');
         for (let subscriptionRegister of listTeacherRegister) {
             const subscription:Teacher = new TeacherBuilder()
                 .register(subscriptionRegister)
@@ -25,7 +30,13 @@ export class TeacherService {
     }
 
     async save(teacher: Teacher) {
-        return await this.repository.save("teacher", teacher);
+        console.log('-----------------------------');
+        console.log('TeacherService.save');
+        console.log('inicial: ', new Date());
+        teacher = await this.repository.save("teacher", teacher);
+        console.log('final: ', new Date());
+        console.log('-----------------------------');
+        return teacher;
     }
 
     async update(teacher: Teacher) {

@@ -1,0 +1,23 @@
+version: '2'
+
+services:
+    posweb:
+      build: .
+      image: posweb
+      container_name: amazon
+      environment:
+        - NEXT_PUBLIC_VERCEL_URL=http://localhost:3000
+        - MONGODB_URI=mongodb://posweb:axlrby216@dias1618.com.br:27017/?authSource=admin&readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
+        - MONGODB_DB=posweb
+        - NEXT_PUBLIC_USER_TYPE=user-type
+        - NEXT_PUBLIC_USER_NAME=user-name
+        - NEXT_PUBLIC_TOKEN=pos-token
+        - REPOSITORY=AMAZON
+        - FILE_MANAGER_KEY=$$2b$$10$$6DLu1jRSLYvitap49oeuaed2ybK2L7o8Re42ZD9IiSs70i4uXTBde
+        - FILE_MANAGER_URL=dias1618.com.br/filemanager
+        - JWT_KEY=$$2a$$12$$6372e9Mu.kikoFVYRidMJOsLmUKwew1exaxr0Ecch2BspcrN5zjyC
+      ports:
+        - 3000:3000
+      restart: on-failure
+
+

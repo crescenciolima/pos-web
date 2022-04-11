@@ -3,7 +3,6 @@ import { BlobCorrected } from "../../utils/types-util";
 import { StorageRepository } from "../storage-repository";
 import { Arquivo } from '../../filemanager/entities/arquivo';
 import { Filemanager } from "../../filemanager/filemanager";
-import { Referency } from "../../models/upload/referency";
 import { UploadReferency } from "../../models/upload/upload-referency";
 
 export class FilemanagerStorageRepository implements StorageRepository{

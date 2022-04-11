@@ -5,7 +5,9 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="pt-br">
-        <Head />
+        <Head>
+          <script async type='text/javascript' src='/js/newrelic.js' />
+        </Head>
         <body>
           <Main />
           <NextScript />
