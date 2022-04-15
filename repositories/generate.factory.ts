@@ -5,6 +5,7 @@ import { RepositoryFactory } from "./factories/repository.factory";
 import { Repository } from "./repository";
 import { StorageRepository } from "./storage-repository";
 import { TreatErrorRepository } from "./treat-error.repository";
+import { RepositoryMap } from "./repository.map";
 
 export class GenerateFactory{
 
@@ -20,14 +21,7 @@ export class GenerateFactory{
     private repositoryFactory:RepositoryFactory;
 
     constructor(){
-        switch(process.env.REPOSITORY){
-            case 'ALTERNATIVE':
-                this.repositoryFactory = new AlternativeRepositoryFactory();
-                break;
-            case 'FIREBASE':
-                this.repositoryFactory = new FirebaseRepositoryFactory();
-                break;
-        }
+        this.repositoryFactory = RepositoryMap.map.get(process.env.REPOSITORY);
     }
 
     repository():Repository{
