@@ -1,6 +1,4 @@
 import { AuthRepository } from "./auth.repository";
-import { AlternativeRepositoryFactory } from "./factories/alternative-repository.factory";
-import { FirebaseRepositoryFactory } from "./factories/firebase-repository.factory";
 import { RepositoryFactory } from "./factories/repository.factory";
 import { Repository } from "./repository";
 import { StorageRepository } from "./storage-repository";
