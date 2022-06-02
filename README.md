@@ -8,3 +8,13 @@ This is a starter template for [Learn Next.js](https://nextjs.org/learn).
 ## How to run
 -- Run npm install
 -- Create on root a .env.local file and use the .env.exemple as an exemple and fill in with your Firebase web project credentials.
+
+
+## Contributors
+
+[![crescencio-lima](https://img.shields.io/badge/crescencio--lima-github-black?colorA=808080&colorB=000000&style=for-the-badge)](https://www.github.com/crescenciolima)
+
+## License
+
+License:<a href="http://www.gnu.org/licenses/gpl.html" target="blank"> GNU GPL v3</a><br>
+Content License: <a href="https://creativecommons.org/licenses/by/3.0/" target = "blank">Creative Commons 3.0 BY</a>
