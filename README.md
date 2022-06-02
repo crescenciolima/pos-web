@@ -12,7 +12,14 @@ This is a starter template for [Learn Next.js](https://nextjs.org/learn).
 
 ## Contributors
 
+[![bem-hur-ganem](https://img.shields.io/badge/bem--hur-github-black?colorA=808080&colorB=000000&style=for-the-badge)](https://github.com/BemHurGanem)
+
+[![leticia-porto](https://img.shields.io/badge/leticia--porto-github-black?colorA=808080&colorB=000000&style=for-the-badge)](https://github.com/leticiaporto)
+
+[![isaac-silva](https://img.shields.io/badge/isaac--silva-github-black?colorA=808080&colorB=000000&style=for-the-badge)](https://github.com/Deaple)
+
 [![crescencio-lima](https://img.shields.io/badge/crescencio--lima-github-black?colorA=808080&colorB=000000&style=for-the-badge)](https://www.github.com/crescenciolima)
+
 
 ## License
 
